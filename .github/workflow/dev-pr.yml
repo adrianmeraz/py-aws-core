@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SECRET_KEY: ${{secrets.SECRET_KEY}}
+      WORKFLOW_FILE: '.github/workflows/dev-pr.yml'
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -28,7 +29,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.local
-        key: dotlocal-${{ runner.os }}-${{ hashFiles('.github/workflows/dev.yml') }}
+        key: dotlocal-${{ runner.os }}-${{ hashFiles(env.WORKFLOW_FILE) }}
 
     - name: Install poetry
       uses: snok/install-poetry@v1
@@ -41,7 +42,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/dev-pr.yml') }}
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles(env.WORKFLOW_FILE) }}
 
     - name: Install poetry dependencies
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
