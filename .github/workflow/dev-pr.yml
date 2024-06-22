@@ -11,8 +11,6 @@ jobs:
   run:
     runs-on: ubuntu-latest
     env:
-      PYTHON: '3.10.4'
-      PYTHONUNBUFFERED: ${{secrets.PYTHONUNBUFFERED}}
       SECRET_KEY: ${{secrets.SECRET_KEY}}
     steps:
     - name: Checkout Code
@@ -43,7 +41,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/dev.yml') }}
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/dev-pr.yml') }}
 
     - name: Install poetry dependencies
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
@@ -51,4 +49,4 @@ jobs:
 
     - name: Run Tests
       run: |
-        poetry run python manage.py test --settings=config.settings.dev --no-input
+        poetry run python manage.py test --no-input
