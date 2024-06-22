@@ -49,7 +49,7 @@ jobs:
 
     - name: Generate Coverage Report
       run: |
-        poetry run coverage run manage.py test --settings=config.settings.dev --no-input --timing
+        poetry run coverage run manage.py test --no-input --timing
         poetry run coverage xml
 
     - name: Upload Coverage to Codecov
