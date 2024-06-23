@@ -23,6 +23,12 @@ jobs:
       with:
         python-version: 3.12
 
+    - name: Split workflow file path
+      env:
+        WORKFLOW_REF: ${{ github.workflow_ref }}
+      id: split
+      run: echo "::set-output name=workflow_ref::${WORKFLOW_REF*@##}"
+
     # https://www.peterbe.com/plog/install-python-poetry-github-actions-faster
     - name: Load cached ~/.local
       uses: actions/cache@v4
