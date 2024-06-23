@@ -21,7 +21,7 @@ jobs:
       run: |
            echo "repo=${REPO}"
            echo "abs_path=${WORKFLOW_REF%%@*}"
-           echo "rel_path=${abs_path#"$repo"}"
+           echo "rel_path=${abs_path#$repo}"
            echo "$rel_path"
            echo "rel_path=${abs_path#"$repo"}" >> $GITHUB_OUTPUT
 
