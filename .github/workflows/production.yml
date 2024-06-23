@@ -11,7 +11,7 @@ jobs:
   buildAndPublish:
     runs-on: ubuntu-latest
     env:
-      WORKFLOW_SHA: ${{ hashFiles(github.workflow_ref) }}
+      WORKFLOW_SHA: ${{ hashFiles( ${{ github.workflow_ref }} ) }}
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
