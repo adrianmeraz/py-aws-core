@@ -21,6 +21,10 @@ jobs:
            echo "fragment=${WORKFLOW_REF%%@*}" >> $GITHUB_OUTPUT
            cat $GITHUB_OUTPUT
 
+    - name: Split workflow 2
+      id: wf_split_2
+      run: cat "${{ steps.wf_split.outputs.fragment }}"
+
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
