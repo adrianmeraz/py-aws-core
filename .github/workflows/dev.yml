@@ -11,7 +11,7 @@ jobs:
   main:
     runs-on: ubuntu-latest
     env:
-      WORKFLOW_SHA: ${{ hashFiles(github.workflow_ref) }}
+      WORKFLOW_SHA: ${{ github.workflow_sha }}
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
