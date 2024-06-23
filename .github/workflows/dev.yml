@@ -23,7 +23,7 @@ jobs:
            echo "repo1=${REPO}"
            echo "abs_path=${WORKFLOW_REF%%@*}"
            echo "rel_path=${abs_path#$REPO}"
-           echo "hashy=${{ hashFiles(GITHUB_WORKFLOW) }}"
+           echo "hashy=${{ hashFiles(env.GITHUB_WORKFLOW) }}"
            echo "rel_path=${abs_path#$REPO}" >> $GITHUB_OUTPUT
 
     - name: Checkout Code
