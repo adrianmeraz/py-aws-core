@@ -11,7 +11,7 @@ jobs:
   buildAndPublish:
     runs-on: ubuntu-latest
     env:
-      WORKFLOW_FILE: '.github/workflows/dev-pr.yml'
+      WORKFLOW_SHA: ${{ github.workflow_sha }}
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -28,7 +28,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.local
-        key: dotlocal-${{ runner.os }}-${{ hashFiles(env.WORKFLOW_FILE) }}
+        key: dotlocal-${{ runner.os }}-${{ env.WORKFLOW_SHA }}
 
     - name: Install poetry
       uses: snok/install-poetry@v1

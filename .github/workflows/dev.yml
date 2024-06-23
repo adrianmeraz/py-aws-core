@@ -11,7 +11,7 @@ jobs:
   main:
     runs-on: ubuntu-latest
     env:
-      WORKFLOW_FILE: '.github/workflows/dev.yml'
+      WORKFLOW_SHA: ${{ github.workflow_sha }}
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -28,7 +28,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.local
-        key: dotlocal-${{ runner.os }}-${{ hashFiles(env.WORKFLOW_FILE) }}
+        key: dotlocal-${{ runner.os }}-${{ env.WORKFLOW_SHA }}
 
     - name: Install poetry
       uses: snok/install-poetry@v1
@@ -41,15 +41,15 @@ jobs:
       uses: actions/cache@v4
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles(env.WORKFLOW_FILE) }}
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ env.WORKFLOW_SHA }}
 
     - name: Install poetry dependencies
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
       run: poetry install
 
-    - name: Generate Coverage Report
+    - name: Run Tests and Generate Coverage Report
       run: |
-        poetry run coverage run manage.py test --no-input --timing
+        poetry run coverage run -m unittest
         poetry run coverage xml
 
     - name: Upload Coverage to Codecov
