@@ -11,6 +11,7 @@ jobs:
   main:
     runs-on: ubuntu-latest
     env:
+      GITHUB_WORKFLOW: $GITHUB_WORKFLOW
       WORKFLOW_FILE: '.github/workflows/dev.yml'
     steps:
     - name: Get workflow file relative path
