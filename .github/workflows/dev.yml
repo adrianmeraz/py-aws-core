@@ -16,7 +16,7 @@ jobs:
     - name: Get workflow file relative path
       env:
         WORKFLOW_REF: ${{ github.workflow_ref }}
-        REPO: ${{ github.repository }}
+        REPO: ${{ github.repository }}/
       id: wf_rel_path
       run: |
            echo "abs_path=${WORKFLOW_REF%%@*}"
@@ -51,7 +51,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles(env.WORKFLOW_FILE) }}
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles(steps.wf_rel_path.outputs.path) }}
 
     - name: Install poetry dependencies
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
