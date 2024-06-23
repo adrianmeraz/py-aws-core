@@ -16,8 +16,8 @@ jobs:
     - name: Split workflow file path TEST
       env:
         WORKFLOW_REF: ${{ github.workflow_ref }}
-      id: split
-      run: echo "workflow_file_ref=${WORKFLOW_REF%%@*}" >> $GITHUB_OUTPUT
+      id: wf_split
+      run: echo "fragment=${WORKFLOW_REF%%@*}" >> $GITHUB_OUTPUT
 
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -29,18 +29,12 @@ jobs:
       with:
         python-version: 3.12
 
-    - name: Split workflow file path
-      env:
-        WORKFLOW_REF: ${{ github.workflow_ref }}
-      id: split
-      run: echo "fragment=${WORKFLOW_REF%*$!$@}" >> $GITHUB_OUTPUT
-
     # https://www.peterbe.com/plog/install-python-poetry-github-actions-faster
     - name: Load cached ~/.local
       uses: actions/cache@v4
       with:
         path: ~/.local
-        key: dotlocal-${{ runner.os }}-${{ hashFiles(env.WORKFLOW_FILE) }}
+        key: dotlocal-${{ runner.os }}-${{ hashFiles(steps.wf_split.outputs.fragment) }}
 
     - name: Install poetry
       uses: snok/install-poetry@v1
