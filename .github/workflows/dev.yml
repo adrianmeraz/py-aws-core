@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKFLOW_FILE: '.github/workflows/dev.yml'
+      AWS_DEFAULT_REGION: 'us-west-2'
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
