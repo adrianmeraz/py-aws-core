@@ -19,8 +19,9 @@ jobs:
         REPO: ${{ github.repository }}/
       id: wf_rel_path
       run: |
+           echo "repo=${REPO}"
            echo "abs_path=${WORKFLOW_REF%%@*}"
-           echo "path=${abs_path#"${REPO}"}" >> $GITHUB_OUTPUT
+           echo "path=${abs_path#"$repo"}" >> $GITHUB_OUTPUT
            cat $GITHUB_OUTPUT
 
     - name: Checkout Code
