@@ -11,7 +11,6 @@ jobs:
   run:
     runs-on: ubuntu-latest
     env:
-      SECRET_KEY: ${{secrets.SECRET_KEY}}
       WORKFLOW_FILE: '.github/workflows/dev-pr.yml'
     steps:
     - name: Checkout Code
