@@ -21,8 +21,7 @@ jobs:
       run: |
            echo "repo=${REPO}"
            echo "abs_path=${WORKFLOW_REF%%@*}"
-           echo "path=${abs_path#"$repo"}" >> $GITHUB_OUTPUT
-           cat $GITHUB_OUTPUT
+           echo "rel_path=${abs_path#$repo}" >> $GITHUB_OUTPUT
 
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -39,7 +38,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.local
-        key: dotlocal-${{ runner.os }}-${{ hashFiles(steps.wf_rel_path.outputs.path) }}
+        key: dotlocal-${{ runner.os }}-${{ hashFiles(steps.wf_rel_path.outputs.rel_path) }}
 
     - name: Install poetry
       uses: snok/install-poetry@v1
@@ -52,7 +51,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles(steps.wf_rel_path.outputs.path) }}
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles(steps.wf_rel_path.outputs.rel_path) }}
 
     - name: Install poetry dependencies
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
