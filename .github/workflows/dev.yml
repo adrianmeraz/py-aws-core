@@ -52,8 +52,8 @@ jobs:
         poetry run coverage run -m unittest
         poetry run coverage xml
 
-    - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v4-beta
+    - name: Upload Coverage Report to Codecov
+      uses: codecov/codecov-action@v4.0.1
       with:
         files: coverage.xml
         fail_ci_if_error: true
