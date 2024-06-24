@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 import boto3
 from botocore.config import Config
 
-from . import logs, secrets_manager
+from . import logs, secrets_manager, utils
 
 logger = logs.logger
 
