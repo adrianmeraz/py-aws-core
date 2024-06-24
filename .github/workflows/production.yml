@@ -21,5 +21,4 @@ jobs:
     - name: Install Poetry, Install Dependencies, Build Project, and Publish to Pypi
       uses: JRubics/poetry-publish@v2.0
       with:
-        python_version: "3.12"
         pypi_token: ${{ secrets.PYPI_TOKEN }}
