@@ -1,6 +1,6 @@
-name: Dev Pull Request
+name: Dev Push
 on:
-  pull_request:
+  push:
     branches:
       - dev
     paths:
@@ -8,11 +8,11 @@ on:
       - '**.yml'
 
 jobs:
-  run:
+  main:
     runs-on: ubuntu-latest
     env:
-      SECRET_KEY: ${{secrets.SECRET_KEY}}
-      WORKFLOW_FILE: '.github/workflows/dev-pr.yml'
+      WORKFLOW_FILE: '.github/workflows/dev.yml'
+      AWS_DEFAULT_REGION: 'us-west-2'
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -48,6 +48,31 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
       run: poetry install
 
-    - name: Run Tests
+    - name: Run Tests and Generate Coverage Report
       run: |
-        poetry run python manage.py test --no-input
+        poetry run coverage run -m unittest
+        poetry run coverage xml
+
+    - name: Upload Coverage Report to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        files: coverage.xml
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+
+    - name: Checkout Main Branch
+      uses: actions/checkout@v4
+      with:
+        ref: main
+
+    - name: Reset main branch
+      run: |
+        git fetch origin dev:dev
+        git reset --hard dev
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        branch: main-promotion
+        delete-branch: true
+        title: Promote dev to main branch
