@@ -4,7 +4,7 @@ from unittest import mock, TestCase
 
 from botocore.stub import Stubber
 
-from src import cognito
+from py_aws_core import cognito
 from tests import const as test_const
 
 

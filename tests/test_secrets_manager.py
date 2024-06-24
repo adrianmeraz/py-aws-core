@@ -1,6 +1,6 @@
 from unittest import mock, TestCase
 
-from src.secrets_manager import SecretsManager
+from py_aws_core.secrets_manager import SecretsManager
 
 
 class SecretsManagerTests(TestCase):
