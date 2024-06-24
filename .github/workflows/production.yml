@@ -37,7 +37,7 @@ jobs:
         virtualenvs-in-project: true
 
     - name: Build and publish to pypi
-      uses: JRubics/poetry-publish@v1.9
+      uses: JRubics/poetry-publish@v2.0
       with:
+        python_version: "3.12"
         pypi_token: ${{ secrets.PYPI_TOKEN }}
-
