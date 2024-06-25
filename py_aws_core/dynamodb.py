@@ -92,19 +92,6 @@ class ErrorResponse:
                 raise exc
 
 
-class DDBQueryResponse(ABC):
-    def __init__(self, data):
-        self._data = data
-        self.Items = data.get('Items')
-        self.Count = data.get('Count')
-        self.ScannedCount = data.get('ScannedCount')
-        self.ResponseMetadata = ResponseMetadata(data['ResponseMetadata'])
-
-    @property
-    def data(self):
-        return self._data
-
-
 class DDBItemResponse(ABC):
     def __init__(self, data):
         self._data = data
