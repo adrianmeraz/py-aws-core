@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from botocore.exceptions import ClientError
 
-from . import dynamodb
+from . import dynamodb, utils
 
 logger = logging.getLogger(__name__)
 
@@ -45,5 +45,30 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
                 if exc := client_err_map.get(e_response.Error.Code):
                     raise exc(e)
             raise  # Raise all other exceptions as is
+        return wrapper_func  # true decorator
+    return deco_func
+
+
+def lambda_response_handler(raise_as):
+    """
+    Passes through any exceptions that inherit from the
+    :param raise_as:
+    :return:
+    """
+    def deco_func(func):
+        @wraps(func)
+        def wrapper_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except raise_as as e:
+                logger.exception(str(e))
+                exc = e
+            except Exception as e:
+                logger.exception(str(e))
+                exc = raise_as(e)
+            return utils.build_lambda_response(
+                status_code=400,
+                exc=exc
+            )
         return wrapper_func  # true decorator
     return deco_func

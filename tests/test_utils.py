@@ -1,7 +1,51 @@
 import datetime
 from unittest import TestCase
 
-from py_aws_core import utils
+from py_aws_core import exceptions, utils
+
+
+class BuildLambdaResponseTests(TestCase):
+
+    def test_body(self):
+        val = utils.build_lambda_response(
+            status_code=200,
+            body={'message': 'Lorem Ipsum'}
+        )
+        self.assertEqual(
+            val,
+            {
+                'isBase64Encoded': False,
+                'statusCode': 200,
+                'body': '{"message": "Lorem Ipsum"}',
+                'headers': {
+                    'Access-Control-Allow-Credentials': True,
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'}
+            }
+        )
+
+    def test_exception(self):
+        val = utils.build_lambda_response(
+            status_code=400,
+            exc=exceptions.SecretsManagerException("Lorem Ipsum")
+        )
+        self.assertEqual(
+            val,
+            {
+                'isBase64Encoded': False,
+                'body': '{"error": "SecretsManagerException: An error occurred while fetching secrets"}',
+                'headers': {
+                    'Access-Control-Allow-Credentials': True,
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
+                'statusCode': 400,
+            }
+        )
 
 
 class Iso8601NowTimestampTests(TestCase):
