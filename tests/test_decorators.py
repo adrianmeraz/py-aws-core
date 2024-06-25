@@ -47,7 +47,7 @@ class LambdaResponseHandlerTests(TestCase):
         self.assertEqual(
             val,
             {
-                'body': '{"error": "EMCoreException: A generic error has occurred"}',
+                'body': '{"error": "AWSCoreException: A generic error has occurred"}',
                 'headers': {
                     'Access-Control-Allow-Credentials': True,
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
