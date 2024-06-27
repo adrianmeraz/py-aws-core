@@ -1,0 +1,16 @@
+{
+    "Error": {
+        "Code": "SomeServiceException",
+        "Message": "Details/context around the exception or error"
+    },
+    "ResponseMetadata": {
+        "RequestId": "1234567890ABCDEF",
+        "HostId": "host ID data will appear here as a hash",
+        "HTTPStatusCode": 400,
+        "HTTPHeaders": {
+            "Test1": "Val1",
+            "Test2": "Val2"
+        },
+        "RetryAttempts": 0
+    }
+}

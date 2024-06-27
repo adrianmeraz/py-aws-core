@@ -1,9 +1,114 @@
+import json
+from importlib.resources import as_file
 from unittest import TestCase
+
+from botocore.exceptions import ClientError
+
 from py_aws_core import decorators, exceptions
+from tests import const as test_const
+
+
+class Boto3Tests(TestCase):
+
+    def test_no_exception(self):
+        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=dict())
+        def func(x):
+            return 2 * x
+
+        val = func(7)
+        self.assertEqual(
+            val,
+            14
+        )
+
+    def test_raise_mapped_client_error(self):
+        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
+        with as_file(source) as err_json:
+            err_json = json.loads(err_json.read_text())
+            client_error = ClientError(error_response=err_json, operation_name='test1')
+
+        client_err_map = {
+            'SomeServiceException': ArithmeticError
+        }
+
+        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=client_err_map)
+        def func():
+            raise client_error
+        with self.assertRaises(ArithmeticError):
+            func()
+
+    def test_raise_unmapped_client_error(self):
+        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
+        with as_file(source) as err_json:
+            err_json = json.loads(err_json.read_text())
+            client_error = ClientError(error_response=err_json, operation_name='test1')
+
+        client_err_map = {
+            'OtherException': ArithmeticError
+        }
+
+        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=client_err_map)
+        def func():
+            raise client_error
+        with self.assertRaises(RuntimeError):
+            func()
+
+    def test_reraise_uncaught_exception(self):
+        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=dict())
+        def func():
+            raise KeyError
+        with self.assertRaises(KeyError):
+            func()
 
 
 class DynamodbHandlerTests(TestCase):
-    pass
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client_err_map = {
+            'SomeServiceException': ArithmeticError
+        }
+
+    def test_no_exception(self):
+        @decorators.dynamodb_handler(client_err_map=self.client_err_map, cancellation_err_maps=list(dict()))
+        def func(x):
+            return 2 * x
+
+        val = func(7)
+        self.assertEqual(
+            val,
+            14
+        )
+
+    def test_raise_client_error(self):
+        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
+        with as_file(source) as err_json:
+            err_json = json.loads(err_json.read_text())
+            client_error = ClientError(error_response=err_json, operation_name='test1')
+
+        @decorators.dynamodb_handler(client_err_map=self.client_err_map, cancellation_err_maps=list())
+        def func():
+            raise client_error
+        with self.assertRaises(ArithmeticError):
+            func()
+
+    def test_raise_cancellation_error(self):
+        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error#ConditionalCheckFailed.json')
+        with as_file(source) as initiate_auth_json:
+            err_json = json.loads(initiate_auth_json.read_text())
+            client_error = ClientError(error_response=err_json, operation_name='test1')
+
+        cancellation_error_maps = [
+            {
+                'ConditionalCheckFailed': RuntimeError
+            }
+        ]
+
+        @decorators.dynamodb_handler(client_err_map=dict(), cancellation_err_maps=cancellation_error_maps)
+        def func():
+            raise client_error
+        with self.assertRaises(RuntimeError):
+            func()
 
 
 class LambdaResponseHandlerTests(TestCase):
