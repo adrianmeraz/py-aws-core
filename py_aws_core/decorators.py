@@ -41,10 +41,10 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
                 logger.error(f'ClientError detected: {e}')
                 e_response = dynamodb.ErrorResponse(e.response)
                 if e_response.CancellationReasons:
-                    return e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
+                    e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
                 if exc := client_err_map.get(e_response.Error.Code):
                     raise exc(e)
-            raise  # Raise all other exceptions as is
+                raise
         return wrapper_func  # true decorator
     return deco_func
 

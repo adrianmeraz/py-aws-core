@@ -14,7 +14,7 @@ class AdminCreateUserTests(TestCase):
         self,
         mocked_aws_cognito_pool_id
     ):
-        source = test_const.TEST_AUTH_RESOURCES_PATH.joinpath('admin_create_user.json')
+        source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('admin_create_user.json')
         cog_client = cognito.CognitoClient()
         with as_file(source) as admin_create_user_json:
             stubber = Stubber(cog_client.boto_client)
@@ -53,7 +53,7 @@ class UserPasswordAuthTests(TestCase):
         self,
         mocked_aws_cognito_pool_client_id
     ):
-        source = test_const.TEST_AUTH_RESOURCES_PATH.joinpath('initiate_auth.json')
+        source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
         cog_client = cognito.CognitoClient()
         with as_file(source) as initiate_auth_json:
             stubber = Stubber(cog_client.boto_client)
@@ -79,7 +79,7 @@ class RefreshTokenAuthTests(TestCase):
         self,
         mocked_aws_cognito_pool_client_id
     ):
-        source = test_const.TEST_AUTH_RESOURCES_PATH.joinpath('initiate_auth.json')
+        source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
         cog_client = cognito.CognitoClient()
         with as_file(source) as initiate_auth_json:
             stubber = Stubber(cog_client.boto_client)
