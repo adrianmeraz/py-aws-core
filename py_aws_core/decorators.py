@@ -19,10 +19,10 @@ def boto3_handler(raise_as, client_error_map: dict):
                 return response
             except ClientError as e:
                 error_code = e.response['Error']['Code']
-                logger.error(f'boto3 client error response: {e.response}, error code: {error_code}')
+                logger.error(f'boto3 client error: {str(e)}, response: {e.response}, error code: {error_code}')
                 if exc := client_error_map.get(error_code):
                     raise exc(e)
-                raise raise_as(str(e), error=error_code)
+                raise raise_as()
             except Exception:  # Raise all other exceptions as is
                 raise
         return wrapper_func  # true decorator
