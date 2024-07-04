@@ -34,6 +34,11 @@ class DDBClient:
         )
 
     @classmethod
+    def get_table_resource(cls):
+        dynamodb = boto3.resource('dynamodb', endpoint_url=cls.__ddb_endpoint_url)
+        return dynamodb.Table(cls.get_table_name())
+
+    @classmethod
     def get_table_name(cls):
         return secrets_manager.SecretsManager.get_secrets()['AWS_DYNAMO_DB_TABLE_NAME']
 
