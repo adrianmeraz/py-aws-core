@@ -58,6 +58,10 @@ class DDBClient:
         return cls.get_client().update_item(*args, **kwargs)
 
     @classmethod
+    def batch_write_item(cls, *args, **kwargs):
+        return cls.get_client().batch_write_item(*args, **kwargs)
+
+    @classmethod
     def transact_write_items(cls, *args, **kwargs):
         return cls.get_client().transact_write_items(*args, **kwargs)
 
