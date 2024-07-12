@@ -47,6 +47,10 @@ class DDBClient:
         return cls.get_client().query(*args, **kwargs)
 
     @classmethod
+    def scan(cls, *args, **kwargs):
+        return cls.get_client().scan(*args, **kwargs)
+
+    @classmethod
     def get_item(cls, *args, **kwargs):
         return cls.get_client().get_item(*args, **kwargs)
 
