@@ -83,6 +83,12 @@ class ABCCommonAPI(ABC):
 
     @classmethod
     def calc_expire_at_timestamp(cls, days: int = None) -> int | str:
+        """
+        Adds days to current unix timestamp to generate new unix timestamp
+        Days set to None will result in empty string
+        :param days: Days to add to current timestamp
+        :return:
+        """
         if days is None:
             return ''
         return utils.add_days_to_current_unix_timestamp(days=days)
