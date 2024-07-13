@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 def build_lambda_response(status_code: int, body: dict | str = None, exc: Exception = None):
@@ -34,9 +34,22 @@ def build_lambda_response(status_code: int, body: dict | str = None, exc: Except
     }
 
 
-def to_iso_8601(dt: datetime = None) -> str:
-    # 2020-07-10 15:00:00.000
+def to_iso_8601(dt: datetime = None, tz=timezone.utc) -> str:
+    """
+    Example output 2020-07-10 15:00:00.000
+    :param tz:
+    :param dt:
+    :return:
+    """
     if not dt:
-        dt = datetime.now(tz=timezone.utc).replace(microsecond=0)
+        dt = get_now_timestamp(tz=tz).replace(microsecond=0)
     return dt.isoformat()
 
+
+def add_days_to_current_unix_timestamp(days: int, tz=timezone.utc) -> int:
+    dt = get_now_timestamp(tz=tz) + timedelta(days=days)
+    return int(dt.timestamp())
+
+
+def get_now_timestamp(tz=timezone.utc):
+    return datetime.now(tz=tz)
