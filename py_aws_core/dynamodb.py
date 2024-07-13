@@ -81,6 +81,10 @@ class ABCCommonAPI(ABC):
     def iso_8601_now_timestamp(cls) -> str:
         return utils.to_iso_8601()
 
+    @classmethod
+    def calc_expire_at_timestamp(cls, days: int) -> int:
+        return utils.add_days_to_unix_timestamp(days=days)
+
 
 class ErrorResponse:
     class Error:
