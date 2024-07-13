@@ -83,7 +83,7 @@ class ABCCommonAPI(ABC):
 
     @classmethod
     def calc_expire_at_timestamp(cls, days: int) -> int:
-        return utils.add_days_to_unix_timestamp(days=days)
+        return utils.add_days_to_current_unix_timestamp(days=days)
 
 
 class ErrorResponse:
