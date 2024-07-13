@@ -13,6 +13,7 @@ class BaseModel:
         self.CreatedBy = self.data.get('CreatedBy')
         self.ModifiedAt = self.data.get('ModifiedAt')
         self.ModifiedBy = self.data.get('ModifiedBy')
+        self.ExpiresAt = self.data.get('ExpiresAt')
 
     @property
     def data(self):
