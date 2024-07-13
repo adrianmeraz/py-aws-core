@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 def build_lambda_response(status_code: int, body: dict | str = None, exc: Exception = None):
@@ -40,3 +40,11 @@ def to_iso_8601(dt: datetime = None) -> str:
         dt = datetime.now(tz=timezone.utc).replace(microsecond=0)
     return dt.isoformat()
 
+
+def add_days_to_unix_timestamp(days: int):
+    dt = get_now_timestamp() + timedelta(days=days)
+    return dt.timestamp()
+
+
+def get_now_timestamp(tz=None):
+    return datetime.now(tz=tz)
