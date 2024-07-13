@@ -41,9 +41,9 @@ def to_iso_8601(dt: datetime = None) -> str:
     return dt.isoformat()
 
 
-def add_days_to_unix_timestamp(days: int):
+def add_days_to_unix_timestamp(days: int) -> int:
     dt = get_now_timestamp() + timedelta(days=days)
-    return dt.timestamp()
+    return int(dt.timestamp())
 
 
 def get_now_timestamp(tz=None):
