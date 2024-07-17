@@ -1,4 +1,7 @@
 import json
+from . import logs
+
+logger = logs.logger
 
 
 class DBEncoder(json.JSONEncoder):
@@ -8,7 +11,11 @@ class DBEncoder(json.JSONEncoder):
         elif attrs := getattr(obj, '__dict__', None):  # Omit any non-public attributes
             return {k: v for k, v in attrs.items() if '__' not in k}
         else:
-            super().default(str(obj))
+            try:
+                super().default(obj)
+            except TypeError:
+                logger.exception(f'"{obj}" is not JSON serializable')
+                raise
 
     @classmethod
     def serialize_to_json(cls, obj):
