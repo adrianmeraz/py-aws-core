@@ -1,0 +1,166 @@
+{
+  "Count": 5,
+  "Items": [
+    {
+      "ModifiedBy": {
+        "S": ""
+      },
+      "ExpiresAt": {
+        "N": "1723689374"
+      },
+      "SK": {
+        "S": "COUNTRY#101"
+      },
+      "CreatedBy": {
+        "S": ""
+      },
+      "Text": {
+        "S": "BOTSUANA"
+      },
+      "ModifiedAt": {
+        "S": ""
+      },
+      "PK": {
+        "S": "COUNTRIES_LIST#"
+      },
+      "Type": {
+        "S": "COUNTRY"
+      },
+      "Value": {
+        "S": "101"
+      },
+      "CreatedAt": {
+        "S": "2024-07-16T02:36:14+00:00"
+      }
+    },
+    {
+      "ModifiedBy": {
+        "S": ""
+      },
+      "ExpiresAt": {
+        "N": "1723689374"
+      },
+      "SK": {
+        "S": "COUNTRY#105"
+      },
+      "CreatedBy": {
+        "S": ""
+      },
+      "Text": {
+        "S": "BRASIL"
+      },
+      "ModifiedAt": {
+        "S": ""
+      },
+      "PK": {
+        "S": "COUNTRIES_LIST#"
+      },
+      "Type": {
+        "S": "COUNTRY"
+      },
+      "Value": {
+        "S": "105"
+      },
+      "CreatedAt": {
+        "S": "2024-07-16T02:36:14+00:00"
+      }
+    },
+    {
+      "ModifiedBy": {
+        "S": ""
+      },
+      "ExpiresAt": {
+        "N": "1723689374"
+      },
+      "SK": {
+        "S": "COUNTRY#108"
+      },
+      "CreatedBy": {
+        "S": ""
+      },
+      "Text": {
+        "S": "BRUNEI"
+      },
+      "ModifiedAt": {
+        "S": ""
+      },
+      "PK": {
+        "S": "COUNTRIES_LIST#"
+      },
+      "Type": {
+        "S": "COUNTRY"
+      },
+      "Value": {
+        "S": "108"
+      },
+      "CreatedAt": {
+        "S": "2024-07-16T02:36:14+00:00"
+      }
+    },
+    {
+      "ModifiedBy": {
+        "S": ""
+      },
+      "ExpiresAt": {
+        "N": "1723689374"
+      },
+      "SK": {
+        "S": "COUNTRY#111"
+      },
+      "CreatedBy": {
+        "S": ""
+      },
+      "Text": {
+        "S": "BULGARIA"
+      },
+      "ModifiedAt": {
+        "S": ""
+      },
+      "PK": {
+        "S": "COUNTRIES_LIST#"
+      },
+      "Type": {
+        "S": "COUNTRY"
+      },
+      "Value": {
+        "S": "111"
+      },
+      "CreatedAt": {
+        "S": "2024-07-16T02:36:14+00:00"
+      }
+    },
+    {
+      "ModifiedBy": {
+        "S": ""
+      },
+      "ExpiresAt": {
+        "N": "1723689374"
+      },
+      "SK": {
+        "S": "COUNTRY#113"
+      },
+      "CreatedBy": {
+        "S": ""
+      },
+      "Text": {
+        "S": "BURKINA FASO"
+      },
+      "ModifiedAt": {
+        "S": ""
+      },
+      "PK": {
+        "S": "COUNTRIES_LIST#"
+      },
+      "Type": {
+        "S": "COUNTRY"
+      },
+      "Value": {
+        "S": "113"
+      },
+      "CreatedAt": {
+        "S": "2024-07-16T02:36:14+00:00"
+      }
+    }
+  ],
+  "ScannedCount": 253
+}
