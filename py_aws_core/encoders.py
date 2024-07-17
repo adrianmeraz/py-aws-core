@@ -10,15 +10,11 @@ class DBEncoder(json.JSONEncoder):
         if isinstance(obj, set):
             return list(obj)
         elif isinstance(obj, Decimal):
-            return float(obj.to)
+            return float(obj)
         elif attrs := getattr(obj, '__dict__', None):  # Omit any non-public attributes
             return {k: v for k, v in attrs.items() if '__' not in k}
         else:
-            try:
-                super().default(obj)
-            except TypeError:
-                logger.exception(f'"{obj}" is not JSON serializable')
-                raise
+            super().default(obj)
 
     @classmethod
     def serialize_to_json(cls, obj):
