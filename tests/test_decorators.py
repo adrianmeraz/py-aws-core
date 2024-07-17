@@ -24,7 +24,7 @@ class Boto3Tests(TestCase):
     def test_raise_mapped_client_error(self):
         source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
         with as_file(source) as err_json:
-            err_json = json.loads(err_json.read_text())
+            err_json = json.loads(err_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
 
         client_err_map = {
@@ -40,7 +40,7 @@ class Boto3Tests(TestCase):
     def test_raise_unmapped_client_error(self):
         source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
         with as_file(source) as err_json:
-            err_json = json.loads(err_json.read_text())
+            err_json = json.loads(err_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
 
         client_err_map = {
@@ -83,7 +83,7 @@ class DynamodbHandlerTests(TestCase):
     def test_raise_client_error(self):
         source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
         with as_file(source) as err_json:
-            err_json = json.loads(err_json.read_text())
+            err_json = json.loads(err_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
 
         @decorators.dynamodb_handler(client_err_map=self.client_err_map, cancellation_err_maps=list())
@@ -95,7 +95,7 @@ class DynamodbHandlerTests(TestCase):
     def test_raise_cancellation_error(self):
         source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error#ConditionalCheckFailed.json')
         with as_file(source) as initiate_auth_json:
-            err_json = json.loads(initiate_auth_json.read_text())
+            err_json = json.loads(initiate_auth_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
 
         cancellation_error_maps = [

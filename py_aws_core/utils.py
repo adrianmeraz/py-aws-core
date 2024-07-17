@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import datetime, timezone, timedelta
 
 
@@ -53,3 +54,20 @@ def add_days_to_current_unix_timestamp(days: int, tz=timezone.utc) -> int:
 
 def get_now_timestamp(tz=timezone.utc):
     return datetime.now(tz=tz)
+
+
+def rand_int(num_a: int, num_b: int) -> int:
+    return random.randint(num_a, num_b)
+
+
+def decode_unicode(s: str) -> str:
+    """
+    Per https://stackoverflow.com/a/33134946
+    This is how to fix unicode decoding errors
+    :param s: string to decode
+    :return:
+    """
+    try:
+        return s.encode('iso-8859-1').decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return s
