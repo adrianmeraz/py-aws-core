@@ -1,6 +1,6 @@
 import os
 from abc import ABC
-from typing import Any, Dict, List
+import typing
 
 import boto3
 from botocore.config import Config
@@ -74,6 +74,14 @@ class DDBClient:
     def transact_write_items(cls, *args, **kwargs):
         return cls.get_client().transact_write_items(*args, **kwargs)
 
+    @classmethod
+    def batch_write_item_maps(cls, item_maps: typing.List[typing.Dict]) -> int:
+        table = cls.get_table_resource()
+        with table.batch_writer() as batch:
+            for _map in item_maps:
+                batch.put_item(Item=_map)
+        return len(item_maps)
+
 
 class ABCCommonAPI(ABC):
 
@@ -111,7 +119,7 @@ class ErrorResponse:
         self.Message = data.get('Message')
         self.CancellationReasons = [self.CancellationReason(r) for r in data.get('CancellationReasons', list())]
 
-    def raise_for_cancellation_reasons(self, error_maps: List[Dict[str, Any]]):
+    def raise_for_cancellation_reasons(self, error_maps: typing.List[typing.Dict[str, typing.Any]]):
         for reason, error_map in zip(self.CancellationReasons, error_maps):
             if exc := error_map.get(reason.Code):
                 raise exc

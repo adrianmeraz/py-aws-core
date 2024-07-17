@@ -1,14 +1,20 @@
 import json
+from . import logs
+from decimal import Decimal
+
+logger = logs.logger
 
 
 class DBEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set):
             return list(obj)
+        elif isinstance(obj, Decimal):
+            return float(obj)
         elif attrs := getattr(obj, '__dict__', None):  # Omit any non-public attributes
             return {k: v for k, v in attrs.items() if '__' not in k}
         else:
-            super().default(str(obj))
+            super().default(obj)
 
     @classmethod
     def serialize_to_json(cls, obj):
