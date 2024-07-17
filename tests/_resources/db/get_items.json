@@ -1,0 +1,44 @@
+[
+  {
+    "disabled":false,
+    "group":null,
+    "selected":false,
+    "text":"BOGOTA D.C (BOG), AEROPUERTO EL DORADO",
+    "value":"1"
+  },
+  {
+    "disabled":false,
+    "group":null,
+    "selected":false,
+    "text":"CARTAGENA (CTG), AEROPUERTO RAFAEL NUÑEZ",
+    "value":"18"
+  },
+  {
+    "disabled":false,
+    "group":null,
+    "selected":false,
+    "text":"MEDELLIN (MDE), AEROPUERTO JOSE MARIA CORDOVA",
+    "value":"12"
+  },
+  {
+    "disabled":false,
+    "group":null,
+    "selected":false,
+    "text":"PEREIRA (PEI), AEROPUERTO MATECAÑA",
+    "value":"15"
+  },
+  {
+    "disabled":false,
+    "group":null,
+    "selected":false,
+    "text":"RIOHACHA (RCH), AEROPUERTO ALMIRANTE PADILLA",
+    "value":"76"
+  },
+  {
+    "disabled":false,
+    "group":null,
+    "selected":false,
+    "text":"SAN ANDRES (ADZ) AEROPUERTO GUSTAVO ROJAS PINILLA",
+    "value":"16"
+  }
+]

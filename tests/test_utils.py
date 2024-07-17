@@ -68,3 +68,12 @@ class AddDaysToUnixTimestampTests(TestCase):
 
         val = utils.add_days_to_current_unix_timestamp(days=180)
         self.assertEqual(val, 1078328008)
+
+
+class DecodeStrTests(TestCase):
+    def test_decode_str(self):
+        val = utils.decode_unicode('ESPA\xc3\x91A')
+        self.assertEqual(val, 'ESPAÑA')
+
+        val = utils.decode_unicode('ESPAÑA')
+        self.assertEqual(val, 'ESPAÑA')
