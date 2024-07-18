@@ -6,10 +6,10 @@ from . import encoders
 class BaseModel:
     def __init__(self, data):
         self.__data = self.to_normalized_data(data)
-        self.PK = self.data['PK']
-        self.SK = self.data['SK']
-        self.Type = self.data['Type']
-        self.CreatedAt = self.data['CreatedAt']
+        self.PK = self.data.get('PK')
+        self.SK = self.data.get('SK')
+        self.Type = self.data.get('Type')
+        self.CreatedAt = self.data.get('CreatedAt')
         self.CreatedBy = self.data.get('CreatedBy')
         self.ModifiedAt = self.data.get('ModifiedAt')
         self.ModifiedBy = self.data.get('ModifiedBy')
