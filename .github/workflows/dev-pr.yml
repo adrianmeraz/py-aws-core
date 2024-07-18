@@ -6,6 +6,7 @@ on:
     paths:
       - '**.py'
       - '**.yml'
+      - 'poetry.lock'
       - 'pyproject.toml'
 
 jobs:
