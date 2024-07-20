@@ -17,7 +17,7 @@ class BuildLambdaResponseTests(TestCase):
                 'isBase64Encoded': False,
                 'statusCode': 200,
                 'body': '{"message": "Lorem Ipsum"}',
-                'headers': {
+                'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': True,
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
@@ -42,7 +42,7 @@ class BuildLambdaResponseTests(TestCase):
                 'isBase64Encoded': False,
                 'statusCode': 200,
                 'body': '{"message": "Lorem Ipsum"}',
-                'headers': {
+                'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': True,
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
@@ -64,7 +64,7 @@ class BuildLambdaResponseTests(TestCase):
             {
                 'isBase64Encoded': False,
                 'body': '{"error": "SecretsManagerException: An error occurred while fetching secrets"}',
-                'headers': {
+                'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': True,
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',

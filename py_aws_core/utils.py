@@ -41,7 +41,7 @@ def build_lambda_response(
         'isBase64Encoded': False,
         'statusCode': status_code,
         'body': body,  # body key value must be a json string
-        'headers': response_headers
+        'multiValueHeaders': response_headers
     }
 
 
