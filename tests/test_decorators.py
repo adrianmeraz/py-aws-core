@@ -132,7 +132,7 @@ class LambdaResponseHandlerTests(TestCase):
             val,
             {
                 'body': '{"error": "DBConditionCheckFailed: Condition Check Failed"}',
-                'headers': {
+                'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': True,
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
@@ -153,7 +153,7 @@ class LambdaResponseHandlerTests(TestCase):
             val,
             {
                 'body': '{"error": "AWSCoreException: A generic error has occurred"}',
-                'headers': {
+                'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': True,
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
