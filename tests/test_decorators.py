@@ -133,11 +133,11 @@ class LambdaResponseHandlerTests(TestCase):
             {
                 'body': '{"error": "DBConditionCheckFailed: Condition Check Failed"}',
                 'multiValueHeaders': {
-                    'Access-Control-Allow-Credentials': True,
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
+                    'Access-Control-Allow-Credentials': [True],
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['application/json']
                 },
                 'isBase64Encoded': False,
                 'statusCode': 400
@@ -154,11 +154,11 @@ class LambdaResponseHandlerTests(TestCase):
             {
                 'body': '{"error": "AWSCoreException: A generic error has occurred"}',
                 'multiValueHeaders': {
-                    'Access-Control-Allow-Credentials': True,
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
+                    'Access-Control-Allow-Credentials': [True],
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['application/json']
                 },
                 'isBase64Encoded': False,
                 'statusCode': 400
