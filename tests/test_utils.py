@@ -18,11 +18,11 @@ class BuildLambdaResponseTests(TestCase):
                 'statusCode': 200,
                 'body': '{"message": "Lorem Ipsum"}',
                 'multiValueHeaders': {
-                    'Access-Control-Allow-Credentials': True,
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
+                    'Access-Control-Allow-Credentials': [True],
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['application/json']
                 }
             }
         )
@@ -31,9 +31,9 @@ class BuildLambdaResponseTests(TestCase):
         val = utils.build_lambda_response(
             status_code=200,
             body={'message': 'Lorem Ipsum'},
-            headers={
-                'X-Request-Token': 'abcdefghijklmnopqrstuvwxyz1234567890',
-                'X-HMAC-Token': '1234567890abcdefghijklmnopqrstuvwxyz'
+            multi_value_headers={
+                'X-Request-Token': ['abcdefghijklmnopqrstuvwxyz1234567890'],
+                'X-HMAC-Token': ['1234567890abcdefghijklmnopqrstuvwxyz']
             }
         )
         self.assertEqual(
@@ -43,13 +43,13 @@ class BuildLambdaResponseTests(TestCase):
                 'statusCode': 200,
                 'body': '{"message": "Lorem Ipsum"}',
                 'multiValueHeaders': {
-                    'Access-Control-Allow-Credentials': True,
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json',
-                    'X-Request-Token': 'abcdefghijklmnopqrstuvwxyz1234567890',
-                    'X-HMAC-Token': '1234567890abcdefghijklmnopqrstuvwxyz'
+                    'Access-Control-Allow-Credentials': [True],
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['application/json'],
+                    'X-Request-Token': ['abcdefghijklmnopqrstuvwxyz1234567890'],
+                    'X-HMAC-Token': ['1234567890abcdefghijklmnopqrstuvwxyz']
                 }
             }
         )
@@ -65,11 +65,11 @@ class BuildLambdaResponseTests(TestCase):
                 'isBase64Encoded': False,
                 'body': '{"error": "SecretsManagerException: An error occurred while fetching secrets"}',
                 'multiValueHeaders': {
-                    'Access-Control-Allow-Credentials': True,
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
+                    'Access-Control-Allow-Credentials': [True],
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['application/json']
                 },
                 'statusCode': 400,
             }

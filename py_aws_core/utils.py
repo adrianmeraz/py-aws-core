@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 def build_lambda_response(
     status_code: int,
     body: typing.Dict | str = None,
-    headers: typing.Dict = None,
+    multi_value_headers: typing.Dict[str, typing.List[str]] = None,
     exc: Exception = None
 ):
     """
@@ -16,7 +16,7 @@ def build_lambda_response(
       See below for further details:
       https://stackoverflow.com/a/54089431
       https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html#apigateway-enable-cors-proxy
-    :param headers:
+    :param multi_value_headers:
     :param status_code:
     :param body:
     :param exc:
@@ -29,14 +29,14 @@ def build_lambda_response(
     if isinstance(body, dict):
         body = json.dumps(body)
     response_headers = {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Credentials': True,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT'
+        'Content-Type': ['application/json'],
+        'Access-Control-Allow-Credentials': [True],
+        'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+        'Access-Control-Allow-Origin': ['*'],
+        'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT']
     }
-    if headers:
-        response_headers |= headers
+    if multi_value_headers:
+        response_headers |= multi_value_headers
     return {
         'isBase64Encoded': False,
         'statusCode': status_code,
