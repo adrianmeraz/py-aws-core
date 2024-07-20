@@ -66,10 +66,10 @@ class BuildLambdaResponseTests(TestCase):
                 'body': '{"error": "SecretsManagerException: An error occurred while fetching secrets"}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': True,
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT',
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['application/json']
                 },
                 'statusCode': 400,
             }

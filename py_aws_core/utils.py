@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 def build_lambda_response(
     status_code: int,
     body: typing.Dict | str = None,
-    headers: typing.Dict = None,
+    headers: typing.Dict[str, typing.List[str]] = None,
     exc: Exception = None
 ):
     """
@@ -29,11 +29,11 @@ def build_lambda_response(
     if isinstance(body, dict):
         body = json.dumps(body)
     response_headers = {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Credentials': True,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'DELETE,GET,POST,PUT'
+        'Content-Type': ['application/json'],
+        'Access-Control-Allow-Credentials': [True],
+        'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+        'Access-Control-Allow-Origin': ['*'],
+        'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT']
     }
     if headers:
         response_headers |= headers
