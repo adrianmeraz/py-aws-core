@@ -1,7 +1,7 @@
 import json
 import random
 import typing
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, UTC
 
 
 def build_lambda_response(
@@ -81,3 +81,7 @@ def decode_unicode(s: str) -> str:
         return s.encode('iso-8859-1').decode('utf-8')
     except (UnicodeEncodeError, UnicodeDecodeError):
         return s
+
+
+def unix_timestamp_to_iso8601(unix_ts: int):
+    return datetime.fromtimestamp(unix_ts, tz=UTC).isoformat()

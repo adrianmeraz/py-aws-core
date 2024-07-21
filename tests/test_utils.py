@@ -105,3 +105,12 @@ class DecodeStrTests(TestCase):
 
         val = utils.decode_unicode('ESPAÑA')
         self.assertEqual(val, 'ESPAÑA')
+
+
+class UnixTimestampToISO8601Tests(TestCase):
+    def test_decode_str(self):
+        val = utils.unix_timestamp_to_iso8601(1721535430)
+        self.assertEqual(val, '2024-07-21T04:17:10+00:00')
+
+        val = utils.unix_timestamp_to_iso8601(1220010000)
+        self.assertEqual(val, '2008-08-29T11:40:00+00:00')
