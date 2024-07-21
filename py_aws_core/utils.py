@@ -53,20 +53,20 @@ def to_iso_8601(dt: datetime = None, tz=timezone.utc) -> str:
     :return:
     """
     if not dt:
-        dt = get_now_timestamp(tz=tz).replace(microsecond=0)
+        dt = get_now_datetime(tz=tz).replace(microsecond=0)
     return dt.isoformat()
 
 
 def add_days_to_current_unix_timestamp(days: int, tz=timezone.utc) -> int:
-    dt = get_now_timestamp(tz=tz) + timedelta(days=days)
+    dt = get_now_datetime(tz=tz) + timedelta(days=days)
     return int(dt.timestamp())
 
 
-def add_seconds_to_current_unix_timestamp(expires_in_seconds: int, tz=timezone.utc) -> datetime:
-    return get_now_timestamp(tz=tz) + timedelta(seconds=expires_in_seconds)
+def add_seconds_to_now_datetime(seconds: int, tz=timezone.utc) -> datetime:
+    return get_now_datetime(tz=tz) + timedelta(seconds=seconds)
 
 
-def get_now_timestamp(tz=timezone.utc):
+def get_now_datetime(tz=timezone.utc) -> datetime:
     return datetime.now(tz=tz)
 
 

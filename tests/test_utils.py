@@ -87,10 +87,10 @@ class Iso8601NowTimestampTests(TestCase):
 
 
 class AddDaysToUnixTimestampTests(TestCase):
-    @mock.patch.object(utils, 'get_now_timestamp')
-    def test_ok(self, mocked_get_now_timestamp):
+    @mock.patch.object(utils, 'get_now_datetime')
+    def test_ok(self, mocked_get_now_datetime):
         dt = datetime.datetime(year=2003, month=9, day=5, hour=15, minute=33, second=28, tzinfo=datetime.timezone.utc)
-        mocked_get_now_timestamp.return_value = dt
+        mocked_get_now_datetime.return_value = dt
         val = utils.add_days_to_current_unix_timestamp(days=7)
         self.assertEqual(val, 1063380808)
 

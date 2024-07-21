@@ -45,6 +45,6 @@ def build_set_cookie_header_value_2(
     cookie[name] = value
     cookie[name]['domain'] = domain
     cookie[name]['path'] = path
-    expires = utils.add_seconds_to_current_unix_timestamp
+    expires = utils.add_seconds_to_now_datetime
     # cookie['session']['expires'] = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
     return cookie.output(header="Set-Cookie:", sep="\015\012")
