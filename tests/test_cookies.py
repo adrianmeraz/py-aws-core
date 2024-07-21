@@ -15,7 +15,7 @@ class BuildSetCookieHeaderTests(TestCase):
             domain='.example.com',
             value='lorem ipsum dolor sit',
             path='/',
-            expires_unix=1721531845
+            expires_in_seconds=86400
         )
 
-        self.assertEqual(val, '')
+        self.assertEqual(val, 'Set-Cookie: ipsum="lorem ipsum dolor sit"; Domain=.example.com; Path=/')

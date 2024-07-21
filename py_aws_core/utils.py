@@ -62,6 +62,10 @@ def add_days_to_current_unix_timestamp(days: int, tz=timezone.utc) -> int:
     return int(dt.timestamp())
 
 
+def add_seconds_to_current_unix_timestamp(expires_in_seconds: int, tz=timezone.utc) -> datetime:
+    return get_now_timestamp(tz=tz) + timedelta(seconds=expires_in_seconds)
+
+
 def get_now_timestamp(tz=timezone.utc):
     return datetime.now(tz=tz)
 

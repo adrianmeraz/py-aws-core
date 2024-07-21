@@ -1,6 +1,8 @@
 from http.cookiejar import Cookie
 from http.cookies import SimpleCookie
 
+import datetime
+
 from . import utils
 
 
@@ -37,12 +39,12 @@ def build_set_cookie_header_value_2(
     domain: str,
     value: str,
     path: str,
-    expires_unix: int
+    expires_in_seconds: int
 ) -> str:
-    c = SimpleCookie()
-    c['name'] = name
-    # c['domain'] = domain
-    c['value'] = value
-    # c['path'] = path
-    # c['expires'] = utils.unix_timestamp_to_iso8601(expires_unix)
-    return c.output(header="Set-Cookie:", sep="\015\012")
+    cookie = SimpleCookie()
+    cookie[name] = value
+    cookie[name]['domain'] = domain
+    cookie[name]['path'] = path
+    expires = utils.add_seconds_to_current_unix_timestamp
+    # cookie['session']['expires'] = expires.strftime("%a, %d %b %Y %H:%M:%S GMT")
+    return cookie.output(header="Set-Cookie:", sep="\015\012")
