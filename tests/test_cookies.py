@@ -10,12 +10,12 @@ class BuildSetCookieHeaderTests(TestCase):
         dt = datetime.datetime(year=2003, month=9, day=5, hour=15, minute=33, second=28, tzinfo=datetime.timezone.utc)
         mocked_get_now_timestamp.return_value = dt
 
-        val = cookies.build_set_cookie_header_value(
+        val = cookies.build_set_cookie_header_value_2(
             name='ipsum',
             domain='.example.com',
             value='lorem ipsum dolor sit',
             path='/',
-            expires=1721531845
+            expires_unix=1721531845
         )
 
         self.assertEqual(val, '')
