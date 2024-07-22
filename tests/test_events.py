@@ -1,7 +1,6 @@
 import json
 from importlib.resources import as_file
 from unittest import TestCase
-from decimal import Decimal
 
 from py_aws_core import events
 from tests import const as test_const
