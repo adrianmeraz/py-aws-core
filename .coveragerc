@@ -6,7 +6,7 @@ omit =
     ./venv/*
     */site-packages/*
     */virtualenvs/*
-    *tests*
+    */tests/*
     *__init__.py
 
 [report]
@@ -15,7 +15,7 @@ omit =
     ./venv/*
     */site-packages/*
     */virtualenvs/*
-    *tests*
+    */tests/*
     *__init__.py
 
 # Regexes for lines to exclude from consideration
