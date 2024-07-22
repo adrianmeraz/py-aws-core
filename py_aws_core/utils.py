@@ -1,7 +1,7 @@
 import json
 import random
 import typing
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, UTC
 
 
 def build_lambda_response(
@@ -53,16 +53,20 @@ def to_iso_8601(dt: datetime = None, tz=timezone.utc) -> str:
     :return:
     """
     if not dt:
-        dt = get_now_timestamp(tz=tz).replace(microsecond=0)
+        dt = get_now_datetime(tz=tz).replace(microsecond=0)
     return dt.isoformat()
 
 
 def add_days_to_current_unix_timestamp(days: int, tz=timezone.utc) -> int:
-    dt = get_now_timestamp(tz=tz) + timedelta(days=days)
+    dt = get_now_datetime(tz=tz) + timedelta(days=days)
     return int(dt.timestamp())
 
 
-def get_now_timestamp(tz=timezone.utc):
+def add_seconds_to_now_datetime(seconds: int, tz=timezone.utc) -> datetime:
+    return get_now_datetime(tz=tz) + timedelta(seconds=seconds)
+
+
+def get_now_datetime(tz=timezone.utc) -> datetime:
     return datetime.now(tz=tz)
 
 
@@ -81,3 +85,7 @@ def decode_unicode(s: str) -> str:
         return s.encode('iso-8859-1').decode('utf-8')
     except (UnicodeEncodeError, UnicodeDecodeError):
         return s
+
+
+def unix_timestamp_to_iso8601(unix_ts: int):
+    return datetime.fromtimestamp(unix_ts, tz=UTC).isoformat()
