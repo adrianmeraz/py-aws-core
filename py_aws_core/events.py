@@ -5,12 +5,12 @@ import typing
 class LambdaEvent:
     class RequestContext:
         def __init__(self, data):
-            self.resourceId = ['resourceId']
-            self.resourcePath = ['resourcePath']
-            self.httpMethod = ['httpMethod']
-            self.requestTime = ['requestTime']
-            self.path = ['path']
-            self.domainName = ['domainName']
+            self.resourceId = data['resourceId']
+            self.resourcePath = data['resourcePath']
+            self.httpMethod = data['httpMethod']
+            self.requestTime = data['requestTime']
+            self.path = data['path']
+            self.domainName = data['domainName']
 
     def __init__(self, data):
         self.headers = data['headers'] or dict()
