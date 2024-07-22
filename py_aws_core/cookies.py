@@ -4,8 +4,6 @@ from . import utils
 
 
 class CookieUtil:
-    HEADER_NAME = 'Set-Cookie:'
-
     @classmethod
     def build_set_cookie_header(
         cls,
@@ -21,6 +19,4 @@ class CookieUtil:
         cookie[name]['path'] = path
         cookie[name]['expires'] = expires_in_seconds
 
-        output = cookie.output(header=cls.HEADER_NAME, sep='\015\012')
-        return output.split(cls.HEADER_NAME)[1].strip()
-
+        return cookie.output(header='', sep='\015\012').strip()
