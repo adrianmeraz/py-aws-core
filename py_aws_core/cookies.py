@@ -4,6 +4,8 @@ from . import utils
 
 
 class CookieUtil:
+    HEADER_NAME = 'Set-Cookie:'
+
     @classmethod
     def build_set_cookie_header(
         cls,
@@ -17,10 +19,8 @@ class CookieUtil:
         cookie[name] = value
         cookie[name]['domain'] = domain
         cookie[name]['path'] = path
-        cookie[name]['expires'] = cls.get_expiry_timestamp(expires_in_seconds)
-        return cookie.output(header="Set-Cookie:", sep="\015\012")
+        cookie[name]['expires'] = expires_in_seconds
 
-    @classmethod
-    def get_expiry_timestamp(cls, expire_in_seconds: int) -> str:
-        dt = utils.add_seconds_to_now_datetime(seconds=expire_in_seconds)
-        return dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        output = cookie.output(header=cls.HEADER_NAME, sep='\015\012')
+        return output.split(cls.HEADER_NAME)[1].strip()
+
