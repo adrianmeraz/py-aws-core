@@ -18,5 +18,5 @@ class BuildSetCookieHeaderTests(TestCase):
             expires_in_seconds=86400*4  # 4 days
         )
 
-        self.assertEqual(val, 'ipsum="lorem ipsum dolor sit"; Domain=.example.com; expires=Tue, 09 Sep 2003 15:33:28 GMT; Path=/')
+        self.assertEqual(val, 'ipsum="lorem ipsum dolor sit"; Domain=.example.com; expires=Tue, 09 Sep 2003 15:33:28 GMT; Path=/; Secure')
         self.assertEqual(mocked_time.call_count, 1)
