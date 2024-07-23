@@ -173,6 +173,7 @@ class RetryTests(TestCase):
 
     def test_multi_retry(self):
         tries = 7
+
         func = mock.Mock(side_effect=exceptions.AWSCoreException("Test"))
         decorated_function = decorators.retry(
             retry_exceptions=(exceptions.AWSCoreException,),
