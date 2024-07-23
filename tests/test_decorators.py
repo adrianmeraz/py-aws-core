@@ -1,6 +1,6 @@
 import json
 from importlib.resources import as_file
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from botocore.exceptions import ClientError
 
@@ -164,3 +164,38 @@ class LambdaResponseHandlerTests(TestCase):
                 'statusCode': 400
             }
         )
+
+
+class RetryTests(TestCase):
+    """
+    Decorator Tests
+    """
+
+    def test_multi_retry(self):
+        tries = 7
+
+        func = mock.Mock(side_effect=exceptions.AWSCoreException("Test"))
+        decorated_function = decorators.retry(
+            retry_exceptions=(exceptions.AWSCoreException,),
+            tries=tries,
+            delay=0,
+            backoff=1,
+            jitter=0,
+        )(func)
+        with self.assertRaises(exceptions.AWSCoreException):
+            decorated_function()
+        self.assertEqual(func.call_count, tries)
+
+    def test_single_retry(self):
+        tries = 1
+        func = mock.Mock(side_effect=exceptions.AWSCoreException("Test"))
+        decorated_function = decorators.retry(
+            retry_exceptions=(exceptions.AWSCoreException,),
+            tries=tries,
+            delay=0,
+            backoff=1,
+            jitter=0,
+        )(func)
+        with self.assertRaises(exceptions.AWSCoreException):
+            decorated_function()
+        self.assertEqual(func.call_count, tries)

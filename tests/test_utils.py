@@ -86,6 +86,13 @@ class Iso8601NowTimestampTests(TestCase):
         )
 
 
+class GenerateJitterTests(TestCase):
+    def test_add_jitter(self):
+        self.assertTrue(.5 <= utils.generate_jitter(midpoint=1.0, floor=0, std_deviation=.5) <= 1.5)
+        self.assertTrue(11 <= utils.generate_jitter(midpoint=15.5, floor=11, std_deviation=20) <= 35.5)
+        self.assertTrue(0.1437 <= utils.generate_jitter(midpoint=.156, floor=.07, std_deviation=.0123) <= 0.1683)
+
+
 class AddDaysToUnixTimestampTests(TestCase):
     @mock.patch.object(utils, 'get_now_datetime')
     def test_ok(self, mocked_get_now_datetime):

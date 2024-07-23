@@ -1,5 +1,6 @@
 import json
 import random
+import time
 import typing
 from datetime import datetime, timezone, timedelta, UTC
 
@@ -70,8 +71,16 @@ def get_now_datetime(tz=timezone.utc) -> datetime:
     return datetime.now(tz=tz)
 
 
+def generate_jitter(midpoint: float, floor: float, std_deviation: float) -> float:
+    return max(floor, midpoint + random.uniform(-std_deviation, +std_deviation))
+
+
 def rand_int(num_a: int, num_b: int) -> int:
     return random.randint(num_a, num_b)
+
+
+def sleep(seconds: float) -> None:
+    time.sleep(seconds)
 
 
 def decode_unicode(s: str) -> str:

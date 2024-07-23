@@ -1,6 +1,8 @@
 import logging
+import typing
 from functools import wraps
 from typing import Any, Dict, List
+
 
 from botocore.exceptions import ClientError
 
@@ -35,10 +37,10 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'{func.__name__}, response: {response}')
+                logger.debug(f'{func.__name__} -> response: {response}')
                 return response
             except ClientError as e:
-                logger.error(f'ClientError detected: {e}')
+                logger.error(f'ClientError detected -> {e}')
                 e_response = dynamodb.ErrorResponse(e.response)
                 if e_response.CancellationReasons:
                     e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
@@ -71,4 +73,48 @@ def lambda_response_handler(raise_as):
                 exc=exc
             )
         return wrapper_func  # true decorator
+    return deco_func
+
+
+def retry(
+    retry_exceptions: typing.Tuple[typing.Type[BaseException]],
+    tries: int = 4,
+    delay: float = 1.5,
+    backoff: float = 2.0,
+    jitter: float = 0.1
+):
+    """
+    Retry calling the decorated function using an exponential backoff.
+
+    Args:
+        :param retry_exceptions: Exceptions to retry on before raise
+        :param tries: Number of times to try (not retry) before giving up.
+        :param delay: Initial delay between retries in seconds.
+        :param backoff: Backoff multiplier (e.g. value of 2.0 will double the delay each retry).
+        :param jitter: adds a standard deviation to delay
+    """
+    def deco_func(func):
+
+        @wraps(func)
+        def wrapper_func(*args, **kwargs):
+            m_tries = 1
+            m_delay = delay
+            f_qname = getattr(func, "__qualname__", None)
+            while m_tries < tries:
+                try:
+                    return func(*args, **kwargs)
+                except retry_exceptions as e:
+                    j_delay = utils.generate_jitter(midpoint=m_delay, floor=0, std_deviation=jitter)
+                    logger.info(
+                        f'{f_qname!r} -> Exception: {type(e)}, {str(e)}, Tries: {m_tries} / {tries}, Retrying in {j_delay:.3f} seconds...'
+                    )
+                    utils.sleep(j_delay)
+                    m_tries += 1
+                    m_delay *= backoff
+
+            logger.warning(f'{f_qname!r} -> Max tries reached: {m_tries} / {tries}')
+            return func(*args, **kwargs)
+
+        return wrapper_func  # true decorator
+
     return deco_func
