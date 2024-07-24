@@ -3,7 +3,7 @@ from importlib.resources import as_file
 from unittest import TestCase, mock
 
 from botocore.exceptions import ClientError
-from httpx import codes, HTTPStatusError, Request, Response
+from httpx import HTTPStatusError, Request, Response
 
 from py_aws_core import decorators, exceptions
 from tests import const as test_const

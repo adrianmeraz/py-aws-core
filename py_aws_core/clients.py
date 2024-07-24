@@ -7,7 +7,7 @@ logger = logs.logger
 
 class RetryClient(Client):
     """
-    Http/2 Client
+    Http/2 Client that retries for given exceptions and http status codes
     """
     RETRY_EXCEPTIONS = (
         HTTPStatusError,
