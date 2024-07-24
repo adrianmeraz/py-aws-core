@@ -168,10 +168,6 @@ class LambdaResponseHandlerTests(TestCase):
 
 
 class RetryTests(TestCase):
-    """
-    Decorator Tests
-    """
-
     def test_multi_retry(self):
         tries = 7
 

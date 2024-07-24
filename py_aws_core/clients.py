@@ -16,7 +16,7 @@ class RetryClient(Client):
         ProxyError
     )
 
-    RETRYABLE_STATUS_CODES = (
+    RETRY_STATUS_CODES = (
         408,
         425,
         429,
@@ -35,6 +35,6 @@ class RetryClient(Client):
         )
 
     @decorators.retry(retry_exceptions=RETRY_EXCEPTIONS)
-    @decorators.http_status_check(reraise_status_codes=RETRYABLE_STATUS_CODES)
+    @decorators.http_status_check(reraise_status_codes=RETRY_STATUS_CODES)
     def send(self, *args, **kwargs):
         return super().send(*args, **kwargs)

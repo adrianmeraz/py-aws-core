@@ -16,7 +16,7 @@ def boto3_handler(raise_as, client_error_map: dict):
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'{__name__}, response: {response}')
+                logger.debug(f'{func.__name__} -> response: {response}')
                 return response
             except ClientError as e:
                 error_code = e.response['Error']['Code']
@@ -127,8 +127,6 @@ def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
                 return func(*args, **kwargs)
             except HTTPStatusError as e:
                 status_code = e.response.status_code
-                # if status_code in (408, 425, 429) or status_code >= 500:     # Retryable status codes
-                #     raise
                 if status_code in reraise_status_codes:     # Retryable status codes
                     raise
                 if status_code == codes.UNAUTHORIZED:
@@ -136,3 +134,5 @@ def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
                 raise exceptions.APIException(*args, **kwargs, **e.__dict__)
 
         return wrapper_func
+
+    return deco_func
