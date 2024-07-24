@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 from botocore.exceptions import ClientError
 from httpx import HTTPStatusError
 
-from . import dynamodb, logs, utils
+from . import dynamodb, exceptions, logs, utils
 
 logger = logs.logger
 
@@ -119,19 +119,20 @@ def retry(
     return deco_func
 
 
-def http_status_check(func):
+def http_status_check(reraise_status_codes: typing.Tuple[int, ...]):
+    def deco_func(func):
+        @wraps(func)
+        def wrapper_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except HTTPStatusError as e:
+                status_code = e.response.status_code
+                # if status_code in (408, 425, 429) or status_code >= 500:     # Retryable status codes
+                #     raise
+                if status_code in reraise_status_codes:     # Retryable status codes
+                    raise
+                if status_code == 401:
+                    raise exceptions.NotAuthorizedException(*args, **kwargs, **e.__dict__)
+                raise exceptions.APIException(*args, **kwargs, **e.__dict__)
 
-    @wraps(func)
-    def wrapper_func(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except HTTPStatusError as e:
-            status_code = e.response.status_code
-            if status_code in (408, 429) or status_code >= 500:     # Retryable status codes
-                raise
-            if status_code == 401:
-                raise NotAuthorized(*args, **kwargs, **e.__dict__)
-
-            raise ApiError(*args, **kwargs, **e.__dict__)
-
-    return wrapper_func
+        return wrapper_func

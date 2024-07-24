@@ -145,7 +145,7 @@ class LambdaResponseHandlerTests(TestCase):
         )
 
     def test_wrapped_exception(self):
-        @decorators.lambda_response_handler(raise_as=exceptions.AWSCoreException)
+        @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
         def func():
             raise RuntimeError('This is a test')
         val = func()
@@ -174,28 +174,28 @@ class RetryTests(TestCase):
     def test_multi_retry(self):
         tries = 7
 
-        func = mock.Mock(side_effect=exceptions.AWSCoreException("Test"))
+        func = mock.Mock(side_effect=exceptions.CoreException("Test"))
         decorated_function = decorators.retry(
-            retry_exceptions=(exceptions.AWSCoreException,),
+            retry_exceptions=(exceptions.CoreException,),
             tries=tries,
             delay=0,
             backoff=1,
             jitter=0,
         )(func)
-        with self.assertRaises(exceptions.AWSCoreException):
+        with self.assertRaises(exceptions.CoreException):
             decorated_function()
         self.assertEqual(func.call_count, tries)
 
     def test_single_retry(self):
         tries = 1
-        func = mock.Mock(side_effect=exceptions.AWSCoreException("Test"))
+        func = mock.Mock(side_effect=exceptions.CoreException("Test"))
         decorated_function = decorators.retry(
-            retry_exceptions=(exceptions.AWSCoreException,),
+            retry_exceptions=(exceptions.CoreException,),
             tries=tries,
             delay=0,
             backoff=1,
             jitter=0,
         )(func)
-        with self.assertRaises(exceptions.AWSCoreException):
+        with self.assertRaises(exceptions.CoreException):
             decorated_function()
         self.assertEqual(func.call_count, tries)

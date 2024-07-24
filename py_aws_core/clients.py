@@ -5,20 +5,18 @@ from . import decorators, logs
 logger = logs.logger
 
 
-RETRY_EXCEPTIONS = (
-    HTTPStatusError,
-    TimeoutException,
-    NetworkError,
-    ProxyError
-)
-
-
 class RetryClient(Client):
     """
     Http/2 Client
     """
+    RETRY_EXCEPTIONS = (
+        HTTPStatusError,
+        TimeoutException,
+        NetworkError,
+        ProxyError
+    )
 
-    RETRYABLE_STATUS_CODES = [
+    RETRYABLE_STATUS_CODES = (
         408,
         425,
         429,
@@ -26,7 +24,7 @@ class RetryClient(Client):
         502,
         503,
         504,
-    ]
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(
@@ -37,6 +35,6 @@ class RetryClient(Client):
         )
 
     @decorators.retry(retry_exceptions=RETRY_EXCEPTIONS)
-    @decorators.api_error_check
+    @decorators.http_status_check(reraise_status_codes=RETRYABLE_STATUS_CODES)
     def send(self, *args, **kwargs):
         return super().send(*args, **kwargs)
