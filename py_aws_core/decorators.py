@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Any, Dict, List
 
 from botocore.exceptions import ClientError
-from httpx import HTTPStatusError
+from httpx import codes, HTTPStatusError
 
 from . import dynamodb, exceptions, logs, utils
 
@@ -119,7 +119,7 @@ def retry(
     return deco_func
 
 
-def http_status_check(reraise_status_codes: typing.Tuple[int, ...]):
+def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
     def deco_func(func):
         @wraps(func)
         def wrapper_func(*args, **kwargs):
@@ -131,7 +131,7 @@ def http_status_check(reraise_status_codes: typing.Tuple[int, ...]):
                 #     raise
                 if status_code in reraise_status_codes:     # Retryable status codes
                     raise
-                if status_code == 401:
+                if status_code == codes.UNAUTHORIZED:
                     raise exceptions.NotAuthorizedException(*args, **kwargs, **e.__dict__)
                 raise exceptions.APIException(*args, **kwargs, **e.__dict__)
 
