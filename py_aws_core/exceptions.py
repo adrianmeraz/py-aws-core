@@ -1,4 +1,4 @@
-class AWSCoreException(Exception):
+class CoreException(Exception):
     ERROR_MESSAGE = 'A generic error has occurred'
 
     def __init__(self, *args, **kwargs):
@@ -11,6 +11,18 @@ class AWSCoreException(Exception):
 # Boto3 Exceptions Located below:
 # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html#botocore-exceptions
 # https://github.com/boto/botocore/blob/develop/botocore/exceptions.py
+
+
+class APIException(CoreException):
+    ERROR_MESSAGE = 'A generic API error occurred'
+
+
+class NotAuthorizedException(APIException):
+    ERROR_MESSAGE = 'Client is not authorized to take action'
+
+
+class AWSCoreException(CoreException):
+    ERROR_MESSAGE = 'A generic AWS error occurred'
 
 
 class CognitoException(AWSCoreException):

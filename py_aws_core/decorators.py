@@ -1,14 +1,13 @@
-import logging
 import typing
 from functools import wraps
 from typing import Any, Dict, List
 
-
 from botocore.exceptions import ClientError
+from httpx import codes, HTTPStatusError
 
-from . import dynamodb, utils
+from . import dynamodb, exceptions, logs, utils
 
-logger = logging.getLogger(__name__)
+logger = logs.logger
 
 
 def boto3_handler(raise_as, client_error_map: dict):
@@ -17,7 +16,7 @@ def boto3_handler(raise_as, client_error_map: dict):
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'{__name__}, response: {response}')
+                logger.debug(f'{func.__name__} -> response: {response}')
                 return response
             except ClientError as e:
                 error_code = e.response['Error']['Code']
@@ -77,7 +76,7 @@ def lambda_response_handler(raise_as):
 
 
 def retry(
-    retry_exceptions: typing.Tuple[typing.Type[BaseException]],
+    retry_exceptions: typing.Tuple,
     tries: int = 4,
     delay: float = 1.5,
     backoff: float = 2.0,
@@ -116,5 +115,24 @@ def retry(
             return func(*args, **kwargs)
 
         return wrapper_func  # true decorator
+
+    return deco_func
+
+
+def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
+    def deco_func(func):
+        @wraps(func)
+        def wrapper_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except HTTPStatusError as e:
+                status_code = e.response.status_code
+                if status_code in reraise_status_codes:     # Retryable status codes
+                    raise
+                if status_code == codes.UNAUTHORIZED:
+                    raise exceptions.NotAuthorizedException(*args, **kwargs, **e.__dict__)
+                raise exceptions.APIException(*args, **kwargs, **e.__dict__)
+
+        return wrapper_func
 
     return deco_func

@@ -3,6 +3,7 @@ from importlib.resources import as_file
 from unittest import TestCase, mock
 
 from botocore.exceptions import ClientError
+from httpx import HTTPStatusError, Request, Response
 
 from py_aws_core import decorators, exceptions
 from tests import const as test_const
@@ -145,14 +146,14 @@ class LambdaResponseHandlerTests(TestCase):
         )
 
     def test_wrapped_exception(self):
-        @decorators.lambda_response_handler(raise_as=exceptions.AWSCoreException)
+        @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
         def func():
             raise RuntimeError('This is a test')
         val = func()
         self.assertEqual(
             val,
             {
-                'body': '{"error": "AWSCoreException: A generic error has occurred"}',
+                'body': '{"error": "CoreException: A generic error has occurred"}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
@@ -167,35 +168,62 @@ class LambdaResponseHandlerTests(TestCase):
 
 
 class RetryTests(TestCase):
-    """
-    Decorator Tests
-    """
-
     def test_multi_retry(self):
         tries = 7
 
-        func = mock.Mock(side_effect=exceptions.AWSCoreException("Test"))
+        func = mock.Mock(side_effect=exceptions.CoreException("Test"))
         decorated_function = decorators.retry(
-            retry_exceptions=(exceptions.AWSCoreException,),
+            retry_exceptions=(exceptions.CoreException,),
             tries=tries,
             delay=0,
             backoff=1,
             jitter=0,
         )(func)
-        with self.assertRaises(exceptions.AWSCoreException):
+        with self.assertRaises(exceptions.CoreException):
             decorated_function()
         self.assertEqual(func.call_count, tries)
 
     def test_single_retry(self):
         tries = 1
-        func = mock.Mock(side_effect=exceptions.AWSCoreException("Test"))
+        func = mock.Mock(side_effect=exceptions.CoreException("Test"))
         decorated_function = decorators.retry(
-            retry_exceptions=(exceptions.AWSCoreException,),
+            retry_exceptions=(exceptions.CoreException,),
             tries=tries,
             delay=0,
             backoff=1,
             jitter=0,
         )(func)
-        with self.assertRaises(exceptions.AWSCoreException):
+        with self.assertRaises(exceptions.CoreException):
             decorated_function()
         self.assertEqual(func.call_count, tries)
+
+
+class HttpStatusCheckTests(TestCase):
+
+    def test_check_response_no_reraise(self):
+        request = Request(url='', method='')
+        func = mock.Mock(side_effect=HTTPStatusError(
+            request=request,
+            response=Response(
+                request=request,
+                status_code=400,
+            ),
+            message='test'
+        ))
+        decorated_function = decorators.http_status_check(reraise_status_codes=())(func)
+        with self.assertRaises(exceptions.APIException):
+            decorated_function()
+
+    def test_check_response_reraise(self):
+        request = Request(url='', method='')
+        func = mock.Mock(side_effect=HTTPStatusError(
+            request=request,
+            response=Response(
+                request=request,
+                status_code=502,
+            ),
+            message='test'
+        ))
+        decorated_function = decorators.http_status_check(reraise_status_codes=(500, 501, 502))(func)
+        with self.assertRaises(HTTPStatusError):
+            decorated_function()

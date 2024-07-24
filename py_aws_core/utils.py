@@ -80,7 +80,7 @@ def rand_int(num_a: int, num_b: int) -> int:
 
 
 def sleep(seconds: float) -> None:
-    time.sleep(seconds)
+    return time.sleep(seconds)
 
 
 def decode_unicode(s: str) -> str:
