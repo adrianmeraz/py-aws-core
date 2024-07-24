@@ -26,9 +26,10 @@ class RetryClient(Client):
         504,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, follow_redirects: bool = True, *args, **kwargs):
+
         super().__init__(
-            follow_redirects=True,
+            follow_redirects=follow_redirects,
             default_encoding="utf-8",
             *args,
             **kwargs
