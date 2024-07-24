@@ -1,14 +1,13 @@
-import logging
 import typing
 from functools import wraps
 from typing import Any, Dict, List
 
-
 from botocore.exceptions import ClientError
+from httpx import HTTPStatusError
 
-from . import dynamodb, utils
+from . import dynamodb, logs, utils
 
-logger = logging.getLogger(__name__)
+logger = logs.logger
 
 
 def boto3_handler(raise_as, client_error_map: dict):
@@ -77,7 +76,7 @@ def lambda_response_handler(raise_as):
 
 
 def retry(
-    retry_exceptions: typing.Tuple[typing.Type[BaseException]],
+    retry_exceptions: typing.Tuple,
     tries: int = 4,
     delay: float = 1.5,
     backoff: float = 2.0,
@@ -118,3 +117,21 @@ def retry(
         return wrapper_func  # true decorator
 
     return deco_func
+
+
+def http_status_check(func):
+
+    @wraps(func)
+    def wrapper_func(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except HTTPStatusError as e:
+            status_code = e.response.status_code
+            if status_code in (408, 429) or status_code >= 500:     # Retryable status codes
+                raise
+            if status_code == 401:
+                raise NotAuthorized(*args, **kwargs, **e.__dict__)
+
+            raise ApiError(*args, **kwargs, **e.__dict__)
+
+    return wrapper_func
