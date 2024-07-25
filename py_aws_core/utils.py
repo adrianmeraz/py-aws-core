@@ -2,6 +2,7 @@ import json
 import random
 import time
 import typing
+import uuid
 from datetime import datetime, timezone, timedelta, UTC
 
 
@@ -81,6 +82,10 @@ def rand_int(num_a: int, num_b: int) -> int:
 
 def sleep(seconds: float) -> None:
     return time.sleep(seconds)
+
+
+def get_uuid() -> uuid.UUID:
+    return uuid.uuid4()
 
 
 def decode_unicode(s: str) -> str:
