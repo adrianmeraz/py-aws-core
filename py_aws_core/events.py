@@ -13,11 +13,13 @@ class LambdaEvent:
             self.domainName = data['domainName']
 
     def __init__(self, data):
+        self._body = data['body']
         self.headers = data['headers'] or dict()
         self.httpMethod = data['httpMethod']
+        self.multiValueHeaders = data['multiValueHeaders']
+        self.multiValueQueryStringParameters = data['multiValueQueryStringParameters']
         self.path = data['path']
         self.queryStringParameters = data['queryStringParameters'] or dict()
-        self._body = data['body']
         self.requestContext = self.RequestContext(data['requestContext'])
 
     @property
