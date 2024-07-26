@@ -12,6 +12,8 @@ coverage = "~7.5"
 python = "~3.12"
 python-dotenv = "~1.0"
 httpx = "^0.27"
+respx = "^0.21.1"
+
 
 [build-system]
 requires = ["poetry-core"]
