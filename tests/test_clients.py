@@ -1,12 +1,14 @@
-from unittest import mock, TestCase
+from http.cookiejar import CookieJar
+from unittest import mock
 
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
 from py_aws_core.clients import RetryClient
 from py_aws_core.exceptions import APIException
+from tests.fixtures import BaseTestFixture
 
 
-class RetryClientTests(TestCase):
+class RetryClientTests(BaseTestFixture):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -43,3 +45,40 @@ class RetryClientTests(TestCase):
             with RetryClient() as h_client:
                 h_client.get('https://example.com')
         self.assertEqual(mock_send.call_count, 1)
+
+    def test_cookies(self):
+        client = RetryClient()
+        self.assertEqual(len(client.cookies), 0)
+
+        # Now add cookies to cookie jar
+        cookie_jar = CookieJar()
+        cookie_1 = self.create_test_cookie(name='cookie_1', value='value_1')
+        cookie_2 = self.create_test_cookie(name='cookie_2', value='value_2')
+
+        cookie_jar.set_cookie(cookie_1)
+        cookie_jar.set_cookie(cookie_2)
+
+        # Add cookie jar to client
+        client = RetryClient(cookies=cookie_jar)
+
+        self.assertEqual(client.b64_encoded_cookies,
+                         b'gASVjAEAAAAAAABdlCiMDmh0dHAuY29va2llamFylIwGQ29va2lllJOUKYGUfZQojAd2ZXJzaW9u\nlEsBjARuYW1llIwIY29va2llXzGUjAV2YWx1ZZSMB3ZhbHVlXzGUjARwb3J0lE6MDnBvcnRfc3Bl\nY2lmaWVklImMBmRvbWFpbpSMD3d3dy5leGFtcGxlLmNvbZSMEGRvbWFpbl9zcGVjaWZpZWSUiIwS\nZG9tYWluX2luaXRpYWxfZG90lImMBHBhdGiUjAEvlIwOcGF0aF9zcGVjaWZpZWSUiIwGc2VjdXJl\nlIiMB2V4cGlyZXOUTRAOjAdkaXNjYXJklImMB2NvbW1lbnSUTowLY29tbWVudF91cmyUTowHcmZj\nMjEwOZSJjAVfcmVzdJR9lHViaAMpgZR9lChoBksBaAeMCGNvb2tpZV8ylGgJjAd2YWx1ZV8ylGgL\nTmgMiWgNjA93d3cuZXhhbXBsZS5jb22UaA+IaBCJaBFoEmgTiGgUiGgVTRAOaBaJaBdOaBhOaBmJ\naBp9lHViZS4=\n')
+
+        # Verifying cookies are wiped
+        client = RetryClient()
+        self.assertEqual(len(client.cookies), 0)
+
+        # Now rehydrate cookies from binary
+        client.b64_decode_and_set_cookies(
+            b'gASVjAEAAAAAAABdlCiMDmh0dHAuY29va2llamFylIwGQ29va2lllJOUKYGUfZQojAd2ZXJzaW9u\nlEsBjARuYW1llIwIY29va2llXzGUjAV2YWx1ZZSMB3ZhbHVlXzGUjARwb3J0lE6MDnBvcnRfc3Bl\nY2lmaWVklImMBmRvbWFpbpSMD3d3dy5leGFtcGxlLmNvbZSMEGRvbWFpbl9zcGVjaWZpZWSUiIwS\nZG9tYWluX2luaXRpYWxfZG90lImMBHBhdGiUjAEvlIwOcGF0aF9zcGVjaWZpZWSUiIwGc2VjdXJl\nlIiMB2V4cGlyZXOUTRAOjAdkaXNjYXJklImMB2NvbW1lbnSUTowLY29tbWVudF91cmyUTowHcmZj\nMjEwOZSJjAVfcmVzdJR9lHViaAMpgZR9lChoBksBaAeMCGNvb2tpZV8ylGgJjAd2YWx1ZV8ylGgL\nTmgMiWgNjA93d3cuZXhhbXBsZS5jb22UaA+IaBCJaBFoEmgTiGgUiGgVTRAOaBaJaBdOaBhOaBmJ\naBp9lHViZS4=\n')
+        self.assertEqual(len(client.cookies), 2)
+
+        # Verify attrs on rehydrated cookies
+        r_cookies = client.cookies.jar._cookies['www.example.com']['/']
+        r_cookie_1 = r_cookies['cookie_1']
+        self.assertEqual(r_cookie_1.name, 'cookie_1')
+        self.assertEqual(r_cookie_1.value, 'value_1')
+
+        r_cookie_2 = r_cookies['cookie_2']
+        self.assertEqual(r_cookie_2.name, 'cookie_2')
+        self.assertEqual(r_cookie_2.value, 'value_2')

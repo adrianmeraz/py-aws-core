@@ -21,6 +21,10 @@ class NotAuthorizedException(APIException):
     ERROR_MESSAGE = 'Client is not authorized to take action'
 
 
+class CookieDecodingError(APIException):
+    ERROR_MESSAGE = 'Error while decoding binary cookies'
+
+
 class AWSCoreException(CoreException):
     ERROR_MESSAGE = 'A generic AWS error occurred'
 
