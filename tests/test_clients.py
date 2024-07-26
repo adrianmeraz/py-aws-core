@@ -5,7 +5,7 @@ from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
 from py_aws_core.clients import RetryClient
 from py_aws_core.exceptions import APIException
-from tests.fixtures import BaseTestFixture
+from py_aws_core.testing import BaseTestFixture
 
 
 class RetryClientTests(BaseTestFixture):
