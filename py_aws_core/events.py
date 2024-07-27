@@ -45,7 +45,7 @@ class LambdaEvent:
     @property
     def body(self):
         if self._body:
-            return json.loads(utils.remove_newline(self._body))
+            return json.loads(utils.remove_whitespace(self._body))
         return self._body
 
     @property

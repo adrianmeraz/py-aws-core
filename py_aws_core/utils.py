@@ -105,5 +105,5 @@ def unix_timestamp_to_iso8601(unix_ts: int):
     return datetime.fromtimestamp(unix_ts, tz=UTC).isoformat()
 
 
-def remove_newline(s: str) -> str:
-    return ''.join([line.strip() for line in s])
+def remove_whitespace(s: str) -> str:
+    return ''.join([line.replace(' ', '') for line in s.split('\r\n')])
