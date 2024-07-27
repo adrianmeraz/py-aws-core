@@ -103,3 +103,7 @@ def decode_unicode(s: str) -> str:
 
 def unix_timestamp_to_iso8601(unix_ts: int):
     return datetime.fromtimestamp(unix_ts, tz=UTC).isoformat()
+
+
+def remove_newline(s: str) -> str:
+    return ''.join([line.strip() for line in s])
