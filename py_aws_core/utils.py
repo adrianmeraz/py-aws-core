@@ -106,4 +106,4 @@ def unix_timestamp_to_iso8601(unix_ts: int):
 
 
 def remove_whitespace(s: str) -> str:
-    return ''.join([line.replace(' ', '') for line in s.split('\r\n')])
+    return ''.join([line.replace(' ', '') for line in s.split('\\r\\n')])
