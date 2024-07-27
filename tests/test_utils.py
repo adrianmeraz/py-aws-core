@@ -123,8 +123,8 @@ class UnixTimestampToISO8601Tests(TestCase):
         self.assertEqual(val, '2008-08-29T11:40:00+00:00')
 
 
-class RemoveNewlineTests(TestCase):
+class RemoveWhitespaceTests(TestCase):
     def test_ok(self):
         test_str = '{\r\n    "movement_type": "I",\r\n    "medium_transport_type": "A",\r\n    "flight_type": "C",\r\n    "control_point_id": "12",\r\n    "control_point_name": "MEDELLIN (MDE), AEROPUERTO JOSE MARIA CORDOVA",\r\n    "flight_date_yyyy_mm_dd": "2023-12-22",\r\n    "flight_number": "973",\r\n    "route_code": "10036",\r\n    "route_name": "FORTDERDALE-MEDELLIN",\r\n    "route_company_code": "SPR",\r\n    "route_company_name": "SPIRIT AIRLINES",\r\n    "country_id": "249",\r\n    "country_name": "ESTADOS UNIDOS",\r\n    "origin_city_id": "15",\r\n    "origin_city_department": "1",\r\n    "origin_city_name": "DALLAS , ESTADOS UNIDOS DE AMERICA"\r\n}'
-        val = utils.remove_newline(test_str)
+        val = utils.remove_whitespace(test_str)
         self.assertEqual(val, '{"movement_type":"I","medium_transport_type":"A","flight_type":"C","control_point_id":"12","control_point_name":"MEDELLIN(MDE),AEROPUERTOJOSEMARIACORDOVA","flight_date_yyyy_mm_dd":"2023-12-22","flight_number":"973","route_code":"10036","route_name":"FORTDERDALE-MEDELLIN","route_company_code":"SPR","route_company_name":"SPIRITAIRLINES","country_id":"249","country_name":"ESTADOSUNIDOS","origin_city_id":"15","origin_city_department":"1","origin_city_name":"DALLAS,ESTADOSUNIDOSDEAMERICA"}')
