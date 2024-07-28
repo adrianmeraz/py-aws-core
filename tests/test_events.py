@@ -26,8 +26,12 @@ class DBEncoderTests(TestCase):
 
         multi_value_headers = mock_event.multi_value_headers
         self.assertEqual(
-            multi_value_headers.cookies['__RequestVerificationToken'],
-            'CfDJ8F_vZ7pnDCpAgEGmL1mJITKFEG29yE4jfeVaiNJqv-D6H-SWxLYSAtUxaCbNko-ykz0vEQdTDCvFYWvjYuaEFuoHYU1LUzF2eTkInqLzANdGhtQTtqlHFWC_0YQrWYp2Ac_t4qU8YgvHQKTLoULBXgg'
+            multi_value_headers.cookies['travel#__RequestVerificationToken'],
+            'CfDJ8GcmGAmFYbdJgvkLq5_X6y4I3JNsdWDwMFwshaQcsrlqLZHWYA7yCFrr5H22IA4u-xXtksHExFYRhCe6tLTMekS-cnH_Ayh2DXQjU0118i_22okKT9t5_rVyRg-tFn-FT2yBjIPg0RpmUkvmvRO8wAo'
+        )
+        self.assertEqual(
+            multi_value_headers.cookies['session_id'],
+            '668638a6-e262-4d07-a0d6-d200d88e3be2'
         )
         self.assertEqual(multi_value_headers.accept, '*/*')
         self.assertEqual(multi_value_headers.accept_encoding, 'gzip, deflate, br')
