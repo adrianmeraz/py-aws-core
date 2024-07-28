@@ -10,7 +10,7 @@ class LambdaEvent:
             self.accept = data['Accept'][0]
             self.accept_encoding = data['Accept-Encoding'][0]
             self._authorization = data.get('Authorization')
-            self._cookies = data.get('Cookie', list())[0]
+            self._cookies = data.get('Cookie')
             self.user_agent = data['User-Agent'][0]
 
         @property
@@ -21,8 +21,10 @@ class LambdaEvent:
 
         @property
         def cookies(self) -> typing.Dict:
+            if not self._cookies:
+                return dict()
             val = dict()
-            for part in self._cookies.split(';'):
+            for part in self._cookies[0].split(';'):
                 k, v = part.strip().split('=')
                 val[k] = v
             return val
