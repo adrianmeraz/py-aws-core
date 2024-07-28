@@ -20,7 +20,7 @@ class LambdaEvent:
             return None
 
         @property
-        def cookies(self) -> dict:
+        def cookies(self) -> typing.Dict:
             return {c.split('=')[0]: c.split('=')[1] for c in self._cookies}
 
     class RequestContext:
@@ -49,8 +49,8 @@ class LambdaEvent:
         return self._body
 
     @property
-    def cookies(self):
-        return self.multi_value_headers._cookies
+    def cookies(self) -> typing.Dict:
+        return self.multi_value_headers.cookies
 
     @property
     def lower_headers(self) -> typing.Dict:
