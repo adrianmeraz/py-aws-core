@@ -59,8 +59,8 @@ def to_iso_8601(dt: datetime = None, tz=timezone.utc) -> str:
     return dt.isoformat()
 
 
-def add_days_to_current_unix_timestamp(days: int, tz=timezone.utc) -> int:
-    dt = get_now_datetime(tz=tz) + timedelta(days=days)
+def add_seconds_to_current_unix_timestamp(seconds: int, tz=timezone.utc) -> int:
+    dt = get_now_datetime(tz=tz) + timedelta(seconds=seconds)
     return int(dt.timestamp())
 
 

@@ -1,7 +1,7 @@
 import datetime
 from unittest import mock, TestCase
 
-from py_aws_core import exceptions, utils
+from py_aws_core import const, exceptions, utils
 
 
 class BuildLambdaResponseTests(TestCase):
@@ -98,10 +98,10 @@ class AddDaysToUnixTimestampTests(TestCase):
     def test_ok(self, mocked_get_now_datetime):
         dt = datetime.datetime(year=2003, month=9, day=5, hour=15, minute=33, second=28, tzinfo=datetime.timezone.utc)
         mocked_get_now_datetime.return_value = dt
-        val = utils.add_days_to_current_unix_timestamp(days=7)
+        val = utils.add_seconds_to_current_unix_timestamp(seconds=7*const.SECONDS_IN_DAY)
         self.assertEqual(val, 1063380808)
 
-        val = utils.add_days_to_current_unix_timestamp(days=180)
+        val = utils.add_seconds_to_current_unix_timestamp(seconds=180*const.SECONDS_IN_DAY)
         self.assertEqual(val, 1078328008)
 
 

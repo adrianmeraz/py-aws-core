@@ -5,7 +5,7 @@ import typing
 import boto3
 from botocore.config import Config
 
-from . import logs, secrets_manager, utils
+from . import const, logs, secrets_manager, utils
 
 logger = logs.logger
 
@@ -86,20 +86,48 @@ class DDBClient:
 class ABCCommonAPI(ABC):
 
     @classmethod
+    def get_batch_entity_create_map(
+        cls,
+        pk: str,
+        sk: str,
+        _type: str,
+        created_by: str = '',
+        expire_in_seconds: int = const.DB_DEFAULT_EXPIRES_IN_SECONDS,
+        **kwargs,
+    ):
+        return {
+            'PK': pk,
+            'SK': sk,
+            'Type': _type,
+            'CreatedAt': cls.iso_8601_now_timestamp(),
+            'CreatedBy': created_by,
+            'ModifiedAt': '',
+            'ModifiedBy': '',
+            'ExpiresAt': cls.calc_expire_at_timestamp(expire_in_seconds=expire_in_seconds),
+        } | kwargs
+
+    @classmethod
+    def get_entity_update_map(cls, modified_by: str):
+        return {
+            'ModifiedAt': cls.iso_8601_now_timestamp(),
+            'ModifiedBy': modified_by
+        }
+
+    @classmethod
     def iso_8601_now_timestamp(cls) -> str:
         return utils.to_iso_8601()
 
     @classmethod
-    def calc_expire_at_timestamp(cls, expire_in_days: int = None) -> int | str:
+    def calc_expire_at_timestamp(cls, expire_in_seconds: int = None) -> int | str:
         """
-        Adds days to current unix timestamp to generate new unix timestamp
-        Days set to None will result in empty string
-        :param expire_in_days: Days to add to current timestamp
+        Adds seconds to current unix timestamp to generate new unix timestamp
+        Seconds set to None will result in empty string
+        :param expire_in_seconds: Seconds to add to current timestamp
         :return:
         """
-        if expire_in_days is None:
+        if expire_in_seconds is None:
             return ''
-        return utils.add_days_to_current_unix_timestamp(days=expire_in_days)
+        return utils.add_seconds_to_current_unix_timestamp(seconds=expire_in_seconds)
 
 
 class ErrorResponse:
