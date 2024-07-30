@@ -1,6 +1,6 @@
 import os
-from abc import ABC
 import typing
+from abc import ABC
 
 import boto3
 from botocore.config import Config
@@ -105,13 +105,6 @@ class ABCCommonAPI(ABC):
             'ModifiedBy': '',
             'ExpiresAt': cls.calc_expire_at_timestamp(expire_in_seconds=expire_in_seconds),
         } | kwargs
-
-    @classmethod
-    def get_entity_update_map(cls, modified_by: str):
-        return {
-            'ModifiedAt': cls.iso_8601_now_timestamp(),
-            'ModifiedBy': modified_by
-        }
 
     @classmethod
     def iso_8601_now_timestamp(cls) -> str:
