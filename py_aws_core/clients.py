@@ -43,7 +43,7 @@ class RetryClient(Client):
         return super().send(*args, **kwargs)
 
     @property
-    def session_id(self):
+    def session_id(self) -> uuid.UUID:
         return self._session_id
 
     @property
@@ -52,14 +52,14 @@ class RetryClient(Client):
 
     def b64_decode_and_set_cookies(self, b64_cookies: bytes):
         if not b64_cookies:
-            logger.info(f'No Cookies To Restore: {b64_cookies}')
+            logger.info(f'Session ID: {self.session_id} -> No Cookies To Restore: {b64_cookies}')
             self.cookies.jar = CookieJar()
         try:
             cookie_jar = CookieJar()
             decoded_bytes = base64.decodebytes(b64_cookies)
             for c in pickle.loads(decoded_bytes):
-                logger.info(f'Setting CookieJar Cookie: "{c}"')
+                logger.info(f'Session ID: {self.session_id} -> Setting CookieJar Cookie: "{c}"')
                 cookie_jar.set_cookie(c)
             self.cookies.jar = cookie_jar
         except (pickle.PickleError, binascii.Error) as e:
-            raise exceptions.CookieDecodingError(info=f'{b64_cookies}, Cookie Error: {str(e)}')
+            raise exceptions.CookieDecodingError(info=f'Session ID: {self.session_id} -> Cookie Error: {str(e)}')
