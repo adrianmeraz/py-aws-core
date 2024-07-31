@@ -1,11 +1,13 @@
 import base64
 import binascii
 import pickle
+import uuid
 from http.cookiejar import CookieJar
 
 from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, ProxyError
 
-from . import decorators, exceptions, logs
+
+from . import decorators, exceptions, logs, utils
 
 logger = logs.logger
 
@@ -31,19 +33,18 @@ class RetryClient(Client):
         504,
     )
 
-    def __init__(self, follow_redirects: bool = True, *args, **kwargs):
-
-        super().__init__(
-            follow_redirects=follow_redirects,
-            default_encoding="utf-8",
-            *args,
-            **kwargs
-        )
+    def __init__(self, session_id: uuid.UUID = None, follow_redirects: bool = True, *args, **kwargs):
+        super().__init__(follow_redirects=follow_redirects, default_encoding="utf-8", *args, **kwargs)
+        self._session_id = session_id or utils.get_uuid()
 
     @decorators.retry(retry_exceptions=RETRY_EXCEPTIONS)
     @decorators.http_status_check(reraise_status_codes=RETRY_STATUS_CODES)
     def send(self, *args, **kwargs):
         return super().send(*args, **kwargs)
+
+    @property
+    def session_id(self):
+        return self._session_id
 
     @property
     def b64_encoded_cookies(self) -> bytes:
@@ -57,6 +58,7 @@ class RetryClient(Client):
             cookie_jar = CookieJar()
             decoded_bytes = base64.decodebytes(b64_cookies)
             for c in pickle.loads(decoded_bytes):
+                logger.info(f'Setting CookieJar Cookie: "{c}"')
                 cookie_jar.set_cookie(c)
             self.cookies.jar = cookie_jar
         except (pickle.PickleError, binascii.Error) as e:
