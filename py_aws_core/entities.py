@@ -1,6 +1,9 @@
+import uuid
+from abc import ABC, abstractmethod
+
 from boto3.dynamodb import types
 
-from . import encoders
+from py_aws_core import const, encoders
 
 
 class BaseModel:
@@ -29,3 +32,28 @@ class BaseModel:
     @property
     def to_json(self):
         return encoders.DBEncoder().serialize_to_json(self)
+
+
+class ABCEntity(ABC, BaseModel):
+    TYPE = const.EntityTypes.ABC
+
+    @classmethod
+    @abstractmethod
+    def create_key(cls, *args, **kwargs) -> str:
+        pass
+
+    @classmethod
+    def type(cls) -> const.EntityTypes:
+        return cls.TYPE
+
+
+class Session(ABCEntity):
+    TYPE = const.EntityTypes.SESSION
+
+    def __init__(self, data):
+        super().__init__(data)
+        self.Base64Cookies = self.data['Base64Cookies']
+
+    @classmethod
+    def create_key(cls, _id: uuid.UUID) -> str:
+        return f'{cls.type().value}#{str(_id)}'

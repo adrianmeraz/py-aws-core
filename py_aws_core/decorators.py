@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 from botocore.exceptions import ClientError
 from httpx import codes, HTTPStatusError
 
-from . import dynamodb, exceptions, logs, utils
+from py_aws_core import db_dynamo, exceptions, logs, utils
 
 logger = logs.logger
 
@@ -40,7 +40,7 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
                 return response
             except ClientError as e:
                 logger.error(f'ClientError detected -> {e}')
-                e_response = dynamodb.ErrorResponse(e.response)
+                e_response = db_dynamo.ErrorResponse(e.response)
                 if e_response.CancellationReasons:
                     e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
                 if exc := client_err_map.get(e_response.Error.Code):
