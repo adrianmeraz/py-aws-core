@@ -68,6 +68,10 @@ class RetryClientTests(BaseTestFixture):
         client = RetryClient()
         self.assertEqual(len(client.cookies), 0)
 
+        # Verify no cookies results in empty cookie jar
+        client.b64_decode_and_set_cookies(b'')
+        self.assertEqual(len(client.cookies), 0)
+
         # Now rehydrate cookies from binary
         client.b64_decode_and_set_cookies(
             b'gASVjAEAAAAAAABdlCiMDmh0dHAuY29va2llamFylIwGQ29va2lllJOUKYGUfZQojAd2ZXJzaW9u\nlEsBjARuYW1llIwIY29va2llXzGUjAV2YWx1ZZSMB3ZhbHVlXzGUjARwb3J0lE6MDnBvcnRfc3Bl\nY2lmaWVklImMBmRvbWFpbpSMD3d3dy5leGFtcGxlLmNvbZSMEGRvbWFpbl9zcGVjaWZpZWSUiIwS\nZG9tYWluX2luaXRpYWxfZG90lImMBHBhdGiUjAEvlIwOcGF0aF9zcGVjaWZpZWSUiIwGc2VjdXJl\nlIiMB2V4cGlyZXOUTRAOjAdkaXNjYXJklImMB2NvbW1lbnSUTowLY29tbWVudF91cmyUTowHcmZj\nMjEwOZSJjAVfcmVzdJR9lHViaAMpgZR9lChoBksBaAeMCGNvb2tpZV8ylGgJjAd2YWx1ZV8ylGgL\nTmgMiWgNjA93d3cuZXhhbXBsZS5jb22UaA+IaBCJaBFoEmgTiGgUiGgVTRAOaBaJaBdOaBhOaBmJ\naBp9lHViZS4=\n')

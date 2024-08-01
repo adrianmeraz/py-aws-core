@@ -53,6 +53,7 @@ class RetryClient(Client):
         if not b64_cookies:
             logger.info(f'Session ID: {self.session_id} -> No Cookies To Restore: {b64_cookies}')
             self.cookies.jar = CookieJar()
+            return
         try:
             cookie_jar = CookieJar()
             decoded_bytes = base64.decodebytes(b64_cookies)
