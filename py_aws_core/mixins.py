@@ -1,4 +1,4 @@
-from .encoders import DBEncoder
+from py_aws_core.encoders import DBEncoder
 
 
 class JsonMixin:

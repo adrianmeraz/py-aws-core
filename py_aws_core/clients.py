@@ -6,8 +6,7 @@ from http.cookiejar import CookieJar
 
 from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, ProxyError
 
-
-from . import decorators, exceptions, logs, utils
+from py_aws_core import decorators, exceptions, logs, services, utils
 
 logger = logs.logger
 
@@ -63,3 +62,13 @@ class RetryClient(Client):
             self.cookies.jar = cookie_jar
         except (pickle.PickleError, binascii.Error) as e:
             raise exceptions.CookieDecodingError(info=f'Session ID: {self.session_id} -> Cookie Error: {str(e)}')
+
+
+class SessionPersistClient(RetryClient):
+    def __enter__(self):
+        services.rehydrate_session_from_database(self)
+        return super().__enter__()
+
+    def __exit__(self, *args, **kwargs):
+        services.write_session_to_database(self)
+        super().__exit__(*args, **kwargs)

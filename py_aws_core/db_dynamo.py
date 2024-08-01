@@ -5,7 +5,7 @@ from abc import ABC
 import boto3
 from botocore.config import Config
 
-from . import const, logs, secrets_manager, utils
+from py_aws_core import const, entities, logs, secrets_manager, utils
 
 logger = logs.logger
 
@@ -82,9 +82,25 @@ class DDBClient:
                 batch.put_item(Item=_map)
         return len(item_maps)
 
+    @classmethod
+    def write_maps_to_db(cls, item_maps: typing.List[typing.Dict]) -> int:
+        return cls.batch_write_item_maps(item_maps=item_maps)
+
+
+class QueryResponse(ABC):
+    def __init__(self, data):
+        self.Items = data.get('Items')
+        self.Count = data.get('Count')
+        self.ScannedCount = data.get('ScannedCount')
+        self.ResponseMetadata = ResponseMetadata(data['ResponseMetadata'])
+
+    def get_by_type(self, _type: const.EntityTypes) -> typing.List:
+        if self.Items:
+            return [item for item in self.Items if entities.BaseModel(item).Type == _type.value]
+        return list()
+
 
 class ABCCommonAPI(ABC):
-
     @classmethod
     def get_batch_entity_create_map(
         cls,

@@ -1,5 +1,5 @@
 import json
-from . import logs
+from py_aws_core import logs
 from decimal import Decimal
 
 logger = logs.logger

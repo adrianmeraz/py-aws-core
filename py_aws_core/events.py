@@ -1,7 +1,7 @@
 import json
 import typing
 
-from . import utils
+from py_aws_core import utils
 
 
 class LambdaEvent:

@@ -4,7 +4,7 @@ from abc import ABC
 import boto3
 from botocore.config import Config
 
-from . import logs, secrets_manager
+from py_aws_core import logs, secrets_manager
 
 logger = logs.logger
 

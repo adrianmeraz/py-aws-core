@@ -4,7 +4,7 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
-from . import exceptions
+from py_aws_core import exceptions
 
 
 class SecretsManager:
