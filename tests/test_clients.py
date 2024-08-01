@@ -104,3 +104,6 @@ class SessionPersistClientTests(BaseTestFixture):
 
         with SessionPersistClient() as client:
             self.assertEqual(len(client.cookies.jar), 0)
+
+        self.assertEqual(mocked_rehydrate_session_from_database.call_count, 1)
+        self.assertEqual(mocked_write_session_to_database.call_count, 1)
