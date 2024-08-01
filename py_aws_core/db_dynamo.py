@@ -94,9 +94,9 @@ class QueryResponse(ABC):
         self.ScannedCount = data.get('ScannedCount')
         self.ResponseMetadata = ResponseMetadata(data['ResponseMetadata'])
 
-    def get_by_type(self, _type: const.EntityTypes) -> typing.List:
+    def get_by_type(self, _type: str) -> typing.List:
         if self.Items:
-            return [item for item in self.Items if entities.BaseModel(item).Type == _type.value]
+            return [item for item in self.Items if entities.BaseModel(item).Type == _type]
         return list()
 
 
