@@ -3,7 +3,8 @@ from unittest import mock
 
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
-from py_aws_core.clients import RetryClient
+from py_aws_core import services
+from py_aws_core.clients import RetryClient, SessionPersistClient
 from py_aws_core.exceptions import APIException
 from py_aws_core.testing import BaseTestFixture
 
@@ -86,3 +87,20 @@ class RetryClientTests(BaseTestFixture):
         r_cookie_2 = r_cookies['cookie_2']
         self.assertEqual(r_cookie_2.name, 'cookie_2')
         self.assertEqual(r_cookie_2.value, 'value_2')
+
+
+class SessionPersistClientTests(BaseTestFixture):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.request = Request(url='', method='')  # Must add a non null request to avoid raising Runtime exception
+        cls.mocked_sleep = mock.patch('py_aws_core.utils.sleep', return_value=None).start()
+
+    @mock.patch.object(services, 'rehydrate_session_from_database')
+    @mock.patch.object(services, 'write_session_to_database')
+    def test_ok(self, mocked_rehydrate_session_from_database, mocked_write_session_to_database):
+        mocked_rehydrate_session_from_database.return_value = True
+        mocked_write_session_to_database.return_value = True
+
+        with SessionPersistClient() as client:
+            self.assertEqual(len(client.cookies.jar), 0)
