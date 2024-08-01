@@ -35,7 +35,7 @@ class BaseModel:
 
 
 class ABCEntity(ABC, BaseModel):
-    TYPE = const.EntityTypes.ABC
+    TYPE = 'ABC'
 
     @classmethod
     @abstractmethod
@@ -43,12 +43,12 @@ class ABCEntity(ABC, BaseModel):
         pass
 
     @classmethod
-    def type(cls) -> const.EntityTypes:
+    def type(cls) -> str:
         return cls.TYPE
 
 
 class Session(ABCEntity):
-    TYPE = const.EntityTypes.SESSION
+    TYPE = 'SESSION'
 
     def __init__(self, data):
         super().__init__(data)

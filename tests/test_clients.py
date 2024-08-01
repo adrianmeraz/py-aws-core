@@ -3,7 +3,8 @@ from unittest import mock
 
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
-from py_aws_core.clients import RetryClient
+from py_aws_core import exceptions, services
+from py_aws_core.clients import RetryClient, SessionPersistClient
 from py_aws_core.exceptions import APIException
 from py_aws_core.testing import BaseTestFixture
 
@@ -46,7 +47,7 @@ class RetryClientTests(BaseTestFixture):
                 h_client.get('https://example.com')
         self.assertEqual(mock_send.call_count, 1)
 
-    def test_cookies(self):
+    def test_ok_cookies(self):
         client = RetryClient()
         self.assertEqual(len(client.cookies), 0)
 
@@ -82,3 +83,33 @@ class RetryClientTests(BaseTestFixture):
         r_cookie_2 = r_cookies['cookie_2']
         self.assertEqual(r_cookie_2.name, 'cookie_2')
         self.assertEqual(r_cookie_2.value, 'value_2')
+
+    def test_cookie_errors(self):
+        client = RetryClient()
+
+        # Verify no cookies results in empty cookie jar
+        client.b64_decode_and_set_cookies(b'')
+        self.assertEqual(len(client.cookies), 0)
+
+        with self.assertRaises(exceptions.CookieDecodingError):
+            client.b64_decode_and_set_cookies(b'badcookies')
+
+
+class SessionPersistClientTests(BaseTestFixture):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.request = Request(url='', method='')  # Must add a non null request to avoid raising Runtime exception
+        cls.mocked_sleep = mock.patch('py_aws_core.utils.sleep', return_value=None).start()
+
+    @mock.patch.object(services, 'rehydrate_session_from_database')
+    @mock.patch.object(services, 'write_session_to_database')
+    def test_ok(self, mocked_rehydrate_session_from_database, mocked_write_session_to_database):
+        mocked_rehydrate_session_from_database.return_value = True
+        mocked_write_session_to_database.return_value = True
+
+        with SessionPersistClient() as client:
+            self.assertEqual(len(client.cookies.jar), 0)
+
+        self.assertEqual(mocked_rehydrate_session_from_database.call_count, 1)
+        self.assertEqual(mocked_write_session_to_database.call_count, 1)

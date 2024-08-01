@@ -1,4 +1,5 @@
 import datetime
+import random
 from unittest import mock, TestCase
 
 from py_aws_core import const, exceptions, utils
@@ -121,6 +122,15 @@ class UnixTimestampToISO8601Tests(TestCase):
 
         val = utils.unix_timestamp_to_iso8601(1220010000)
         self.assertEqual(val, '2008-08-29T11:40:00+00:00')
+
+
+class RandIntTests(TestCase):
+    @mock.patch.object(random, 'randint')
+    def test_decode_str(self, mocked_randint):
+        mocked_randint.return_value = 87
+
+        val = utils.rand_int(num_a=10, num_b=99)
+        self.assertEqual(val, 87)
 
 
 class RemoveWhitespaceTests(TestCase):

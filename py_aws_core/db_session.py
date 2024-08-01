@@ -10,10 +10,10 @@ logger = logs.logger
 class SessionDBAPI(db_dynamo.ABCCommonAPI):
     @classmethod
     def build_session_map(
-            cls,
-            _id: uuid.UUID,
-            b64_cookies: bytes,
-            expire_in_seconds: int = const.DB_DEFAULT_EXPIRES_IN_SECONDS
+        cls,
+        _id: uuid.UUID,
+        b64_cookies: bytes,
+        expire_in_seconds: int = const.DB_DEFAULT_EXPIRES_IN_SECONDS
     ):
         pk = sk = entities.Session.create_key(_id=_id)
         return cls.get_batch_entity_create_map(
