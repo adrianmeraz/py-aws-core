@@ -1,6 +1,6 @@
-from db_dynamo import DDBClient
 from py_aws_core import logs
-from db_session import SessionDBAPI
+from py_aws_core.db_dynamo import DDBClient
+from py_aws_core.db_session import SessionDBAPI
 
 logger = logs.logger
 
