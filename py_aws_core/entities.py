@@ -56,4 +56,4 @@ class Session(ABCEntity):
 
     @classmethod
     def create_key(cls, _id: uuid.UUID) -> str:
-        return f'{cls.type().value}#{str(_id)}'
+        return f'{cls.type()}#{str(_id)}'
