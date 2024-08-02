@@ -4,14 +4,23 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
-from py_aws_core import exceptions
+from py_aws_core import exceptions, logs
+
+logger = logs.logger
 
 
 class SecretsManager:
+    """
+    First checks environment variables for secrets.
+    If secret not found, will attempt to pull from secrets manager
+    """
     __secrets = None
 
     @classmethod
     def __get_secrets(cls, secret_name: str):
+        if secret_value := os.environ.get(secret_name):
+            logger.debug(f'Secret "{secret_name}" found in environment variables')
+            return secret_value
         try:
             sm_client = boto3.client('secretsmanager')
             r_secrets = sm_client.get_secret_value(
