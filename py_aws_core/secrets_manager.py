@@ -48,7 +48,3 @@ class SecretsManager:
             return os.environ['AWS_SECRET_NAME']
         except KeyError:
             raise exceptions.SecretsManagerException('Missing environment variable "AWS_SECRET_NAME"')
-
-    @staticmethod
-    def get_env_var(secret_name: str) -> str:
-        return os.environ[secret_name]
