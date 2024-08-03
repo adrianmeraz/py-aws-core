@@ -94,6 +94,17 @@ class DDBClient:
         return self.batch_write_item_maps(item_maps=item_maps)
 
 
+__db_client = DDBClient()
+
+
+def get_db_client():
+    """
+    Reuses db client across all modules for efficiency
+    :return:
+    """
+    return __db_client
+
+
 class QueryResponse(ABC):
     def __init__(self, data):
         self.Items = data.get('Items')

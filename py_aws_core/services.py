@@ -1,9 +1,9 @@
 from py_aws_core import logs
-from py_aws_core.db_dynamo import DDBClient
+from py_aws_core.db_dynamo import get_db_client
 from py_aws_core.db_session import SessionDBAPI
 
 logger = logs.logger
-db_client = DDBClient()
+db_client = get_db_client()
 
 
 def rehydrate_session_from_database(client):

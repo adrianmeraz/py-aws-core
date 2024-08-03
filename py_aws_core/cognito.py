@@ -4,9 +4,11 @@ from abc import ABC
 import boto3
 from botocore.config import Config
 
-from py_aws_core import logs, secrets_manager
+from py_aws_core import logs
+from py_aws_core.secrets_manager import get_secrets_manager
 
 logger = logs.logger
+secrets_manager = get_secrets_manager()
 
 COGNITO_CLIENT_CONNECT_TIMEOUT = 4.9
 COGNITO_CLIENT_READ_TIMEOUT = 4.9
@@ -24,7 +26,6 @@ class CognitoClient:
 
     def __init__(self):
         self._boto_client = None
-        self._secrets_manager = secrets_manager.SecretsManager()
 
     @property
     def boto_client(self):
@@ -38,11 +39,11 @@ class CognitoClient:
 
     @property
     def aws_cognito_pool_client_id(self):
-        return self._secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_CLIENT_ID')
+        return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_CLIENT_ID')
 
     @property
     def aws_cognito_pool_id(self):
-        return self._secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_ID')
+        return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_ID')
 
     @classmethod
     def get_new_client(cls):
