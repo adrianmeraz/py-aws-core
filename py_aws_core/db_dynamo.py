@@ -21,7 +21,7 @@ class DDBClient:
             total_max_attempts=2,
         )
     )
-    __ddb_endpoint_url = os.environ.get('DDB_ENDPOINT')
+    __ddb_endpoint_url = utils.get_environment_variable('DDB_ENDPOINT')
     __ddb_session = boto3.Session()
 
     @classmethod
