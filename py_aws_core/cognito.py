@@ -20,6 +20,7 @@ class CognitoClient:
             total_max_attempts=2,
         )
     )
+    __boto3_session = boto3.Session()
 
     def __init__(self):
         self._boto_client = None
@@ -46,7 +47,7 @@ class CognitoClient:
     @classmethod
     def get_new_client(cls):
         logger.info(f'Getting new Cognito client')
-        return boto3.Session().client(
+        return cls.__boto3_session.client(
             config=cls.__CONFIG,
             service_name='cognito-idp',
         )
