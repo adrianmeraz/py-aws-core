@@ -22,5 +22,6 @@ class DBSessionTests(TestCase):
             session['Base64Cookies']['B'] = bytes(session['Base64Cookies']['B'], 'utf-8')
             mocked_query.return_value = _json
 
-        r_query = db_session.SessionDBAPI.GetSessionQuery.call(uuid.UUID('10c7676f-77a3-4605-b5ed-76c210369c66'))
+        db_client = DDBClient()
+        r_query = db_session.SessionDBAPI.GetSessionQuery.call(db_client=db_client, _id=uuid.UUID('10c7676f-77a3-4605-b5ed-76c210369c66'))
         self.assertEqual(len(r_query.session_b64_cookies), 1241)

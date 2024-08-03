@@ -38,11 +38,12 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
         @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
         def call(
             cls,
+            db_client: DDBClient,
             _id: uuid.UUID,
         ) -> Response:
-            table_name = DDBClient.get_table_name()
+            table_name = db_client.get_table_name()
             pk = entities.Session.create_key(_id=_id)
-            response = DDBClient.query(
+            response = db_client.query(
                 TableName=table_name,
                 KeyConditionExpression="#pk = :pk",
                 ExpressionAttributeNames={
@@ -63,12 +64,13 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
         @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
         def call(
             cls,
+            db_client: DDBClient,
             _id: uuid.UUID,
             b64_cookies: bytes
         ):
-            table_name = DDBClient.get_table_name()
+            table_name = db_client.get_table_name()
             pk = sk = entities.Session.create_key(_id=_id)
-            return DDBClient.update_item(
+            return db_client.update_item(
                 TableName=table_name,
                 Key={
                     'PK': {'S': pk},

@@ -21,5 +21,5 @@ def write_session_to_database(client):
     logger.info(f'Session ID: {session_id} -> Writing cookies to database...')
     b64_cookies = client.b64_encoded_cookies
     c_maps = [SessionDBAPI.build_session_map(_id=client.session_id, b64_cookies=b64_cookies)]
-    DDBClient.write_maps_to_db(item_maps=c_maps)
+    DDBClient().write_maps_to_db(item_maps=c_maps)
     logger.info(f'Session ID: {session_id} -> Wrote cookies to database')
