@@ -40,7 +40,7 @@ class DDBClient:
 
     @classmethod
     def get_table_name(cls):
-        return secrets_manager.SecretsManager.get_secrets()['AWS_DYNAMO_DB_TABLE_NAME']
+        return secrets_manager.SecretsManager().get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
 
     @classmethod
     def query(cls, *args, **kwargs):

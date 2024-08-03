@@ -1,28 +1,38 @@
+import json
+import os
+from importlib.resources import as_file
 from unittest import mock, TestCase
+from unittest.mock import PropertyMock
+
+from botocore.stub import Stubber
 
 from py_aws_core.secrets_manager import SecretsManager
+from tests import const as test_const
 
 
 class SecretsManagerTests(TestCase):
-    pass
-    # @mock.patch.object(dynamodb.DDBClient, 'get_table_name')
-    # def test_table_name(self, mocked_get_secrets):
-    #     mocked_get_secrets.return_value = 'test_table_123'
-    #     val = SecretsManager.get_aws_dynamo_db_table_name()
-    #     self.assertEqual(
-    #         val,
-    #         'test_table_123'
-    #     )
-    #
-    #     self.assertEqual(mocked_get_secrets.call_count, 1)
+    @mock.patch.object(os.environ, 'get')
+    def test_get_secret_env_var(self, mock_os_environ_get):
+        mock_os_environ_get.return_value = 'TEST_VAL_1'
+        sm = SecretsManager()
+        stubber = Stubber(sm.boto_client)
+        stubber.activate()
+        val = sm.get_secret(secret_name='TEST_KEY_1')
+        self.assertEqual(val, 'TEST_VAL_1')
 
-    # @mock.patch.object(SecretsManager, 'get_aws_cognito_pool_id')
-    # def test_get_aws_cognito_pool_id(self, mocked_get_secrets):
-    #     mocked_get_secrets.return_value = 'us-west-2_Test123'
-    #     val = SecretsManager.get_aws_cognito_pool_id()
-    #     self.assertEqual(
-    #         val,
-    #         'us-west-2_Test123'
-    #     )
-    #
-    #     self.assertEqual(mocked_get_secrets.call_count, 1)
+    @mock.patch.object(SecretsManager, new_callable=PropertyMock, attribute='get_aws_secret_id')
+    def test_get_secret_caching(self, mock_get_aws_secret_id):
+        mock_get_aws_secret_id.return_value = 'TEST_VAL_2'
+
+        sm = SecretsManager()
+        stubber = Stubber(sm.boto_client)
+        stubber.activate()
+        source = test_const.TEST_SECRETS_MANAGER_RESOURCES_PATH.joinpath('get_secret_value.json')
+        with as_file(source) as admin_create_user_json:
+            stubber.add_response('get_secret_value', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
+            val = sm.get_secret(secret_name='test_key_1')
+        self.assertEqual(val, 'test_val_1')
+
+        # Now checking cache
+        val = sm.get_secret(secret_name='test_key_1')
+        self.assertEqual(val, 'test_val_1')
