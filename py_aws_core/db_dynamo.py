@@ -16,11 +16,32 @@ class DDBClient:
     __config = Config(
         connect_timeout=DDB_CLIENT_CONNECT_TIMEOUT,
         read_timeout=DDB_CLIENT_READ_TIMEOUT,
+        tcp_keepalive=True,  # Keep TCP connections open for faster response
         retries=dict(
             total_max_attempts=2,
         )
     )
-    __ddb_endpoint_url = utils.get_environment_variable('DDB_ENDPOINT')
+
+    def __init__(self):
+        self._boto_client = None
+        self._table_resource = None
+        self._secrets_manager = secrets_manager.SecretsManager()
+
+    @property
+    def boto_client(self):
+        if not self._boto_client:
+            self._boto_client = self.get_new_client()
+        return self._boto_client
+
+    @boto_client.setter
+    def boto_client(self, value):
+        self._boto_client = value
+
+    @property
+    def table_resource(self):
+        if not self._table_resource:
+            self._table_resource = self.get_new_table_resource()
+        return self._table_resource
 
     @classmethod
     def get_new_client(cls):
@@ -28,61 +49,48 @@ class DDBClient:
         return boto3.Session().client(
             config=cls.__config,
             service_name='dynamodb',
-            endpoint_url=cls.__ddb_endpoint_url
+            verify=False  # Don't validate SSL certs for faster responses
         )
 
-    @classmethod
-    def get_table_resource(cls):
-        dynamodb = boto3.resource('dynamodb', endpoint_url=cls.__ddb_endpoint_url)
-        return dynamodb.Table(cls.get_table_name())
+    def get_new_table_resource(self):
+        dynamodb = boto3.resource('dynamodb')
+        return dynamodb.Table(self.get_table_name())
 
-    @classmethod
-    def get_table_name(cls):
-        return secrets_manager.SecretsManager().get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
+    def get_table_name(self):
+        return self._secrets_manager.get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
 
-    @classmethod
-    def query(cls, *args, **kwargs):
-        return cls.get_new_client().query(*args, **kwargs)
+    def query(self, *args, **kwargs):
+        return self.boto_client.query(*args, **kwargs)
 
-    @classmethod
-    def scan(cls, *args, **kwargs):
-        return cls.get_new_client().scan(*args, **kwargs)
+    def scan(self, *args, **kwargs):
+        return self.boto_client.scan(*args, **kwargs)
 
-    @classmethod
-    def get_item(cls, *args, **kwargs):
-        return cls.get_new_client().get_item(*args, **kwargs)
+    def get_item(self, *args, **kwargs):
+        return self.boto_client.get_item(*args, **kwargs)
 
-    @classmethod
-    def put_item(cls, *args, **kwargs):
-        return cls.get_new_client().put_item(*args, **kwargs)
+    def put_item(self, *args, **kwargs):
+        return self.boto_client.put_item(*args, **kwargs)
 
-    @classmethod
-    def delete_item(cls, *args, **kwargs):
-        return cls.get_new_client().delete_item(*args, **kwargs)
+    def delete_item(self, *args, **kwargs):
+        return self.boto_client.delete_item(*args, **kwargs)
 
-    @classmethod
-    def update_item(cls, *args, **kwargs):
-        return cls.get_new_client().update_item(*args, **kwargs)
+    def update_item(self, *args, **kwargs):
+        return self.boto_client.update_item(*args, **kwargs)
 
-    @classmethod
-    def batch_write_item(cls, *args, **kwargs):
-        return cls.get_new_client().batch_write_item(*args, **kwargs)
+    def batch_write_item(self, *args, **kwargs):
+        return self.boto_client.batch_write_item(*args, **kwargs)
 
-    @classmethod
-    def transact_write_items(cls, *args, **kwargs):
-        return cls.get_new_client().transact_write_items(*args, **kwargs)
+    def transact_write_items(self, *args, **kwargs):
+        return self.boto_client.transact_write_items(*args, **kwargs)
 
-    @classmethod
-    def batch_write_item_maps(cls, item_maps: typing.List[typing.Dict]) -> int:
-        table = cls.get_table_resource()
-        with table.batch_writer() as batch:
+    def batch_write_item_maps(self, item_maps: typing.List[typing.Dict]) -> int:
+        with self.table_resource.batch_writer() as batch:
             for _map in item_maps:
                 batch.put_item(Item=_map)
         return len(item_maps)
 
-    @classmethod
-    def write_maps_to_db(cls, item_maps: typing.List[typing.Dict]) -> int:
-        return cls.batch_write_item_maps(item_maps=item_maps)
+    def write_maps_to_db(self, item_maps: typing.List[typing.Dict]) -> int:
+        return self.batch_write_item_maps(item_maps=item_maps)
 
 
 class QueryResponse(ABC):
