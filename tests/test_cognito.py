@@ -17,7 +17,7 @@ class AdminCreateUserTests(TestCase):
         source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('admin_create_user.json')
         cog_client = cognito.CognitoClient()
         with as_file(source) as admin_create_user_json:
-            stubber = Stubber(cog_client.boto_client)
+            stubber = Stubber(cog_client._boto_client)
             stubber.activate()
             stubber.add_response('admin_create_user', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
         mocked_aws_cognito_pool_id.return_value = test_const.TEST_COGNITO_POOL_ID
@@ -56,7 +56,7 @@ class UserPasswordAuthTests(TestCase):
         source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
         cog_client = cognito.CognitoClient()
         with as_file(source) as initiate_auth_json:
-            stubber = Stubber(cog_client.boto_client)
+            stubber = Stubber(cog_client._boto_client)
             stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
         mocked_aws_cognito_pool_client_id.return_value = test_const.TEST_COGNITO_POOL_CLIENT_ID
@@ -82,7 +82,7 @@ class RefreshTokenAuthTests(TestCase):
         source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
         cog_client = cognito.CognitoClient()
         with as_file(source) as initiate_auth_json:
-            stubber = Stubber(cog_client.boto_client)
+            stubber = Stubber(cog_client._boto_client)
             stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
         mocked_aws_cognito_pool_client_id.return_value = test_const.TEST_COGNITO_POOL_CLIENT_ID

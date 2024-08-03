@@ -22,16 +22,18 @@ class CognitoClient:
     )
 
     def __init__(self):
-        self.boto_client = self.get_cognito_idp_client()
+        self._boto_client = None
         self._secrets_manager = secrets_manager.SecretsManager()
 
-    @classmethod
-    def get_cognito_idp_client(cls):
-        logger.info(f'Getting new Cognito client')
-        return boto3.Session().client(
-            config=cls.__CONFIG,
-            service_name='cognito-idp',
-        )
+    @property
+    def boto_client(self):
+        if not self._boto_client:
+            self._boto_client = self.get_new_client()
+        return self._boto_client
+
+    @boto_client.setter
+    def boto_client(self, value):
+        self._boto_client = value
 
     @property
     def aws_cognito_pool_client_id(self):
@@ -41,11 +43,19 @@ class CognitoClient:
     def aws_cognito_pool_id(self):
         return self._secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_ID')
 
+    @classmethod
+    def get_new_client(cls):
+        logger.info(f'Getting new Cognito client')
+        return boto3.Session().client(
+            config=cls.__CONFIG,
+            service_name='cognito-idp',
+        )
+
     def admin_create_user(self, *args, **kwargs):
-        return self.boto_client.admin_create_user(*args, **kwargs)
+        return self._boto_client.admin_create_user(*args, **kwargs)
 
     def initiate_auth(self, *args, **kwargs):
-        return self.boto_client.initiate_auth(*args, **kwargs)
+        return self._boto_client.initiate_auth(*args, **kwargs)
 
 
 class AdminCreateUser:
