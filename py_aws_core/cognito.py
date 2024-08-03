@@ -23,6 +23,7 @@ class CognitoClient:
 
     def __init__(self):
         self.boto_client = self.get_cognito_idp_client()
+        self._secrets_manager = secrets_manager.SecretsManager()
 
     @classmethod
     def get_cognito_idp_client(cls):
@@ -32,13 +33,13 @@ class CognitoClient:
             service_name='cognito-idp',
         )
 
-    @classmethod
-    def aws_cognito_pool_client_id(cls):
-        return secrets_manager.SecretsManager.get_secrets()['AWS_COGNITO_POOL_CLIENT_ID']
+    @property
+    def aws_cognito_pool_client_id(self):
+        return self._secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_CLIENT_ID')
 
-    @classmethod
-    def aws_cognito_pool_id(cls):
-        return secrets_manager.SecretsManager.get_secrets()['AWS_COGNITO_POOL_ID']
+    @property
+    def aws_cognito_pool_id(self):
+        return self._secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_ID')
 
     def admin_create_user(self, *args, **kwargs):
         return self.boto_client.admin_create_user(*args, **kwargs)
