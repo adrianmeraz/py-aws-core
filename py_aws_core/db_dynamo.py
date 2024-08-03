@@ -21,6 +21,7 @@ class DDBClient:
             total_max_attempts=2,
         )
     )
+    __boto3_session = boto3.Session()
 
     def __init__(self):
         self._boto_client = None
@@ -46,7 +47,7 @@ class DDBClient:
     @classmethod
     def get_new_client(cls):
         logger.info(f'Getting new DynamoDB client')
-        return boto3.Session().client(
+        return cls.__boto3_session.client(
             config=cls.__config,
             service_name='dynamodb',
             verify=False  # Don't validate SSL certs for faster responses
