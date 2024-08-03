@@ -1,5 +1,4 @@
 import json
-import os
 from importlib.resources import as_file
 from unittest import mock, TestCase
 from unittest.mock import PropertyMock
@@ -12,7 +11,7 @@ from tests import const as test_const
 
 
 class SecretsManagerTests(TestCase):
-    @mock.patch.object(utils, 'get_env_var')
+    @mock.patch.object(utils, 'get_environment_variable')
     def test_get_secret_env_var(self, mocked_get_env_var):
         mocked_get_env_var.return_value = 'TEST_VAL_1'
         sm = SecretsManager()

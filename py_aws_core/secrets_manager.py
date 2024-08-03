@@ -14,12 +14,14 @@ class SecretsManager:
     First checks environment variables for secrets.
     If secret not found, will attempt to pull from secrets manager
     """
+    AWS_SECRET_NAME = 'AWS_SECRET_NAME'
+
     def __init__(self):
         self._boto_client = boto3.client('secretsmanager')
         self._secrets_map = dict()
 
     def get_secret(self, secret_name: str):
-        if secret_value := utils.get_env_var(secret_name):
+        if secret_value := utils.get_environment_variable(secret_name):
             logger.debug(f'Secret "{secret_name}" found in environment variables')
             return secret_value
         if val := self._secrets_map.get(secret_name):
@@ -44,7 +46,6 @@ class SecretsManager:
 
     @property
     def get_aws_secret_id(self) -> str:
-        try:
-            return os.environ['AWS_SECRET_NAME']
-        except KeyError:
-            raise exceptions.SecretsManagerException('Missing environment variable "AWS_SECRET_NAME"')
+        if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME):
+            return aws_secret_id
+        raise exceptions.SecretsManagerException(f'Missing environment variable "{self.AWS_SECRET_NAME}"')

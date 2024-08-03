@@ -89,8 +89,8 @@ def get_uuid() -> uuid.UUID:
     return uuid.uuid4()
 
 
-def get_env_var(secret_name: str) -> str:
-    return os.environ.get(secret_name)
+def get_environment_variable(secret_name: str, default=None) -> str:
+    return os.environ.get(secret_name, default=default)
 
 
 def decode_unicode(s: str) -> str:
