@@ -6,14 +6,15 @@ from unittest.mock import PropertyMock
 
 from botocore.stub import Stubber
 
+from py_aws_core import utils
 from py_aws_core.secrets_manager import SecretsManager
 from tests import const as test_const
 
 
 class SecretsManagerTests(TestCase):
-    @mock.patch.object(os.environ, 'get')
-    def test_get_secret_env_var(self, mock_os_environ_get):
-        mock_os_environ_get.return_value = 'TEST_VAL_1'
+    @mock.patch.object(utils, 'get_env_var')
+    def test_get_secret_env_var(self, mocked_get_env_var):
+        mocked_get_env_var.return_value = 'TEST_VAL_1'
         sm = SecretsManager()
         stubber = Stubber(sm.boto_client)
         stubber.activate()

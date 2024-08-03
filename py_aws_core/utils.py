@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import time
 import typing
@@ -86,6 +87,10 @@ def sleep(seconds: float) -> None:
 
 def get_uuid() -> uuid.UUID:
     return uuid.uuid4()
+
+
+def get_env_var(secret_name: str) -> str:
+    return os.environ.get(secret_name)
 
 
 def decode_unicode(s: str) -> str:

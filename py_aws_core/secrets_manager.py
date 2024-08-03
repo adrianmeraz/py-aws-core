@@ -4,7 +4,7 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
-from py_aws_core import exceptions, logs
+from py_aws_core import exceptions, logs, utils
 
 logger = logs.logger
 
@@ -19,7 +19,7 @@ class SecretsManager:
         self._secrets_map = dict()
 
     def get_secret(self, secret_name: str):
-        if secret_value := os.environ.get(secret_name):
+        if secret_value := utils.get_env_var(secret_name):
             logger.debug(f'Secret "{secret_name}" found in environment variables')
             return secret_value
         if val := self._secrets_map.get(secret_name):
