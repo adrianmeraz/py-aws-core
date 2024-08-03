@@ -1,7 +1,11 @@
 import datetime
+import json
+from importlib.resources import as_file
 from unittest import mock, TestCase
 
 from py_aws_core import const, db_dynamo, utils
+from py_aws_core.db_dynamo import DDBClient
+from tests import const as test_const
 
 
 class ABCCommonAPITests(TestCase):
@@ -17,3 +21,12 @@ class ABCCommonAPITests(TestCase):
 
         val = db_dynamo.ABCCommonAPI.calc_expire_at_timestamp(expire_in_seconds=None)
         self.assertEqual(val, '')
+
+    @mock.patch.object(DDBClient, 'query')
+    def test_sessions(self, mocked_query):
+        source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#query_sessions.json')
+        with as_file(source) as query_sessions:
+            _json = json.loads(query_sessions.read_text(encoding='utf-8'))
+            session = _json['Items'][0]
+            session['Base64Cookies']['B'] = bytes(session['Base64Cookies']['B'], 'utf-8')
+            mocked_query.return_value = _json
