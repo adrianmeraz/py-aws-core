@@ -1,5 +1,4 @@
 import json
-import os
 
 import boto3
 from botocore.exceptions import ClientError
@@ -17,7 +16,7 @@ class SecretsManager:
     AWS_SECRET_NAME = 'AWS_SECRET_NAME'
 
     def __init__(self):
-        self._boto_client = boto3.client('secretsmanager')
+        self._boto_client = None
         self._secrets_map = dict()
 
     def get_secret(self, secret_name: str):
@@ -38,6 +37,8 @@ class SecretsManager:
 
     @property
     def boto_client(self):
+        if not self._boto_client:
+            self._boto_client = boto3.client('secretsmanager')
         return self._boto_client
 
     @boto_client.setter

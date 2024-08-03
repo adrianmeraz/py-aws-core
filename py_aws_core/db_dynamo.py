@@ -1,4 +1,3 @@
-import os
 import typing
 from abc import ABC
 
@@ -22,12 +21,11 @@ class DDBClient:
         )
     )
     __ddb_endpoint_url = utils.get_environment_variable('DDB_ENDPOINT')
-    __ddb_session = boto3.Session()
 
     @classmethod
-    def get_client(cls):
+    def get_new_client(cls):
         logger.info(f'Getting new DynamoDB client')
-        return cls.__ddb_session.client(
+        return boto3.Session().client(
             config=cls.__config,
             service_name='dynamodb',
             endpoint_url=cls.__ddb_endpoint_url
@@ -44,35 +42,35 @@ class DDBClient:
 
     @classmethod
     def query(cls, *args, **kwargs):
-        return cls.get_client().query(*args, **kwargs)
+        return cls.get_new_client().query(*args, **kwargs)
 
     @classmethod
     def scan(cls, *args, **kwargs):
-        return cls.get_client().scan(*args, **kwargs)
+        return cls.get_new_client().scan(*args, **kwargs)
 
     @classmethod
     def get_item(cls, *args, **kwargs):
-        return cls.get_client().get_item(*args, **kwargs)
+        return cls.get_new_client().get_item(*args, **kwargs)
 
     @classmethod
     def put_item(cls, *args, **kwargs):
-        return cls.get_client().put_item(*args, **kwargs)
+        return cls.get_new_client().put_item(*args, **kwargs)
 
     @classmethod
     def delete_item(cls, *args, **kwargs):
-        return cls.get_client().delete_item(*args, **kwargs)
+        return cls.get_new_client().delete_item(*args, **kwargs)
 
     @classmethod
     def update_item(cls, *args, **kwargs):
-        return cls.get_client().update_item(*args, **kwargs)
+        return cls.get_new_client().update_item(*args, **kwargs)
 
     @classmethod
     def batch_write_item(cls, *args, **kwargs):
-        return cls.get_client().batch_write_item(*args, **kwargs)
+        return cls.get_new_client().batch_write_item(*args, **kwargs)
 
     @classmethod
     def transact_write_items(cls, *args, **kwargs):
-        return cls.get_client().transact_write_items(*args, **kwargs)
+        return cls.get_new_client().transact_write_items(*args, **kwargs)
 
     @classmethod
     def batch_write_item_maps(cls, item_maps: typing.List[typing.Dict]) -> int:
