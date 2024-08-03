@@ -16,6 +16,7 @@ class DDBClient:
     __config = Config(
         connect_timeout=DDB_CLIENT_CONNECT_TIMEOUT,
         read_timeout=DDB_CLIENT_READ_TIMEOUT,
+        tcp_keepalive=True,
         retries=dict(
             total_max_attempts=2,
         )
