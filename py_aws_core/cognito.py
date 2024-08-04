@@ -54,10 +54,10 @@ class CognitoClient:
         )
 
     def admin_create_user(self, *args, **kwargs):
-        return self._boto_client.admin_create_user(*args, **kwargs)
+        return self.boto_client.admin_create_user(*args, **kwargs)
 
     def initiate_auth(self, *args, **kwargs):
-        return self._boto_client.initiate_auth(*args, **kwargs)
+        return self.boto_client.initiate_auth(*args, **kwargs)
 
 
 class AdminCreateUser:
