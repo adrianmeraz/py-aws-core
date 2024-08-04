@@ -1,6 +1,7 @@
 import base64
 import binascii
 import pickle
+import ssl
 import uuid
 from http.cookiejar import CookieJar
 
@@ -9,6 +10,10 @@ from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, Proxy
 from py_aws_core import decorators, exceptions, logs, services, utils
 
 logger = logs.logger
+# Using same ssl context for all clients to save on loading SSL bundles
+# See https://github.com/python/cpython/issues/95031#issuecomment-1749489998
+# Also results in tests running about 9 times faster
+SSL_CONTEXT = ssl.create_default_context()
 
 
 class RetryClient(Client):
@@ -32,8 +37,14 @@ class RetryClient(Client):
         504,
     )
 
-    def __init__(self, session_id: uuid.UUID = None, follow_redirects: bool = True, *args, **kwargs):
-        super().__init__(follow_redirects=follow_redirects, default_encoding="utf-8", *args, **kwargs)
+    def __init__(self, session_id: uuid.UUID = None, follow_redirects: bool = True, verify: bool = None, *args, **kwargs):
+        super().__init__(
+            follow_redirects=follow_redirects,
+            default_encoding="utf-8",
+            verify=verify or SSL_CONTEXT,
+            *args,
+            **kwargs
+        )
         self._session_id = session_id or utils.get_uuid()
 
     @decorators.retry(retry_exceptions=RETRY_EXCEPTIONS)
