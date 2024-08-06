@@ -4,7 +4,10 @@ from abc import ABC
 import boto3
 from botocore.config import Config
 
-from py_aws_core import const, entities, logs, secrets_manager, utils
+from py_aws_core import const, entities, logs, utils
+from .secrets_manager import get_secrets_manager
+
+secrets_manager = get_secrets_manager()
 
 logger = logs.logger
 
@@ -26,7 +29,6 @@ class DDBClient:
     def __init__(self):
         self._boto_client = None
         self._table_resource = None
-        self._secrets_manager = secrets_manager.SecretsManager()
 
     @property
     def boto_client(self):
@@ -53,12 +55,13 @@ class DDBClient:
             verify=False  # Don't validate SSL certs for faster responses
         )
 
+    @classmethod
+    def get_table_name(cls):
+        return secrets_manager.get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
+
     def get_new_table_resource(self):
         dynamodb = boto3.resource('dynamodb')
         return dynamodb.Table(self.get_table_name())
-
-    def get_table_name(self):
-        return self._secrets_manager.get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
 
     def query(self, *args, **kwargs):
         return self.boto_client.query(*args, **kwargs)

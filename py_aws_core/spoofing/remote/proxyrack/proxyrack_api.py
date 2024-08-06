@@ -3,7 +3,7 @@ import logging
 from httpx import Client
 
 from py_aws_core import decorators
-from . import exceptions
+from spoofing import exceptions
 
 logger = logging.getLogger(__name__)
 

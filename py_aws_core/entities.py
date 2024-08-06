@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from boto3.dynamodb import types
 
-from py_aws_core import const, encoders
+from py_aws_core import encoders
 
 
 class BaseModel:
