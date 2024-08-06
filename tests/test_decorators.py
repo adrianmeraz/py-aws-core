@@ -112,6 +112,37 @@ class DynamodbHandlerTests(TestCase):
             func()
 
 
+class HttpStatusCheckTests(TestCase):
+
+    def test_check_response_no_reraise(self):
+        request = Request(url='', method='')
+        func = mock.Mock(side_effect=HTTPStatusError(
+            request=request,
+            response=Response(
+                request=request,
+                status_code=400,
+            ),
+            message='test'
+        ))
+        decorated_function = decorators.http_status_check(reraise_status_codes=())(func)
+        with self.assertRaises(exceptions.APIException):
+            decorated_function()
+
+    def test_check_response_reraise(self):
+        request = Request(url='', method='')
+        func = mock.Mock(side_effect=HTTPStatusError(
+            request=request,
+            response=Response(
+                request=request,
+                status_code=502,
+            ),
+            message='test'
+        ))
+        decorated_function = decorators.http_status_check(reraise_status_codes=(500, 501, 502))(func)
+        with self.assertRaises(HTTPStatusError):
+            decorated_function()
+
+
 class LambdaResponseHandlerTests(TestCase):
 
     def test_no_exception(self):
@@ -198,32 +229,30 @@ class RetryTests(TestCase):
         self.assertEqual(func.call_count, tries)
 
 
-class HttpStatusCheckTests(TestCase):
+class WrapExceptions(TestCase):
+    def test_no_exception(self):
+        @decorators.wrap_exceptions(raise_as=BlockingIOError)
+        def func(x):
+            return 2 * x
 
-    def test_check_response_no_reraise(self):
-        request = Request(url='', method='')
-        func = mock.Mock(side_effect=HTTPStatusError(
-            request=request,
-            response=Response(
-                request=request,
-                status_code=400,
-            ),
-            message='test'
-        ))
-        decorated_function = decorators.http_status_check(reraise_status_codes=())(func)
-        with self.assertRaises(exceptions.APIException):
-            decorated_function()
+        val = func(7)
+        self.assertEqual(
+            val,
+            14
+        )
 
-    def test_check_response_reraise(self):
-        request = Request(url='', method='')
-        func = mock.Mock(side_effect=HTTPStatusError(
-            request=request,
-            response=Response(
-                request=request,
-                status_code=502,
-            ),
-            message='test'
-        ))
-        decorated_function = decorators.http_status_check(reraise_status_codes=(500, 501, 502))(func)
-        with self.assertRaises(HTTPStatusError):
-            decorated_function()
+    def test_pass_thru(self):
+        @decorators.wrap_exceptions(raise_as=BlockingIOError)
+        def func():
+            raise BlockingIOError
+
+        with self.assertRaises(BlockingIOError):
+            func()
+
+    def test_catch_all(self):
+        @decorators.wrap_exceptions(raise_as=BlockingIOError)
+        def func():
+            raise KeyError
+
+        with self.assertRaises(BlockingIOError):
+            func()
