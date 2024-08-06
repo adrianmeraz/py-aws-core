@@ -26,14 +26,14 @@ class ProxyBackend(ABC):
 
 class CaptchaBackend(ABC):
 
-    def get_captcha_id(self, client: Client, proxy, site_key: str, page_url: str):
+    def get_captcha_id(self, client: Client, proxy: str, site_key: str, page_url: str, **kwargs):
         raise NotImplemented
 
-    def get_gcaptcha_token(self, client: Client, captcha_id: str):
+    def get_gcaptcha_token(self, client: Client, captcha_id: str, **kwargs):
         raise NotImplemented
 
-    def report_bad_captcha_id(self, client: Client, captcha_id: str):
+    def report_bad_captcha_id(self, client: Client, captcha_id: str, **kwargs):
         raise NotImplemented
 
-    def report_good_captcha_id(self, client: Client, captcha_id: str):
+    def report_good_captcha_id(self, client: Client, captcha_id: str, **kwargs):
         raise NotImplemented

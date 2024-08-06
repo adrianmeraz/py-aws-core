@@ -7,7 +7,3 @@ class SpoofingException(Exception):
 
     def __str__(self):
         return self.ERROR_MESSAGE
-
-
-class TwoCaptchaException(SpoofingException):
-    ERROR_MESSAGE = 'A 2Captcha Error has occurred'

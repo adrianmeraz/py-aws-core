@@ -12,7 +12,7 @@ from py_aws_core import decorators, exceptions, logs, services, utils
 logger = logs.logger
 # Using same ssl context for all clients to save on loading SSL bundles
 # See https://github.com/python/cpython/issues/95031#issuecomment-1749489998
-# Also results in tests running about 9 times faster
+# Also results in _tests running about 9 times faster
 SSL_CONTEXT = ssl.create_default_context()
 
 

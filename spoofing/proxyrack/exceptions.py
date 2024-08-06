@@ -1,4 +1,4 @@
-from ...exceptions import SpoofingException
+from spoofing.exceptions import SpoofingException
 
 
 class ProxyRackException(SpoofingException):
