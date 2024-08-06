@@ -136,3 +136,21 @@ def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
         return wrapper_func
 
     return deco_func
+
+
+def wrap_exceptions(raise_as):
+
+    def deco_func(func):
+
+        @wraps(func)
+        def wrapper_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except raise_as:
+                raise
+            except Exception as e:
+                raise raise_as(*args, **kwargs, **e.__dict__)
+
+        return wrapper_func  # true decorator
+
+    return deco_func
