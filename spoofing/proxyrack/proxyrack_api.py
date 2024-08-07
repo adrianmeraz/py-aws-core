@@ -91,7 +91,7 @@ class GetCountryIPCount:
         return r.text
 
 
-class GetTempAPIKey:
+class PostTempAPIKey:
     class Response:
         class Password:
             def __init__(self, data):

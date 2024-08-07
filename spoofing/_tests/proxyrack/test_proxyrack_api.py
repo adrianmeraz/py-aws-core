@@ -18,7 +18,7 @@ class ActiveConnectionsTests(BaseTestFixture):
     def test_ok(self):
         source = test_const.TEST_RESOURCE_PATH.joinpath('active_conns.json')
         with as_file(source) as active_conns_json:
-            mocked_active_conns_route = self.create_ok_route(
+            mocked_route_active_conns = self.create_ok_route(
                 method='GET',
                 url__eq='http://api.proxyrack.net/active_conns',
                 _json=json.loads(active_conns_json.read_text(encoding='utf-8'))
@@ -28,13 +28,13 @@ class ActiveConnectionsTests(BaseTestFixture):
             r_active_connections = proxyrack_api.GetActiveConnections.call(client)
             self.assertEqual(len(r_active_connections.connections), 2)
 
-        self.assertEqual(mocked_active_conns_route.call_count, 1)
+        self.assertEqual(mocked_route_active_conns.call_count, 1)
 
     @respx.mock
     def test_ProxyRackError(self):
         source = test_const.TEST_RESOURCE_PATH.joinpath('active_conns.json')
         with as_file(source) as active_conns_json:
-            mocked_active_conns_route = self.create_route(
+            mocked_route_active_conns = self.create_route(
                 method='GET',
                 url__eq='http://api.proxyrack.net/active_conns',
                 response_status_code=400,
@@ -45,57 +45,72 @@ class ActiveConnectionsTests(BaseTestFixture):
             with self.assertRaises(exceptions.ProxyRackException):
                 proxyrack_api.GetActiveConnections.call(client)
 
-        self.assertEqual(mocked_active_conns_route.call_count, 1)
+        self.assertEqual(mocked_route_active_conns.call_count, 1)
 
-#
-# class APIKeyTests(BaseTestFixture):
-#     """
-#         API Keys Tests
-#     """
-#
-#     @respx.mock
-#     def test_ok(self):
-#         mocked_passwords_route = respx.post("http://api.proxyrack.net/passwords").mock(
-#             return_value=Response(status_code=codes.OK, json=self.passwords_json)
-#         )
-#
-#         with RetryClient() as client:
-#             r_generate_temp_api_key = proxyrack_api.GetTempAPIKey.call(client, expiration_seconds=60)
-#             self.assertEquals(r_generate_temp_api_key.api_key, 'temp-bf3702-be83a4-0bbfc1-be7f58-62cfff')
-#
-#         self.assertTrue(mocked_passwords_route.called)
-#
-#     @respx.mock
-#     def test_ProxyRackError(self):
-#         mocked_passwords_route = respx.post("http://api.proxyrack.net/passwords").mock(
-#             return_value=Response(status_code=codes.BAD_REQUEST, json=self.passwords_json)
-#         )
-#
-#         with RetryClient() as client:
-#             with self.assertRaises(exceptions.ProxyRackException):
-#                 proxyrack_api.GetTempAPIKey.call(
-#                     client,
-#                     expiration_seconds=60
-#                 )
-#         self.assertTrue(mocked_passwords_route.called)
-#
-#
-# class StatsTests(BaseTestFixture):
-#     """
-#         Stats Tests
-#     """
-#
-#     @respx.mock
-#     def test_ok(self):
-#         mocked_stats_route = respx.get("http://api.proxyrack.net/stats").mock(
-#             return_value=Response(status_code=codes.OK, json=self.stats_json)
-#         )
-#
-#         with RetryClient() as client:
-#             r_stats = proxyrack_api.GetStats.call(client=client)
-#             self.assertEquals(r_stats.thread_limit, 10000)
-#
-#         self.assertTrue(mocked_stats_route.called)
+
+class PostTempAPIKeyTests(BaseTestFixture):
+    """
+        API Keys Tests
+    """
+
+    @respx.mock
+    def test_ok(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('passwords.json')
+        with as_file(source) as passwords_json:
+            mocked_route_passwords = self.create_route(
+                method='POST',
+                url__eq='http://api.proxyrack.net/passwords?expirationSeconds=60',
+                response_status_code=200,
+                response_json=json.loads(passwords_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            r_generate_temp_api_key = proxyrack_api.PostTempAPIKey.call(client, expiration_seconds=60)
+            self.assertEqual(r_generate_temp_api_key.api_key, 'temp-bf3702-be83a4-0bbfc1-be7f58-62cfff')
+
+        self.assertEqual(mocked_route_passwords.call_count, 1)
+
+    @respx.mock
+    def test_ProxyRackError(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('passwords.json')
+        with as_file(source) as passwords_json:
+            mocked_route_passwords = self.create_route(
+                method='POST',
+                url__eq='http://api.proxyrack.net/passwords?expirationSeconds=60',
+                response_status_code=400,
+                response_json=json.loads(passwords_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            with self.assertRaises(exceptions.ProxyRackException):
+                proxyrack_api.PostTempAPIKey.call(
+                    client,
+                    expiration_seconds=60
+                )
+        self.assertEqual(mocked_route_passwords.call_count, 1)
+
+
+class StatsTests(BaseTestFixture):
+    """
+        Stats Tests
+    """
+
+    @respx.mock
+    def test_ok(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('stats.json')
+        with as_file(source) as stats_json:
+            mocked_route_stats = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/stats',
+                response_status_code=200,
+                response_json=json.loads(stats_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            r_stats = proxyrack_api.GetStats.call(client=client)
+            self.assertEqual(r_stats.thread_limit, 10000)
+
+        self.assertEqual(mocked_route_stats.call_count, 1)
 #
 #     @respx.mock
 #     def test_400(self):
