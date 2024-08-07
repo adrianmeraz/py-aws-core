@@ -1,0 +1,364 @@
+import json
+from importlib.resources import as_file
+from unittest import mock
+
+import respx
+from httpx import Client
+
+from py_aws_core.testing import BaseTestFixture
+from spoofing.twocaptcha import twocaptcha_api
+from . import const as test_const
+
+
+class GetSolvedCaptchaTests(BaseTestFixture):
+    """
+        Get Captcha ID Tests
+    """
+
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_ok(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        source = test_const.TEST_RESOURCE_PATH.joinpath('get_solved_token.json')
+        with as_file(source) as get_solved_token_json:
+            mocked_get_solved_token_route = self.create_ok_route(
+                method='GET',
+                url__eq='http://2captcha.com/res.php?key=IPSUMKEY&action=get&id=2122988149&json=1',
+                _json=json.loads(get_solved_token_json.read_text(encoding='utf-8'))
+            )
+
+        with Client() as client:
+            r = twocaptcha_api.GetSolvedToken.call(
+                client=client,
+                captcha_id=2122988149
+            )
+            self.assertEqual(r.request, '03AHJ_Vuve5Asa4koK3KSMyUkCq0vUFCR5Im4CwB7PzO3dCxIo11i53epEraq-uBO5mVm2XRikL8iKOWr0aG50sCuej9bXx5qcviUGSm4iK4NC_Q88flavWhaTXSh0VxoihBwBjXxwXuJZ-WGN5Sy4dtUl2wbpMqAj8Zwup1vyCaQJWFvRjYGWJ_TQBKTXNB5CCOgncqLetmJ6B6Cos7qoQyaB8ZzBOTGf5KSP6e-K9niYs772f53Oof6aJeSUDNjiKG9gN3FTrdwKwdnAwEYX-F37sI_vLB1Zs8NQo0PObHYy0b0sf7WSLkzzcIgW9GR0FwcCCm1P8lB-50GQHPEBJUHNnhJyDzwRoRAkVzrf7UkV8wKCdTwrrWqiYDgbrzURfHc2ESsp020MicJTasSiXmNRgryt-gf50q5BMkiRH7osm4DoUgsjc_XyQiEmQmxl5sqZP7aKsaE-EM00x59XsPzD3m3YI6SRCFRUevSyumBd7KmXE8VuzIO9lgnnbka4-eZynZa6vbB9cO3QjLH0xSG3-egcplD1uLGh79wC34RF49Ui3eHwua4S9XHpH6YBe7gXzz6_mv-o-fxrOuphwfrtwvvi2FGfpTexWvxhqWICMFTTjFBCEGEgj7_IFWEKirXW2RTZCVF0Gid7EtIsoEeZkPbrcUISGmgtiJkJ_KojuKwImF0G0CsTlxYTOU2sPsd5o1JDt65wGniQR2IZufnPbbK76Yh_KI2DY4cUxMfcb2fAXcFMc9dcpHg6f9wBXhUtFYTu6pi5LhhGuhpkiGcv6vWYNxMrpWJW_pV7q8mPilwkAP-zw5MJxkgijl2wDMpM-UUQ_k37FVtf-ndbQAIPG7S469doZMmb5IZYgvcB4ojqCW3Vz6Q')
+
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_get_solved_token_route.call_count, 1)
+
+    # @respx.mock
+    # def test_captcha_unsolvable(self):
+    #     mocked_get_solved_token_route = respx.get(
+    #         "http://2captcha.com/res.php?key=dummy&action=get&id=2122988149&json=1",
+    #     ).mock(
+    #         return_value=Response(status_code=codes.OK, json=self.captcha_unsolvable_json)
+    #     )
+    #
+    #     with self.assertRaises(exceptions.CaptchaUnsolvable):
+    #         with Client() as client:
+    #             r = twocaptcha_api.GetSolvedToken.call(
+    #                 client=client,
+    #                 captcha_id=2122988149
+    #             )
+    #             self.assertEquals(r.request, self.get_solved_token_json['request'])
+    #
+    #     self.assertTrue(mocked_get_solved_token_route.called)
+
+
+# class GetCaptchaIDTests(BaseTestFixture):
+#     """
+#         Get Captcha ID Tests
+#     """
+#
+#     @respx.mock
+#     def test_ok(self):
+#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
+#             return_value=Response(status_code=codes.OK, json=self.get_captcha_id_json)
+#         )
+#
+#         with Client() as client:
+#             r = twocaptcha_api.GetCaptchaId.call(
+#                 client=client,
+#                 proxy='http://example.com:1000',
+#                 site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+#                 page_url='https://example.com'
+#             )
+#         self.assertEquals(r.request, '2122988149')
+#
+#         self.assertTrue(mocked_get_captcha_id_route.called)
+#
+#     @respx.mock
+#     def test_redirect(self):
+#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
+#             return_value=Response(status_code=codes.MOVED_PERMANENTLY, json=self.warn_error_status_json)
+#         )
+#
+#         with self.assertRaises(exceptions.TwoCaptchaException):
+#             with Client() as client:
+#                 twocaptcha_api.GetCaptchaId.call(
+#                     client=client,
+#                     proxy='http://example.com:1000',
+#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+#                     page_url='https://example.com'
+#                 )
+#
+#         self.assertTrue(mocked_get_captcha_id_route.called)
+#
+#     @respx.mock
+#     def test_invalid_response(self):
+#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
+#             return_value=Response(status_code=codes.OK, json=self.warn_error_status_json)
+#         )
+#
+#         with self.assertRaises(exceptions.WarnError):
+#             with Client() as client:
+#                 twocaptcha_api.GetCaptchaId.call(
+#                     client=client,
+#                     proxy='http://example.com:1000',
+#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+#                     page_url='https://example.com'
+#                 )
+#
+#         self.assertTrue(mocked_get_captcha_id_route.called)
+#
+#     @respx.mock
+#     def test_warn_error(self):
+#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
+#             return_value=Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     "status": 1,
+#                     "request": "ERROR_WRONG_CAPTCHA_ID"
+#                 }
+#             )
+#         )
+#
+#         with self.assertRaises(exceptions.TwoCaptchaException):
+#             with Client() as client:
+#                 twocaptcha_api.get_captcha_id(
+#                     client,
+#                     proxy='http://example.com:1000',
+#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+#                     page_url='https://example.com'
+#                 )
+#
+#         self.assertTrue(mocked_get_captcha_id_route.called)
+#
+#     @respx.mock
+#     def test_critical_error(self):
+#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
+#             return_value=Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     "status": 1,
+#                     "request": "ERROR_WRONG_USER_KEY"
+#                 }
+#             )
+#         )
+#
+#         with self.assertRaises(exceptions.CriticalError):
+#             with Client() as client:
+#                 twocaptcha_api.GetCaptchaId.call(
+#                     client=client,
+#                     proxy='http://example.com:1000',
+#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+#                     page_url='https://example.com'
+#                 )
+#
+#         self.assertTrue(mocked_get_captcha_id_route.called)
+#
+#     @respx.mock
+#     def test_captcha_unsolvable(self):
+#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
+#             return_value=Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     "status": 1,
+#                     "request": "ERROR_CAPTCHA_UNSOLVABLE"
+#                 }
+#             )
+#         )
+#
+#         with self.assertRaises(exceptions.CaptchaUnsolvable):
+#             with Client() as client:
+#                 twocaptcha_api.GetCaptchaId.call(
+#                     client=client,
+#                     proxy='http://example.com:1000',
+#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+#                     page_url='https://example.com'
+#                 )
+#
+#         self.assertTrue(mocked_get_captcha_id_route.called)
+#
+#     @respx.mock
+#     def test_captcha_not_ready(self):
+#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
+#             return_value=Response(
+#                 status_code=codes.OK,
+#                 json=self.captcha_not_ready
+#             )
+#         )
+#
+#         with self.assertRaises(exceptions.CaptchaNotReady):
+#             with Client() as client:
+#                 twocaptcha_api.GetCaptchaId.call(
+#                     client=client,
+#                     proxy='http://example.com:1000',
+#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+#                     page_url='https://example.com'
+#                 )
+#
+#         self.assertTrue(mocked_get_captcha_id_route.called)
+#
+#
+# class GetSolvedTokenTests(BaseTestFixture):
+#     """
+#         Get Solved Token Tests
+#     """
+#
+#     @respx.mock
+#     def test_ok(self):
+#         mocked_get_solved_token_route = respx.get("http://2captcha.com/res.php").mock(
+#             return_value=Response(
+#                 status_code=codes.OK,
+#                 json=self.get_solved_token_json
+#             )
+#         )
+#
+#         with Client() as client:
+#             r = twocaptcha_api.GetSolvedToken.call(
+#                 client=client,
+#                 captcha_id=2122988149,
+#             )
+#
+#         self.assertEquals(r.request, self.get_solved_token_json['request'])
+#         self.assertEquals(r.status, 1)
+#         self.assertEquals(mocked_get_solved_token_route.call_count, 1)
+#
+#     @respx.mock
+#     def test_error_wrong_captcha_id(self):
+#         mocked_get_solved_token_route = respx.get("http://2captcha.com/res.php").mock(
+#             return_value=Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     "status": 1,
+#                     "request": "ERROR_WRONG_CAPTCHA_ID"
+#                 }
+#             )
+#         )
+#
+#         with self.assertRaises(exceptions.WarnError):
+#             with Client() as client:
+#                 twocaptcha_api.GetSolvedToken.call(
+#                     client=client,
+#                     captcha_id=2122988149
+#                 )
+#
+#         self.assertEquals(mocked_get_solved_token_route.call_count, 1)
+#
+#
+# class ReportCaptchaTests(BaseTestFixture):
+#     """
+#         Report Captcha Tests
+#     """
+#
+#     @respx.mock
+#     def test_reportbad_ok(self):
+#         mocked_report_bad_captcha_route = respx.get(
+#             "http://2captcha.com/res.php?key=dummy&action=reportbad&id=2122988149&json=1",
+#         ).mock(
+#             Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     'status': 1,
+#                     'request': 'OK_REPORT_RECORDED'
+#                 }
+#             )
+#         )
+#
+#         with Client() as client:
+#             r_report = twocaptcha_api.ReportBadCaptcha.call(client=client, captcha_id=2122988149)
+#
+#         self.assertEquals(r_report.request, 'OK_REPORT_RECORDED')
+#
+#         self.assertTrue(mocked_report_bad_captcha_route.called)
+#
+#     @respx.mock
+#     def test_reportgood_ok(self):
+#         mocked_report_good_captcha_route = respx.get(
+#             "http://2captcha.com/res.php?key=dummy&action=reportgood&id=2122988149&json=1",
+#         ).mock(
+#             Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     'status': 1,
+#                     'request': 'OK_REPORT_RECORDED'
+#                 }
+#             )
+#         )
+#
+#         with Client() as client:
+#             r_report = twocaptcha_api.ReportGoodCaptcha.call(client=client, captcha_id=2122988149)
+#
+#         self.assertEquals(r_report.request, 'OK_REPORT_RECORDED')
+#
+#         self.assertEquals(mocked_report_good_captcha_route.call_count, 1)
+#
+#     @respx.mock
+#     def test_reportbad_invalid_response(self):
+#         mocked_report_bad_captcha_route = respx.get(
+#             "http://2captcha.com/res.php?key=dummy&action=reportbad&id=2122988149&json=1",
+#         ).mock(
+#             Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     'status': 0,
+#                     'request': 'DUMMY'
+#                 }
+#             )
+#         )
+#
+#         with self.assertRaises(exceptions.InvalidResponse):
+#             with Client() as client:
+#                 twocaptcha_api.ReportBadCaptcha.call(client=client, captcha_id=2122988149)
+#
+#         self.assertTrue(mocked_report_bad_captcha_route.called)
+#
+#     @respx.mock
+#     def test_invalid_report(self):
+#         mocked_report_bad_captcha_route = respx.get(
+#             "http://2captcha.com/res.php?key=dummy&action=reportbad&id=2122988149&json=1",
+#         ).mock(
+#             Response(
+#                 status_code=codes.OK,
+#                 json=self.warn_error_status_json
+#             )
+#         )
+#
+#         with self.assertRaises(exceptions.WarnError):
+#             with Client() as client:
+#                 twocaptcha_api.ReportBadCaptcha.call(client=client, captcha_id=2122988149)
+#
+#         self.assertEquals(mocked_report_bad_captcha_route.call_count, 1)
+#
+#
+# class RegisterPingbackTests(BaseTestFixture):
+#     """
+#         Register Pingback Tests
+#     """
+#
+#     @respx.mock
+#     def test_ok(self):
+#         mocked_register_pingback_route = respx.get(
+#             "http://2captcha.com/res.php?key=dummy&action=add_pingback&addr=http%3A%2F%2Fmysite.com%2Fpingback%2Furl%2F&json=1",
+#         ).mock(
+#             Response(
+#                 status_code=codes.OK,
+#                 json={
+#                     'status': 1,
+#                     'request': 'OK_PINGBACK'
+#                 }
+#             )
+#         )
+#
+#         with Client() as client:
+#             r_report = twocaptcha_api.RegisterPingback.call(
+#                 client=client,
+#                 addr='http://mysite.com/pingback/url/'
+#             )
+#
+#         self.assertEquals(r_report.request, 'OK_PINGBACK')
+#
+#         self.assertTrue(mocked_register_pingback_route.called)

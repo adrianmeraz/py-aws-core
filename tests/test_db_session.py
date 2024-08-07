@@ -1,5 +1,4 @@
 import json
-import json
 import uuid
 from importlib.resources import as_file
 from unittest import mock, TestCase

@@ -11,8 +11,17 @@ from .exceptions import CaptchaNotReady, TwoCaptchaException
 logger = logging.getLogger(__name__)
 secrets_manager = get_secrets_manager()
 
-API_KEY = secrets_manager.get_secret('CAPTCHA_PASSWORD')
 ROOT_URL = 'http://2captcha.com'
+
+
+class TwoCaptchaAPI:
+    _api_key = None
+
+    @classmethod
+    def get_api_key(cls):
+        if not cls._api_key:
+            cls._api_key = secrets_manager.get_secret('CAPTCHA_PASSWORD')
+        return cls._api_key
 
 
 class TwoCaptchaResponse:
@@ -26,7 +35,7 @@ class TwoCaptchaResponse:
         return self.request == 'OK_REPORT_RECORDED'
 
 
-class GetCaptchaId:
+class GetCaptchaId(TwoCaptchaAPI):
     class Response(TwoCaptchaResponse):
         pass
 
@@ -38,7 +47,7 @@ class GetCaptchaId:
         proxy_type = proxy_parts.scheme.upper()
 
         params = {
-            'key': API_KEY,
+            'key': cls.get_api_key(),
             'method': 'userrecaptcha',
             'googlekey': site_key,
             'pageurl': page_url,
@@ -56,7 +65,7 @@ class GetCaptchaId:
         return cls.Response(r.json())
 
 
-class GetSolvedToken:
+class GetSolvedToken(TwoCaptchaAPI):
     class Response(TwoCaptchaResponse):
         pass
 
@@ -67,7 +76,7 @@ class GetSolvedToken:
         url = f'{ROOT_URL}/res.php'
 
         params = {
-            'key': API_KEY,
+            'key': cls.get_api_key(),
             'action': 'get',
             'id': captcha_id,
             'json': 1,
@@ -78,7 +87,7 @@ class GetSolvedToken:
         return cls.Response(r.json())
 
 
-class ReportCaptcha:
+class ReportCaptcha(TwoCaptchaAPI):
     class Response(TwoCaptchaResponse):
         pass
 
@@ -89,7 +98,7 @@ class ReportCaptcha:
         action = 'reportgood' if is_good else 'reportbad'
 
         params = {
-            'key': API_KEY,
+            'key': cls.get_api_key(),
             'action': action,
             'id': captcha_id,
             'json': '1',
@@ -118,7 +127,7 @@ class ReportGoodCaptcha(ReportCaptcha):
         return r
 
 
-class RegisterPingback:
+class RegisterPingback(TwoCaptchaAPI):
     class Response(TwoCaptchaResponse):
         pass
 
@@ -129,7 +138,7 @@ class RegisterPingback:
         url = f'{ROOT_URL}/res.php'
 
         params = {
-            'key': API_KEY,
+            'key': cls.get_api_key(),
             'action': 'add_pingback',
             'addr': addr,
             'json': '1',

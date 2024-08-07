@@ -1,7 +1,7 @@
 from httpx import Client
 
-from . import twocaptcha_api
 from spoofing.backends import CaptchaBackend
+from . import twocaptcha_api
 
 
 class TwoCaptchaBackend(CaptchaBackend):
