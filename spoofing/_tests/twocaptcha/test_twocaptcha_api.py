@@ -397,33 +397,34 @@ class ReportCaptchaTests(BaseTestFixture):
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_report_bad_captcha.call_count, 1)
-#
-#
-# class RegisterPingbackTests(BaseTestFixture):
-#     """
-#         Register Pingback Tests
-#     """
-#
-#     @respx.mock
-#     def test_ok(self):
-#         mocked_register_pingback_route = respx.get(
-#             "http://2captcha.com/res.php?key=dummy&action=add_pingback&addr=http%3A%2F%2Fmysite.com%2Fpingback%2Furl%2F&json=1",
-#         ).mock(
-#             Response(
-#                 status_code=codes.OK,
-#                 json={
-#                     'status': 1,
-#                     'request': 'OK_PINGBACK'
-#                 }
-#             )
-#         )
-#
-#         with Client() as client:
-#             r_report = twocaptcha_api.RegisterPingback.call(
-#                 client=client,
-#                 addr='http://mysite.com/pingback/url/'
-#             )
-#
-#         self.assertEquals(r_report.request, 'OK_PINGBACK')
-#
-#         self.assertTrue(mocked_register_pingback_route.called)
+
+
+class RegisterPingbackTests(BaseTestFixture):
+    """
+        Register Pingback Tests
+    """
+
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_ok(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        source = test_const.TEST_RESOURCE_PATH.joinpath('add_pingback.json')
+        with as_file(source) as warn_error_status_json:
+            mocked_register_pingback = self.create_route(
+                method='GET',
+                url__eq='http://2captcha.com/res.php?key=IPSUMKEY&action=add_pingback&addr=http%3A%2F%2Fmysite.com%2Fpingback%2Furl%2F&json=1',
+                response_status_code=200,
+                response_json=json.loads(warn_error_status_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            r_report = twocaptcha_api.RegisterPingback.call(
+                client=client,
+                addr='http://mysite.com/pingback/url/'
+            )
+
+        self.assertEqual(r_report.request, 'OK_PINGBACK')
+
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_register_pingback.call_count, 1)
