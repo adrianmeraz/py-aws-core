@@ -26,9 +26,9 @@ class ActiveConnectionsTests(BaseTestFixture):
 
         with RetryClient() as client:
             r_active_connections = proxyrack_api.GetActiveConnections.call(client)
-            self.assertEquals(len(r_active_connections.connections), 2)
+            self.assertEqual(len(r_active_connections.connections), 2)
 
-        self.assertEquals(mocked_active_conns_route.call_count, 100)
+        self.assertEqual(mocked_active_conns_route.call_count, 1)
 
     @respx.mock
     def test_ProxyRackError(self):
@@ -45,7 +45,7 @@ class ActiveConnectionsTests(BaseTestFixture):
             with self.assertRaises(exceptions.ProxyRackException):
                 proxyrack_api.GetActiveConnections.call(client)
 
-        self.assertEquals(mocked_active_conns_route.call_count, 1)
+        self.assertEqual(mocked_active_conns_route.call_count, 1)
 
 #
 # class APIKeyTests(BaseTestFixture):
