@@ -128,54 +128,69 @@ class StatsTests(BaseTestFixture):
                 proxyrack_api.GetStats.call(client=client)
 
         self.assertTrue(mocked_route_stats.called)
-#
-#
-# class IspsTests(BaseTestFixture):
-#     """
-#         Isps Tests
-#     """
-#
-#     @respx.mock
-#     def test_ok(self):
-#         mocked_isps_route = respx.get("http://api.proxyrack.net/countries/US/isps").mock(
-#             return_value=Response(status_code=codes.OK, json=self.isps_json)
-#         )
-#
-#         with RetryClient() as client:
-#             r_isps = proxyrack_api.GetISPs.call(client=client, country='US')
-#             self.assertEquals(len(r_isps.isps), 54)
-#
-#         self.assertTrue(mocked_isps_route.called)
-#
-#     @respx.mock
-#     def test_400(self):
-#         mocked_isps_route = respx.get("http://api.proxyrack.net/countries/US/isps").mock(
-#             return_value=Response(status_code=codes.BAD_REQUEST, json=self.isps_json)
-#         )
-#
-#         with self.assertRaises(exceptions.ProxyRackException):
-#             with RetryClient() as client:
-#                 proxyrack_api.GetISPs.call(client=client, country='US')
-#
-#         self.assertTrue(mocked_isps_route.called)
-#
-#
-# class CountriesTests(BaseTestFixture):
-#     """
-#         Countries Tests
-#     """
-#
-#     @respx.mock
-#     def test_ok(self):
-#         mocked_count_route = respx.get("http://api.proxyrack.net/countries").mock(
-#             return_value=Response(status_code=codes.OK, json=self.countries_json)
-#         )
-#
-#         with RetryClient() as client:
-#             r_countries = proxyrack_api.GetCountries.call(client=client)
-#             self.assertEquals(len(r_countries.countries), 205)
-#
-#         self.assertTrue(mocked_count_route.called)
+
+
+class IspsTests(BaseTestFixture):
+    """
+        Isps Tests
+    """
+
+    @respx.mock
+    def test_ok(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('us_isps.json')
+        with as_file(source) as us_isps_json:
+            mocked_route_us_isps = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/countries/US/isps',
+                response_status_code=200,
+                response_json=json.loads(us_isps_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            r_isps = proxyrack_api.GetISPs.call(client=client, country='US')
+            self.assertEqual(len(r_isps.isps), 54)
+
+        self.assertEqual(mocked_route_us_isps.call_count, 1)
+
+    @respx.mock
+    def test_400(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('us_isps.json')
+        with as_file(source) as us_isps_json:
+            mocked_route_us_isps = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/countries/US/isps',
+                response_status_code=400,
+                response_json=json.loads(us_isps_json.read_text(encoding='utf-8'))
+            )
+
+        with self.assertRaises(exceptions.ProxyRackException):
+            with RetryClient() as client:
+                proxyrack_api.GetISPs.call(client=client, country='US')
+
+        self.assertEqual(mocked_route_us_isps.call_count, 1)
+
+
+class CountriesTests(BaseTestFixture):
+    """
+        Countries Tests
+    """
+
+    @respx.mock
+    def test_ok(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('countries.json')
+        with as_file(source) as countries_json:
+            mocked_route_countries = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/countries',
+                response_status_code=200,
+                response_json=json.loads(countries_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            r_countries = proxyrack_api.GetCountries.call(client=client)
+            self.assertEqual(len(r_countries.countries), 205)
+
+        self.assertEqual(mocked_route_countries.call_count, 1)
 #
 #     @respx.mock
 #     def test_400(self):
