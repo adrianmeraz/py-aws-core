@@ -111,18 +111,23 @@ class StatsTests(BaseTestFixture):
             self.assertEqual(r_stats.thread_limit, 10000)
 
         self.assertEqual(mocked_route_stats.call_count, 1)
-#
-#     @respx.mock
-#     def test_400(self):
-#         mocked_stats_route = respx.get("http://api.proxyrack.net/stats").mock(
-#             return_value=Response(status_code=codes.BAD_REQUEST, json=self.stats_json)
-#         )
-#
-#         with self.assertRaises(exceptions.ProxyRackException):
-#             with RetryClient() as client:
-#                 proxyrack_api.GetStats.call(client=client)
-#
-#         self.assertTrue(mocked_stats_route.called)
+
+    @respx.mock
+    def test_400(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('stats.json')
+        with as_file(source) as stats_json:
+            mocked_route_stats = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/stats',
+                response_status_code=400,
+                response_json=json.loads(stats_json.read_text(encoding='utf-8'))
+            )
+
+        with self.assertRaises(exceptions.ProxyRackException):
+            with RetryClient() as client:
+                proxyrack_api.GetStats.call(client=client)
+
+        self.assertTrue(mocked_route_stats.called)
 #
 #
 # class IspsTests(BaseTestFixture):
