@@ -282,54 +282,58 @@ class GetSolvedTokenTests(BaseTestFixture):
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_ping_captcha_id.call_count, 1)
-#
-#     @respx.mock
-#     def test_error_wrong_captcha_id(self):
-#         mocked_get_solved_token_route = respx.get("http://2captcha.com/res.php").mock(
-#             return_value=Response(
-#                 status_code=codes.OK,
-#                 json={
-#                     "status": 1,
-#                     "request": "ERROR_WRONG_CAPTCHA_ID"
-#                 }
-#             )
-#         )
-#
-#         with self.assertRaises(exceptions.WarnError):
-#             with Client() as client:
-#                 twocaptcha_api.GetSolvedToken.call(
-#                     client=client,
-#                     captcha_id=2122988149
-#                 )
-#
-#         self.assertEquals(mocked_get_solved_token_route.call_count, 1)
-#
-#
-# class ReportCaptchaTests(BaseTestFixture):
-#     """
-#         Report Captcha Tests
-#     """
-#
-#     @respx.mock
-#     def test_reportbad_ok(self):
-#         mocked_report_bad_captcha_route = respx.get(
-#             "http://2captcha.com/res.php?key=dummy&action=reportbad&id=2122988149&json=1",
-#         ).mock(
-#             Response(
-#                 status_code=codes.OK,
-#                 json={
-#                     'status': 1,
-#                     'request': 'OK_REPORT_RECORDED'
-#                 }
-#             )
-#         )
-#
-#         with Client() as client:
-#             r_report = twocaptcha_api.ReportBadCaptcha.call(client=client, captcha_id=2122988149)
-#
-#         self.assertEquals(r_report.request, 'OK_REPORT_RECORDED')
-#
-#         self.assertTrue(mocked_report_bad_captcha_route.called)
+
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_error_wrong_captcha_id(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        mocked_ping_captcha_id = self.create_route(
+            method='GET',
+            url__eq='http://2captcha.com/res.php?key=IPSUMKEY&action=get&id=2122988149&json=1',
+            response_status_code=200,
+            response_json={
+                "status": 1,
+                "request": "ERROR_WRONG_CAPTCHA_ID"
+            }
+        )
+
+        with self.assertRaises(exceptions.WarnError):
+            with RetryClient() as client:
+                twocaptcha_api.GetSolvedToken.call(
+                    client=client,
+                    captcha_id=2122988149
+                )
+
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_ping_captcha_id.call_count, 1)
+
+
+class ReportCaptchaTests(BaseTestFixture):
+    """
+        Report Captcha Tests
+    """
+
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_reportbad_ok(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        source = test_const.TEST_RESOURCE_PATH.joinpath('report_bad_captcha.json')
+        with as_file(source) as report_bad_captcha_json:
+            mocked_ping_captcha_id = self.create_route(
+                method='GET',
+                url__eq='http://2captcha.com/res.php?key=IPSUMKEY&action=reportbad&id=2122988149&json=1',
+                response_status_code=200,
+                response_json=json.loads(report_bad_captcha_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            r_report = twocaptcha_api.ReportBadCaptcha.call(client=client, captcha_id=2122988149)
+
+        self.assertEqual(r_report.request, 'OK_REPORT_RECORDED')
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_ping_captcha_id.call_count, 1)
 #
 #     @respx.mock
 #     def test_reportgood_ok(self):
