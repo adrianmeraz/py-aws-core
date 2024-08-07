@@ -376,23 +376,27 @@ class ReportCaptchaTests(BaseTestFixture):
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_report_bad_captcha.call_count, 1)
-#
-#     @respx.mock
-#     def test_invalid_report(self):
-#         mocked_report_bad_captcha_route = respx.get(
-#             "http://2captcha.com/res.php?key=dummy&action=reportbad&id=2122988149&json=1",
-#         ).mock(
-#             Response(
-#                 status_code=codes.OK,
-#                 json=self.warn_error_status_json
-#             )
-#         )
-#
-#         with self.assertRaises(exceptions.WarnError):
-#             with Client() as client:
-#                 twocaptcha_api.ReportBadCaptcha.call(client=client, captcha_id=2122988149)
-#
-#         self.assertEquals(mocked_report_bad_captcha_route.call_count, 1)
+
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_invalid_report(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        source = test_const.TEST_RESOURCE_PATH.joinpath('warn_error_status.json')
+        with as_file(source) as warn_error_status_json:
+            mocked_report_bad_captcha = self.create_route(
+                method='GET',
+                url__eq='http://2captcha.com/res.php?key=IPSUMKEY&action=reportbad&id=2122988149&json=1',
+                response_status_code=200,
+                response_json=json.loads(warn_error_status_json.read_text(encoding='utf-8'))
+            )
+
+        with self.assertRaises(exceptions.WarnError):
+            with RetryClient() as client:
+                twocaptcha_api.ReportBadCaptcha.call(client=client, captcha_id=2122988149)
+
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_report_bad_captcha.call_count, 1)
 #
 #
 # class RegisterPingbackTests(BaseTestFixture):
