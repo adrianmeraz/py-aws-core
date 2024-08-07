@@ -191,76 +191,96 @@ class CountriesTests(BaseTestFixture):
             self.assertEqual(len(r_countries.countries), 205)
 
         self.assertEqual(mocked_route_countries.call_count, 1)
-#
-#     @respx.mock
-#     def test_400(self):
-#         mocked_count_route = respx.get("http://api.proxyrack.net/countries").mock(
-#             return_value=Response(status_code=codes.BAD_REQUEST, json=self.countries_json)
-#         )
-#
-#         with self.assertRaises(exceptions.ProxyRackException):
-#             with RetryClient() as client:
-#                 proxyrack_api.GetCountries.call(client=client)
-#
-#         self.assertTrue(mocked_count_route.called)
-#
-#
-# class CitiesTests(BaseTestFixture):
-#     """
-#         Cities Tests
-#     """
-#
-#     @respx.mock
-#     def test_ok(self):
-#         mocked_cities_route = respx.get("http://api.proxyrack.net/cities").mock(
-#             return_value=Response(status_code=codes.OK, json=self.cities_json)
-#         )
-#
-#         with RetryClient() as client:
-#             r_cities = proxyrack_api.GetCities.call(client=client)
-#
-#         self.assertEquals(len(r_cities.cities), 82)
-#
-#         self.assertTrue(mocked_cities_route.called)
-#
-#     @respx.mock
-#     def test_400(self):
-#         mocked_cities_route = respx.get("http://api.proxyrack.net/cities").mock(
-#             return_value=Response(status_code=codes.BAD_REQUEST, json=self.cities_json)
-#         )
-#
-#         with self.assertRaises(exceptions.ProxyRackException):
-#             with RetryClient() as client:
-#                 proxyrack_api.GetCities.call(client=client)
-#
-#         self.assertTrue(mocked_cities_route.called)
-#
-#
-# class CountryIPCountTests(BaseTestFixture):
-#     """
-#         Cities Tests
-#     """
-#
-#     @respx.mock
-#     def test_ok(self):
-#         mocked_country_ip_count_route = respx.get("http://api.proxyrack.net/countries/US/count").mock(
-#             return_value=Response(status_code=codes.OK, text='152')
-#         )
-#
-#         with RetryClient() as client:
-#             r_country_ip_count = proxyrack_api.GetCountryIPCount.call(client=client, country='US')
-#             self.assertEquals(r_country_ip_count, '152')
-#
-#         self.assertTrue(mocked_country_ip_count_route.called)
-#
-#     @respx.mock
-#     def test_400(self):
-#         mocked_country_ip_count_route = respx.get("http://api.proxyrack.net/countries/US/count").mock(
-#             return_value=Response(status_code=codes.BAD_REQUEST, text='152')
-#         )
-#
-#         with self.assertRaises(exceptions.ProxyRackException):
-#             with RetryClient() as client:
-#                 proxyrack_api.GetCountryIPCount.call(client=client, country='US')
-#
-#         self.assertTrue(mocked_country_ip_count_route.called)
+
+    @respx.mock
+    def test_400(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('countries.json')
+        with as_file(source) as countries_json:
+            mocked_route_countries = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/countries',
+                response_status_code=400,
+                response_json=json.loads(countries_json.read_text(encoding='utf-8'))
+            )
+
+        with self.assertRaises(exceptions.ProxyRackException):
+            with RetryClient() as client:
+                proxyrack_api.GetCountries.call(client=client)
+
+        self.assertEqual(mocked_route_countries.call_count, 1)
+
+
+class CitiesTests(BaseTestFixture):
+    """
+        Cities Tests
+    """
+
+    @respx.mock
+    def test_ok(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('cities.json')
+        with as_file(source) as cities_json:
+            mocked_route_cities = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/cities',
+                response_status_code=200,
+                response_json=json.loads(cities_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            r_cities = proxyrack_api.GetCities.call(client=client)
+
+        self.assertEqual(len(r_cities.cities), 82)
+        self.assertEqual(mocked_route_cities.call_count, 1)
+
+    @respx.mock
+    def test_400(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('cities.json')
+        with as_file(source) as cities_json:
+            mocked_route_cities = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/cities',
+                response_status_code=400,
+                response_json=json.loads(cities_json.read_text(encoding='utf-8'))
+            )
+
+        with self.assertRaises(exceptions.ProxyRackException):
+            with RetryClient() as client:
+                proxyrack_api.GetCities.call(client=client)
+
+        self.assertEqual(mocked_route_cities.call_count, 1)
+
+
+class CountryIPCountTests(BaseTestFixture):
+    """
+        Cities Tests
+    """
+
+    @respx.mock
+    def test_ok(self):
+        mocked_route_ip_count = self.create_route(
+            method='GET',
+            url__eq='http://api.proxyrack.net/countries/US/count',
+            response_status_code=200,
+            response_text='152'
+        )
+
+        with RetryClient() as client:
+            r_country_ip_count = proxyrack_api.GetCountryIPCount.call(client=client, country='US')
+            self.assertEqual(r_country_ip_count, '152')
+
+        self.assertEqual(mocked_route_ip_count.call_count, 1)
+
+    @respx.mock
+    def test_400(self):
+        mocked_route_ip_count = self.create_route(
+            method='GET',
+            url__eq='http://api.proxyrack.net/countries/US/count',
+            response_status_code=400,
+            response_text='152'
+        )
+
+        with self.assertRaises(exceptions.ProxyRackException):
+            with RetryClient() as client:
+                proxyrack_api.GetCountryIPCount.call(client=client, country='US')
+
+        self.assertEqual(mocked_route_ip_count.call_count, 1)
