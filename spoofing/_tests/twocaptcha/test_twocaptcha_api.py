@@ -171,72 +171,85 @@ class PingCaptchaIdTests(BaseTestFixture):
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_ping_captcha_id.call_count, 1)
 
-#
-#     @respx.mock
-#     def test_critical_error(self):
-#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
-#             return_value=Response(
-#                 status_code=codes.OK,
-#                 json={
-#                     "status": 1,
-#                     "request": "ERROR_WRONG_USER_KEY"
-#                 }
-#             )
-#         )
-#
-#         with self.assertRaises(exceptions.CriticalError):
-#             with Client() as client:
-#                 twocaptcha_api.GetCaptchaId.call(
-#                     client=client,
-#                     proxy='http://example.com:1000',
-#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-#                     page_url='https://example.com'
-#                 )
-#
-#         self.assertTrue(mocked_get_captcha_id_route.called)
-#
-#     @respx.mock
-#     def test_captcha_unsolvable(self):
-#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
-#             return_value=Response(
-#                 status_code=codes.OK,
-#                 json={
-#                     "status": 1,
-#                     "request": "ERROR_CAPTCHA_UNSOLVABLE"
-#                 }
-#             )
-#         )
-#
-#         with self.assertRaises(exceptions.CaptchaUnsolvable):
-#             with Client() as client:
-#                 twocaptcha_api.GetCaptchaId.call(
-#                     client=client,
-#                     proxy='http://example.com:1000',
-#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-#                     page_url='https://example.com'
-#                 )
-#
-#         self.assertTrue(mocked_get_captcha_id_route.called)
-#
-#     @respx.mock
-#     def test_captcha_not_ready(self):
-#         mocked_get_captcha_id_route = respx.post("http://2captcha.com/in.php").mock(
-#             return_value=Response(
-#                 status_code=codes.OK,
-#                 json=self.captcha_not_ready
-#             )
-#         )
-#
-#         with self.assertRaises(exceptions.CaptchaNotReady):
-#             with Client() as client:
-#                 twocaptcha_api.GetCaptchaId.call(
-#                     client=client,
-#                     proxy='http://example.com:1000',
-#                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-#                     page_url='https://example.com'
-#                 )
-#
-#         self.assertTrue(mocked_get_captcha_id_route.called)
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_critical_error(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        mocked_ping_captcha_id = self.create_route(
+            method='POST',
+            url__eq='http://2captcha.com/in.php?key=IPSUMKEY&method=userrecaptcha&googlekey=6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-&pageurl=https%3A%2F%2Fexample.com&json=1&proxy=example.com%3A1000&proxytype=HTTP',
+            response_status_code=200,
+            response_json={
+                "status": 1,
+                "request": "ERROR_WRONG_USER_KEY"
+            }
+        )
+
+        with self.assertRaises(exceptions.CriticalError):
+            with RetryClient() as client:
+                twocaptcha_api.PingCaptchaId.call(
+                    client=client,
+                    proxy='http://example.com:1000',
+                    site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+                    page_url='https://example.com'
+                )
+
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_ping_captcha_id.call_count, 1)
+
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_captcha_unsolvable(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        mocked_ping_captcha_id = self.create_route(
+            method='POST',
+            url__eq='http://2captcha.com/in.php?key=IPSUMKEY&method=userrecaptcha&googlekey=6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-&pageurl=https%3A%2F%2Fexample.com&json=1&proxy=example.com%3A1000&proxytype=HTTP',
+            response_status_code=200,
+            response_json={
+                "status": 1,
+                "request": "ERROR_CAPTCHA_UNSOLVABLE"
+            }
+        )
+
+        with self.assertRaises(exceptions.CaptchaUnsolvable):
+            with RetryClient() as client:
+                twocaptcha_api.PingCaptchaId.call(
+                    client=client,
+                    proxy='http://example.com:1000',
+                    site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+                    page_url='https://example.com'
+                )
+
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_ping_captcha_id.call_count, 1)
+
+    @respx.mock
+    @mock.patch.object(twocaptcha_api.TwoCaptchaAPI, 'get_api_key')
+    def test_captcha_not_ready(self, mocked_get_api_key):
+        mocked_get_api_key.return_value = 'IPSUMKEY'
+
+        source = test_const.TEST_RESOURCE_PATH.joinpath('captcha_not_ready.json')
+        with as_file(source) as captcha_not_ready_json:
+            mocked_ping_captcha_id = self.create_route(
+                method='POST',
+                url__eq='http://2captcha.com/in.php?key=IPSUMKEY&method=userrecaptcha&googlekey=6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-&pageurl=https%3A%2F%2Fexample.com&json=1&proxy=example.com%3A1000&proxytype=HTTP',
+                response_status_code=200,
+                response_json=json.loads(captcha_not_ready_json.read_text(encoding='utf-8'))
+            )
+
+        with self.assertRaises(exceptions.CaptchaNotReady):
+            with RetryClient() as client:
+                twocaptcha_api.PingCaptchaId.call(
+                    client=client,
+                    proxy='http://example.com:1000',
+                    site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
+                    page_url='https://example.com'
+                )
+
+        self.assertEqual(mocked_get_api_key.call_count, 1)
+        self.assertEqual(mocked_ping_captcha_id.call_count, 1)
 #
 #
 # class GetSolvedTokenTests(BaseTestFixture):
