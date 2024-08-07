@@ -35,7 +35,7 @@ class TwoCaptchaResponse:
         return self.request == 'OK_REPORT_RECORDED'
 
 
-class GetCaptchaId(TwoCaptchaAPI):
+class PingCaptchaId(TwoCaptchaAPI):
     class Response(TwoCaptchaResponse):
         pass
 
