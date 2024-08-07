@@ -2,7 +2,6 @@ import json
 from importlib.resources import as_file
 
 import respx
-from httpx import Response, codes
 
 from py_aws_core.clients import RetryClient
 from py_aws_core.testing import BaseTestFixture
@@ -29,20 +28,25 @@ class ActiveConnectionsTests(BaseTestFixture):
             r_active_connections = proxyrack_api.GetActiveConnections.call(client)
             self.assertEquals(len(r_active_connections.connections), 2)
 
+        self.assertEquals(mocked_active_conns_route.call_count, 100)
+
+    @respx.mock
+    def test_ProxyRackError(self):
+        source = test_const.TEST_RESOURCE_PATH.joinpath('active_conns.json')
+        with as_file(source) as active_conns_json:
+            mocked_active_conns_route = self.create_route(
+                method='GET',
+                url__eq='http://api.proxyrack.net/active_conns',
+                response_status_code=400,
+                response_json=json.loads(active_conns_json.read_text(encoding='utf-8'))
+            )
+
+        with RetryClient() as client:
+            with self.assertRaises(exceptions.ProxyRackException):
+                proxyrack_api.GetActiveConnections.call(client)
+
         self.assertEquals(mocked_active_conns_route.call_count, 1)
 
-#     @respx.mock
-#     def test_ProxyRackError(self):
-#         mocked_active_conns_route = respx.get("http://api.proxyrack.net/active_conns").mock(
-#             return_value=Response(status_code=codes.BAD_REQUEST, json=self.active_conns_json)
-#         )
-#
-#         with RetryClient() as client:
-#             with self.assertRaises(exceptions.ProxyRackException):
-#                 proxyrack_api.GetActiveConnections.call(client)
-#
-#         self.assertEquals(mocked_active_conns_route.call_count, 1)
-#
 #
 # class APIKeyTests(BaseTestFixture):
 #     """

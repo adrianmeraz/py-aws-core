@@ -6,6 +6,7 @@ omit =
     ./venv/*
     */site-packages/*
     */virtualenvs/*
+    */_tests/*
     */tests/*
     *__init__.py
 
@@ -15,6 +16,7 @@ omit =
     ./venv/*
     */site-packages/*
     */virtualenvs/*
+    */_tests/*
     */tests/*
     *__init__.py
 
