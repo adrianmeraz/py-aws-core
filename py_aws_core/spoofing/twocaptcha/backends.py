@@ -1,6 +1,6 @@
 from httpx import Client
 
-from spoofing.backends import CaptchaBackend
+from py_aws_core.spoofing.backends import CaptchaBackend
 from . import twocaptcha_api
 
 

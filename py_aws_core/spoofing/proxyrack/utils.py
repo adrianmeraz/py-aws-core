@@ -1,7 +1,7 @@
 import typing
 import uuid
 
-from spoofing.proxyrack import const
+from py_aws_core.spoofing.proxyrack import const
 
 
 class ProxyBuilder:

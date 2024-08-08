@@ -5,7 +5,7 @@ import respx
 
 from py_aws_core.clients import RetryClient
 from py_aws_core.testing import BaseTestFixture
-from spoofing.proxyrack import exceptions, proxyrack_api
+from py_aws_core.spoofing.proxyrack import exceptions, proxyrack_api
 from . import const as test_const
 
 

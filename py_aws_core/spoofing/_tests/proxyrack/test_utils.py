@@ -1,5 +1,5 @@
 from py_aws_core.testing import BaseTestFixture
-from spoofing.proxyrack import const, utils
+from py_aws_core.spoofing.proxyrack import const, utils
 
 
 class UtilTests(BaseTestFixture):
