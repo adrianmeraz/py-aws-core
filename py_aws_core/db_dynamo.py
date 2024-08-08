@@ -129,7 +129,7 @@ class ABCCommonAPI(ABC):
         sk: str,
         _type: str,
         created_by: str = '',
-        expire_in_seconds: int = const.DB_DEFAULT_EXPIRES_IN_SECONDS,
+        expire_in_seconds: int | None = const.DB_DEFAULT_EXPIRES_IN_SECONDS,
         **kwargs,
     ):
         return {

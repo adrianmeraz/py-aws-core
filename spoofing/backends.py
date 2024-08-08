@@ -1,6 +1,6 @@
 import logging
 import random
-from abc import ABC, abstractmethod, abstractclassmethod
+from abc import ABC, abstractmethod
 
 from httpx import Client
 
