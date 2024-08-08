@@ -63,8 +63,24 @@ class DDBClient:
         dynamodb = boto3.resource('dynamodb')
         return dynamodb.Table(self.get_table_name())
 
-    def query(self, *args, **kwargs):
-        return self.boto_client.query(*args, **kwargs)
+    def query(
+        self,
+        *args,
+        key_condition_expression: str,
+        expression_attribute_names: typing.Dict,
+        expression_attribute_values: typing.Dict,
+        projection_expression: str = None,
+        **kwargs
+    ):
+        return self.boto_client.query(
+            TableName=self.get_table_name(),
+            KeyConditionExpression=key_condition_expression,
+            ExpressionAttributeNames=expression_attribute_names,
+            ExpressionAttributeValues=expression_attribute_values,
+            ProjectionExpression=projection_expression,
+            *args,
+            **kwargs
+        )
 
     def scan(self, *args, **kwargs):
         return self.boto_client.scan(*args, **kwargs)
@@ -79,19 +95,19 @@ class DDBClient:
         return self.boto_client.delete_item(*args, **kwargs)
 
     def update_item(
+        *args,
         self,
         key: typing.Dict,
         update_expression: str,
         expression_attribute_values: typing.Dict,
-        *args,
         **kwargs
     ):
         return self.boto_client.update_item(
+            *args,
             TableName=self.get_table_name(),
             Key=key,
             UpdateExpression=update_expression,
             ExpressionAttributeValues=expression_attribute_values,
-            *args,
             **kwargs
         )
 

@@ -26,7 +26,7 @@ class TwoCaptchaAPI:
     @classmethod
     def get_pingback_token(cls):
         if not cls._api_key:
-            cls._api_key = secrets_manager.get_secret('CAPTCHA_PASSWORD')
+            cls._api_key = secrets_manager.get_secret('TWOCAPTCHA_PINGBACK_TOKEN')
         return cls._api_key
 
 
