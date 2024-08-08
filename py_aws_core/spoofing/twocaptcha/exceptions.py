@@ -1,4 +1,4 @@
-from spoofing.exceptions import SpoofingException
+from py_aws_core.spoofing.exceptions import SpoofingException
 
 
 class TwoCaptchaException(SpoofingException):

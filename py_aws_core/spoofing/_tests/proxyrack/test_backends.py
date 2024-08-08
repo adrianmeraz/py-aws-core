@@ -1,12 +1,9 @@
-import httpx
-import respx
-from httpx import Response, codes
 from unittest import mock
 
 
 from py_aws_core.testing import BaseTestFixture
-from spoofing.proxyrack import const, exceptions, proxyrack_api
-from spoofing.proxyrack.backends import ProxyRackProxyBackend
+from py_aws_core.spoofing.proxyrack import const
+from py_aws_core.spoofing.proxyrack.backends import ProxyRackProxyBackend
 
 
 class ProxyRackProxyBackendTests(BaseTestFixture):

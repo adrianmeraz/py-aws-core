@@ -2,8 +2,8 @@ import logging
 import typing
 import uuid
 
-from spoofing.backends import ProxyBackend
-from spoofing.proxyrack import const, utils
+from py_aws_core.spoofing.backends import ProxyBackend
+from py_aws_core.spoofing.proxyrack import const, utils
 
 logger = logging.getLogger(__name__)
 
