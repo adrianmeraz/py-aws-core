@@ -95,8 +95,8 @@ class DDBClient:
         return self.boto_client.delete_item(TableName=self.get_table_name(), *args, **kwargs)
 
     def update_item(
-        *args,
         self,
+        *args,
         key: typing.Dict,
         update_expression: str,
         expression_attribute_values: typing.Dict,
