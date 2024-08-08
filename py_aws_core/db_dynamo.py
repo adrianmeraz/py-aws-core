@@ -83,16 +83,16 @@ class DDBClient:
         )
 
     def scan(self, *args, **kwargs):
-        return self.boto_client.scan(*args, **kwargs)
+        return self.boto_client.scan(TableName=self.get_table_name(), *args, **kwargs)
 
     def get_item(self, *args, **kwargs):
-        return self.boto_client.get_item(*args, **kwargs)
+        return self.boto_client.get_item(TableName=self.get_table_name(), *args, **kwargs)
 
     def put_item(self, *args, **kwargs):
-        return self.boto_client.put_item(*args, **kwargs)
+        return self.boto_client.put_item(TableName=self.get_table_name(), *args, **kwargs)
 
     def delete_item(self, *args, **kwargs):
-        return self.boto_client.delete_item(*args, **kwargs)
+        return self.boto_client.delete_item(TableName=self.get_table_name(), *args, **kwargs)
 
     def update_item(
         *args,
