@@ -49,6 +49,14 @@ jobs:
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
       run: poetry install
 
-    - name: Run Tests
+    - name: Run Tests and Generate Coverage Report
       run: |
-        poetry run python -m unittest
+        poetry run coverage run -m unittest
+        poetry run coverage xml
+
+    - name: Upload Coverage Report to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        files: coverage.xml
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
