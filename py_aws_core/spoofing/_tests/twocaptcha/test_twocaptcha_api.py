@@ -5,10 +5,9 @@ from unittest import mock
 import respx
 
 from py_aws_core.clients import RetryClient
+from py_aws_core.spoofing.twocaptcha import exceptions, twocaptcha_api
 from py_aws_core.testing import BaseTestFixture
-from spoofing.twocaptcha import exceptions, twocaptcha_api
 from . import const as test_const
-
 
 RESOURCE_PATH = test_const.TEST_API_RESOURCE_PATH
 

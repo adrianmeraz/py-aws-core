@@ -78,4 +78,3 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
                     ':mda': {'S': SessionDBAPI.iso_8601_now_timestamp()}
                 }
             )
-
