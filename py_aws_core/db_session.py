@@ -41,20 +41,18 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
             db_client: DDBClient,
             _id: uuid.UUID,
         ) -> Response:
-            table_name = db_client.get_table_name()
             pk = entities.Session.create_key(_id=_id)
             response = db_client.query(
-                TableName=table_name,
-                KeyConditionExpression="#pk = :pk",
-                ExpressionAttributeNames={
+                key_condition_expression="#pk = :pk",
+                expression_attribute_names={
                     "#pk": "PK",
                     "#cookies": "Base64Cookies",
                     "#typ": "Type"
                 },
-                ExpressionAttributeValues={
+                expression_attribute_values={
                     ":pk": {"S": pk},
                 },
-                ProjectionExpression='#cookies, #typ'
+                projection_expression='#cookies, #typ'
             )
             logger.debug(f'{cls.__qualname__}.call#: response: {response}')
             return cls.Response(response)
@@ -68,16 +66,14 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
             _id: uuid.UUID,
             b64_cookies: bytes
         ):
-            table_name = db_client.get_table_name()
             pk = sk = entities.Session.create_key(_id=_id)
             return db_client.update_item(
-                TableName=table_name,
-                Key={
+                key={
                     'PK': {'S': pk},
                     'SK': {'S': sk},
                 },
-                UpdateExpression='SET Base64Cookies = :b64, ModifiedAt = :mda',
-                ExpressionAttributeValues={
+                update_expression='SET Base64Cookies = :b64, ModifiedAt = :mda',
+                expression_attribute_values={
                     ':b64': {'B': b64_cookies},
                     ':mda': {'S': SessionDBAPI.iso_8601_now_timestamp()}
                 }

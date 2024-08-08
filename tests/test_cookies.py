@@ -1,8 +1,7 @@
-import datetime
-from unittest import mock, TestCase
 import time
+from unittest import mock, TestCase
 
-from py_aws_core import cookies, utils
+from py_aws_core import cookies
 
 
 class BuildSetCookieHeaderTests(TestCase):

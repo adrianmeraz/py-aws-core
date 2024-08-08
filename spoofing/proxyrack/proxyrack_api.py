@@ -7,8 +7,6 @@ from . import exceptions
 
 logger = logging.getLogger(__name__)
 
-ROOT_URL = 'http://api.proxyrack.net'
-
 
 STATUS_ERRORS_MAP = {
     407: exceptions.ProxyNotAuthenticated,
@@ -19,7 +17,11 @@ STATUS_ERRORS_MAP = {
 }
 
 
-class GetActiveConnections:
+class ProxyrackAPI:
+    ROOT_URL = 'http://api.proxyrack.net'
+
+
+class GetActiveConnections(ProxyrackAPI):
     class Response:
         class Connection:
             def __init__(self, data):
@@ -33,13 +35,13 @@ class GetActiveConnections:
     @classmethod
     @decorators.wrap_exceptions(raise_as=exceptions.ProxyRackException)
     def call(cls, client: Client, *args, **kwargs):
-        url = f'{ROOT_URL}/active_conns'
+        url = f'{cls.ROOT_URL}/active_conns'
         r = client.get(url=url, *args, **kwargs)
         r.raise_for_status()
         return cls.Response(r.json())
 
 
-class GetCities:
+class GetCities(ProxyrackAPI):
     class Response:
         def __init__(self, data):
             self.cities = data
@@ -47,13 +49,13 @@ class GetCities:
     @classmethod
     @decorators.wrap_exceptions(raise_as=exceptions.ProxyRackException)
     def call(cls, client: Client, *args, **kwargs):
-        url = f'{ROOT_URL}/cities'
+        url = f'{cls.ROOT_URL}/cities'
         r = client.get(url=url, *args, **kwargs)
         r.raise_for_status()
         return cls.Response(r.json())
 
 
-class GetCountries:
+class GetCountries(ProxyrackAPI):
     class Response:
         def __init__(self, data):
             self.countries = data
@@ -61,13 +63,13 @@ class GetCountries:
     @classmethod
     @decorators.wrap_exceptions(raise_as=exceptions.ProxyRackException)
     def call(cls, client: Client, *args, **kwargs):
-        url = f'{ROOT_URL}/countries'
+        url = f'{cls.ROOT_URL}/countries'
         r = client.get(url=url, *args, **kwargs)
         r.raise_for_status()
         return cls.Response(r.json())
 
 
-class GetISPs:
+class GetISPs(ProxyrackAPI):
     class Response:
         def __init__(self, data):
             self.isps = data
@@ -75,23 +77,23 @@ class GetISPs:
     @classmethod
     @decorators.wrap_exceptions(raise_as=exceptions.ProxyRackException)
     def call(cls, client: Client, country: str, *args, **kwargs):
-        url = f'{ROOT_URL}/countries/{country}/isps'
+        url = f'{cls.ROOT_URL}/countries/{country}/isps'
         r = client.get(url=url, *args, **kwargs)
         r.raise_for_status()
         return cls.Response(r.json())
 
 
-class GetCountryIPCount:
+class GetCountryIPCount(ProxyrackAPI):
     @classmethod
     @decorators.wrap_exceptions(raise_as=exceptions.ProxyRackException)
     def call(cls, client: Client, country: str, *args, **kwargs):
-        url = f'{ROOT_URL}/countries/{country}/count'
+        url = f'{cls.ROOT_URL}/countries/{country}/count'
         r = client.get(url=url, *args, **kwargs)
         r.raise_for_status()
         return r.text
 
 
-class GetTempAPIKey:
+class PostTempAPIKey(ProxyrackAPI):
     class Response:
         class Password:
             def __init__(self, data):
@@ -109,7 +111,7 @@ class GetTempAPIKey:
     @classmethod
     @decorators.wrap_exceptions(raise_as=exceptions.ProxyRackException)
     def call(cls, client: Client, expiration_seconds: int, *args, **kwargs):
-        url = f'{ROOT_URL}/passwords'
+        url = f'{cls.ROOT_URL}/passwords'
 
         params = {
             'expirationSeconds': expiration_seconds,
@@ -120,7 +122,7 @@ class GetTempAPIKey:
         return cls.Response(r.json())
 
 
-class GetStats:
+class GetStats(ProxyrackAPI):
     class Response:
         class IPInfo:
             class Fingerprint:
@@ -152,7 +154,7 @@ class GetStats:
             :return:
         """
 
-        url = f'{ROOT_URL}/stats'
+        url = f'{cls.ROOT_URL}/stats'
         r = client.get(url=url, *args, **kwargs)
         r.raise_for_status()
         return cls.Response(r.json())

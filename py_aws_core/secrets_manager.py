@@ -31,6 +31,7 @@ class SecretsManager:
             self._secrets_map = json.loads(r_secrets['SecretString'])
             return self._secrets_map[secret_name]
         except ClientError as e:
+            logger.exception(f'Error while trying to find secret "{secret_name}"')
             # For a list of exceptions thrown, see
             # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
             raise exceptions.SecretsManagerException(e)
