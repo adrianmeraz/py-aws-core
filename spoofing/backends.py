@@ -1,6 +1,5 @@
 import logging
 import random
-import uuid
 from abc import ABC, abstractmethod
 
 from httpx import Client
@@ -13,10 +12,6 @@ secrets_manager = get_secrets_manager()
 
 
 class ProxyBackend(ABC):
-    def __init__(self, session_id: str | uuid.UUID = None, **kwargs):
-        self._session_id = session_id or uuid.uuid4()
-        self.kwargs = kwargs
-
     @abstractmethod
     def get_proxy_url(self, **kwargs):
         raise NotImplemented

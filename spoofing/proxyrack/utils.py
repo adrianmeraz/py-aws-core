@@ -30,15 +30,21 @@ class ProxyBuilder:
         @property
         def to_string(self) -> str:
             opts = {
-                'city': ','.join(self._cities),
+                'city': self.to_str(self._cities),
                 'country': self._country,
-                'isp': ','.join(self._isps),
+                'isp': self.to_str(self._isps),
                 'osName': self._proxy_os.value,
                 'proxyIp': self._proxy_ip,
                 'session': self._session_id,
                 'refreshMinutes': self._refresh_minutes
             } | self._kwargs
             return ';'.join([f'{k}={str(v).replace(" ", "")}' for k, v in opts.items() if v])
+
+        @staticmethod
+        def to_str(objs: typing.List[str]) -> str:
+            if objs:
+                return ','.join(objs)
+            return ''
 
     def __init__(self, username: str, password: str, netloc: str, config: Config):
         self._username = username
