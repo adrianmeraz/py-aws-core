@@ -10,6 +10,9 @@ from spoofing.twocaptcha import exceptions, twocaptcha_api
 from . import const as test_const
 
 
+RESOURCE_PATH = test_const.TEST_API_RESOURCE_PATH
+
+
 class GetSolvedCaptchaTests(BaseTestFixture):
     """
         Get Captcha ID Tests
@@ -20,7 +23,7 @@ class GetSolvedCaptchaTests(BaseTestFixture):
     def test_ok(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('get_solved_token.json')
+        source = RESOURCE_PATH.joinpath('get_solved_token.json')
         with as_file(source) as get_solved_token_json:
             mocked_get_solved_token_route = self.create_ok_route(
                 method='GET',
@@ -43,7 +46,7 @@ class GetSolvedCaptchaTests(BaseTestFixture):
     def test_captcha_unsolvable(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('captcha_unsolvable.json')
+        source = RESOURCE_PATH.joinpath('captcha_unsolvable.json')
         with as_file(source) as get_solved_token_json:
             mocked_get_solved_token_route = self.create_ok_route(
                 method='GET',
@@ -72,7 +75,7 @@ class PingCaptchaIdTests(BaseTestFixture):
     def test_ok(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('get_captcha_id.json')
+        source = RESOURCE_PATH.joinpath('get_captcha_id.json')
         with as_file(source) as get_captcha_id_json:
             mocked_ping_captcha_id = self.create_ok_route(
                 method='POST',
@@ -97,7 +100,7 @@ class PingCaptchaIdTests(BaseTestFixture):
     def test_redirect(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('warn_error_status.json')
+        source = RESOURCE_PATH.joinpath('warn_error_status.json')
         with as_file(source) as warn_error_status_json:
             mocked_ping_captcha_id = self.create_route(
                 method='POST',
@@ -123,7 +126,7 @@ class PingCaptchaIdTests(BaseTestFixture):
     def test_invalid_response(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('warn_error_status.json')
+        source = RESOURCE_PATH.joinpath('warn_error_status.json')
         with as_file(source) as warn_error_status_json:
             mocked_ping_captcha_id = self.create_route(
                 method='POST',
@@ -230,7 +233,7 @@ class PingCaptchaIdTests(BaseTestFixture):
     def test_captcha_not_ready(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('captcha_not_ready.json')
+        source = RESOURCE_PATH.joinpath('captcha_not_ready.json')
         with as_file(source) as captcha_not_ready_json:
             mocked_ping_captcha_id = self.create_route(
                 method='POST',
@@ -262,7 +265,7 @@ class GetSolvedTokenTests(BaseTestFixture):
     def test_ok(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('get_solved_token.json')
+        source = RESOURCE_PATH.joinpath('get_solved_token.json')
         with as_file(source) as get_solved_token_json:
             mocked_get_solved_token = self.create_route(
                 method='GET',
@@ -319,7 +322,7 @@ class ReportCaptchaTests(BaseTestFixture):
     def test_reportbad_ok(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('report_captcha.json')
+        source = RESOURCE_PATH.joinpath('report_captcha.json')
         with as_file(source) as report_captcha_json:
             mocked_report_bad_captcha = self.create_route(
                 method='GET',
@@ -340,7 +343,7 @@ class ReportCaptchaTests(BaseTestFixture):
     def test_reportgood_ok(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('report_captcha.json')
+        source = RESOURCE_PATH.joinpath('report_captcha.json')
         with as_file(source) as report_captcha_json:
             mocked_report_good_captcha = self.create_route(
                 method='GET',
@@ -361,7 +364,7 @@ class ReportCaptchaTests(BaseTestFixture):
     def test_reportbad_invalid_response(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('invalid_response.json')
+        source = test_const.TEST_API_RESOURCE_PATH.joinpath('invalid_response.json')
         with as_file(source) as report_captcha_json:
             mocked_report_bad_captcha = self.create_route(
                 method='GET',
@@ -382,7 +385,7 @@ class ReportCaptchaTests(BaseTestFixture):
     def test_invalid_report(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('warn_error_status.json')
+        source = test_const.TEST_API_RESOURCE_PATH.joinpath('warn_error_status.json')
         with as_file(source) as warn_error_status_json:
             mocked_report_bad_captcha = self.create_route(
                 method='GET',
@@ -409,7 +412,7 @@ class RegisterPingbackTests(BaseTestFixture):
     def test_ok(self, mocked_get_api_key):
         mocked_get_api_key.return_value = 'IPSUMKEY'
 
-        source = test_const.TEST_RESOURCE_PATH.joinpath('add_pingback.json')
+        source = test_const.TEST_API_RESOURCE_PATH.joinpath('add_pingback.json')
         with as_file(source) as warn_error_status_json:
             mocked_register_pingback = self.create_route(
                 method='GET',

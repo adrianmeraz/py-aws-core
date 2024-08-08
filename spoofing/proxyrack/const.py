@@ -27,3 +27,4 @@ DEFAULT_PROXYRACK_ISP_WEIGHTS = [
     ('Spectrum', 1),
     ('Verizon Fios', 1),
 ]
+

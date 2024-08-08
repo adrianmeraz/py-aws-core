@@ -23,6 +23,12 @@ class TwoCaptchaAPI:
             cls._api_key = secrets_manager.get_secret('CAPTCHA_PASSWORD')
         return cls._api_key
 
+    @classmethod
+    def get_pingback_token(cls):
+        if not cls._api_key:
+            cls._api_key = secrets_manager.get_secret('CAPTCHA_PASSWORD')
+        return cls._api_key
+
 
 class TwoCaptchaResponse:
     def __init__(self, data):

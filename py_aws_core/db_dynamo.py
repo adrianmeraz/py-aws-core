@@ -78,8 +78,22 @@ class DDBClient:
     def delete_item(self, *args, **kwargs):
         return self.boto_client.delete_item(*args, **kwargs)
 
-    def update_item(self, *args, **kwargs):
-        return self.boto_client.update_item(*args, **kwargs)
+    def update_item(
+        self,
+        key: typing.Dict,
+        update_expression: str,
+        expression_attribute_values: typing.Dict,
+        *args,
+        **kwargs
+    ):
+        return self.boto_client.update_item(
+            TableName=self.get_table_name(),
+            Key=key,
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            *args,
+            **kwargs
+        )
 
     def batch_write_item(self, *args, **kwargs):
         return self.boto_client.batch_write_item(*args, **kwargs)
@@ -122,6 +136,12 @@ class QueryResponse(ABC):
 
 
 class ABCCommonAPI(ABC):
+    """
+        https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
+        If your primary key consists of both a partition key(pk) and a sort key(sk),
+        the parameter will check whether attribute_not_exists(pk) AND attribute_not_exists(sk) evaluate to true or
+        false before attempting the write operation.
+    """
     @classmethod
     def get_batch_entity_create_map(
         cls,
@@ -141,6 +161,21 @@ class ABCCommonAPI(ABC):
             'ModifiedAt': '',
             'ModifiedBy': '',
             'ExpiresAt': cls.calc_expire_at_timestamp(expire_in_seconds=expire_in_seconds),
+        } | kwargs
+
+    @classmethod
+    def get_entity_update_map(
+        cls,
+        pk: str,
+        sk: str,
+        modified_by: str = '',
+        **kwargs,
+    ):
+        return {
+            'PK': pk,
+            'SK': sk,
+            'ModifiedAt': cls.iso_8601_now_timestamp(),
+            'ModifiedBy': modified_by,
         } | kwargs
 
     @classmethod

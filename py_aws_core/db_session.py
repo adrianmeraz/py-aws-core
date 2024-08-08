@@ -68,16 +68,14 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
             _id: uuid.UUID,
             b64_cookies: bytes
         ):
-            table_name = db_client.get_table_name()
             pk = sk = entities.Session.create_key(_id=_id)
             return db_client.update_item(
-                TableName=table_name,
-                Key={
+                key={
                     'PK': {'S': pk},
                     'SK': {'S': sk},
                 },
-                UpdateExpression='SET Base64Cookies = :b64, ModifiedAt = :mda',
-                ExpressionAttributeValues={
+                update_expression='SET Base64Cookies = :b64, ModifiedAt = :mda',
+                expression_attribute_values={
                     ':b64': {'B': b64_cookies},
                     ':mda': {'S': SessionDBAPI.iso_8601_now_timestamp()}
                 }

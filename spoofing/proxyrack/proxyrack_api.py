@@ -18,6 +18,8 @@ STATUS_ERRORS_MAP = {
     564: exceptions.ProxyNotOnline
 }
 
+class
+
 
 class GetActiveConnections:
     class Response:
