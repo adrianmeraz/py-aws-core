@@ -9,8 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class ProxyRackProxyBackend(ProxyBackend):
+    @classmethod
     def get_proxy_url(
-        self,
+        cls,
         netloc: str,
         cities: typing.List[str] = None,
         country: str = None,
@@ -19,7 +20,7 @@ class ProxyRackProxyBackend(ProxyBackend):
         proxy_os: const.ProxyOs = None,
         session_id: str | uuid.UUID = None,
         **kwargs
-    ):
+    ) -> str:
         config = utils.ProxyBuilder.Config(
             cities=cities,
             country=country,
@@ -30,8 +31,8 @@ class ProxyRackProxyBackend(ProxyBackend):
             refresh_minutes=60
         )
         return utils.ProxyBuilder(
-            username=self.get_proxy_username(),
-            password=self.get_proxy_password(),
+            username=cls.get_proxy_username(),
+            password=cls.get_proxy_password(),
             netloc=netloc,
             config=config
         ).http_url

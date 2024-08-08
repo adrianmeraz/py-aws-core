@@ -19,7 +19,7 @@ class ProxyRackProxyBackendTests(BaseTestFixture):
     def test_proxy_url(self, mocked_get_proxy_username, mocked_get_proxy_password):
         mocked_get_proxy_username.return_value = 'user123'
         mocked_get_proxy_password.return_value = 'pass456'
-        proxy_url = ProxyRackProxyBackend().get_proxy_url(
+        proxy_url = ProxyRackProxyBackend.get_proxy_url(
             cities=['Dallas'],
             netloc='megaproxy.rotating.proxyrack.net:10000',
             proxy_ip='192.168.86.250',

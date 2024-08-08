@@ -1,6 +1,6 @@
 import logging
 import random
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractclassmethod
 
 from httpx import Client
 
@@ -12,8 +12,9 @@ secrets_manager = get_secrets_manager()
 
 
 class ProxyBackend(ABC):
+    @classmethod
     @abstractmethod
-    def get_proxy_url(self, **kwargs):
+    def get_proxy_url(cls, **kwargs) -> str:
         raise NotImplemented
 
     @staticmethod
