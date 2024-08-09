@@ -11,11 +11,10 @@ from .exceptions import CaptchaNotReady, TwoCaptchaException
 logger = logging.getLogger(__name__)
 secrets_manager = get_secrets_manager()
 
-ROOT_URL = 'http://2captcha.com'
-
 
 class TwoCaptchaAPI:
     _api_key = None
+    ROOT_URL = 'http://2captcha.com'
 
     @classmethod
     def get_api_key(cls):
@@ -48,7 +47,7 @@ class PingCaptchaId(TwoCaptchaAPI):
     @classmethod
     @decorators.error_check
     def call(cls, client: Client, proxy: str, site_key: str, page_url: str, pingback: str = None) -> Response:
-        url = f'{ROOT_URL}/in.php'
+        url = f'{cls.ROOT_URL}/in.php'
         proxy_parts = urlparse(proxy)
         proxy_type = proxy_parts.scheme.upper()
 
@@ -79,7 +78,7 @@ class GetSolvedToken(TwoCaptchaAPI):
     @aws_decorators.retry(retry_exceptions=(CaptchaNotReady,), tries=60, delay=5, backoff=1)
     @decorators.error_check
     def call(cls, client: Client, captcha_id: int) -> Response:
-        url = f'{ROOT_URL}/res.php'
+        url = f'{cls.ROOT_URL}/res.php'
 
         params = {
             'key': cls.get_api_key(),
@@ -99,7 +98,7 @@ class ReportCaptcha(TwoCaptchaAPI):
 
     @classmethod
     def call(cls, client: Client, captcha_id: int, is_good: bool) -> Response:
-        url = f'{ROOT_URL}/res.php'
+        url = f'{cls.ROOT_URL}/res.php'
 
         action = 'reportgood' if is_good else 'reportbad'
 
@@ -141,7 +140,7 @@ class RegisterPingback(TwoCaptchaAPI):
     @aws_decorators.retry(retry_exceptions=(CaptchaNotReady,))
     @decorators.error_check
     def call(cls, client: Client, addr: str) -> Response:
-        url = f'{ROOT_URL}/res.php'
+        url = f'{cls.ROOT_URL}/res.php'
 
         params = {
             'key': cls.get_api_key(),
