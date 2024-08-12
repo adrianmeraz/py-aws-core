@@ -42,7 +42,7 @@ class TwoCaptchaResponse:
 
 class PingCaptchaId(TwoCaptchaAPI):
     class Request:
-        def __init__(self, proxy_url: str, site_key: str, page_url: str, pingback: str = None):
+        def __init__(self, site_key: str, page_url: str, proxy_url: str = None, pingback: str = None):
             self.proxy_url = proxy_url
             self.site_key = site_key
             self.page_url = page_url
