@@ -1,6 +1,10 @@
 import logging.config
 import os
 
+from dotenv import load_dotenv
+
+dotenv = load_dotenv()  # take environment variables from .env.
+
 logger = logging.getLogger(__name__)
 
 
