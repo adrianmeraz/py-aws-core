@@ -83,12 +83,12 @@ class PingCaptchaIdTests(BaseTestFixture):
             )
 
         with RetryClient() as client:
-            r = twocaptcha_api.PingCaptchaId.call(
-                client=client,
-                proxy='http://example.com:1000',
+            request = twocaptcha_api.PingCaptchaId.Request(
+                proxy_url='http://example.com:1000',
                 site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-                page_url='https://example.com'
+                page_url='https://example.com',
             )
+            r = twocaptcha_api.PingCaptchaId.call(client=client, request=request)
         self.assertEqual(r.request, '2122988149')
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
@@ -110,12 +110,12 @@ class PingCaptchaIdTests(BaseTestFixture):
 
         with self.assertRaises(exceptions.TwoCaptchaException):
             with RetryClient() as client:
-                twocaptcha_api.PingCaptchaId.call(
-                    client=client,
-                    proxy='http://example.com:1000',
+                request = twocaptcha_api.PingCaptchaId.Request(
+                    proxy_url='http://example.com:1000',
                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-                    page_url='https://example.com'
+                    page_url='https://example.com',
                 )
+                twocaptcha_api.PingCaptchaId.call(client=client, request=request)
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_ping_captcha_id.call_count, 1)
@@ -136,12 +136,12 @@ class PingCaptchaIdTests(BaseTestFixture):
 
         with self.assertRaises(exceptions.WarnError):
             with RetryClient() as client:
-                twocaptcha_api.PingCaptchaId.call(
-                    client=client,
-                    proxy='http://example.com:1000',
+                request = twocaptcha_api.PingCaptchaId.Request(
+                    proxy_url='http://example.com:1000',
                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-                    page_url='https://example.com'
+                    page_url='https://example.com',
                 )
+                twocaptcha_api.PingCaptchaId.call(client=client, request=request)
 
         self.assertTrue(mocked_ping_captcha_id.call_count, 1)
         self.assertTrue(mocked_get_api_key.call_count, 1)
@@ -163,12 +163,12 @@ class PingCaptchaIdTests(BaseTestFixture):
 
         with self.assertRaises(exceptions.TwoCaptchaException):
             with RetryClient() as client:
-                twocaptcha_api.PingCaptchaId.call(
-                    client=client,
-                    proxy='http://example.com:1000',
+                request = twocaptcha_api.PingCaptchaId.Request(
+                    proxy_url='http://example.com:1000',
                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-                    page_url='https://example.com'
+                    page_url='https://example.com',
                 )
+                twocaptcha_api.PingCaptchaId.call(client=client, request=request)
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_ping_captcha_id.call_count, 1)
@@ -190,12 +190,12 @@ class PingCaptchaIdTests(BaseTestFixture):
 
         with self.assertRaises(exceptions.CriticalError):
             with RetryClient() as client:
-                twocaptcha_api.PingCaptchaId.call(
-                    client=client,
-                    proxy='http://example.com:1000',
+                request = twocaptcha_api.PingCaptchaId.Request(
+                    proxy_url='http://example.com:1000',
                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-                    page_url='https://example.com'
+                    page_url='https://example.com',
                 )
+                twocaptcha_api.PingCaptchaId.call(client=client, request=request)
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_ping_captcha_id.call_count, 1)
@@ -217,12 +217,12 @@ class PingCaptchaIdTests(BaseTestFixture):
 
         with self.assertRaises(exceptions.CaptchaUnsolvable):
             with RetryClient() as client:
-                twocaptcha_api.PingCaptchaId.call(
-                    client=client,
-                    proxy='http://example.com:1000',
+                request = twocaptcha_api.PingCaptchaId.Request(
+                    proxy_url='http://example.com:1000',
                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-                    page_url='https://example.com'
+                    page_url='https://example.com',
                 )
+                twocaptcha_api.PingCaptchaId.call(client=client, request=request)
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_ping_captcha_id.call_count, 1)
@@ -243,12 +243,12 @@ class PingCaptchaIdTests(BaseTestFixture):
 
         with self.assertRaises(exceptions.CaptchaNotReady):
             with RetryClient() as client:
-                twocaptcha_api.PingCaptchaId.call(
-                    client=client,
-                    proxy='http://example.com:1000',
+                request = twocaptcha_api.PingCaptchaId.Request(
+                    proxy_url='http://example.com:1000',
                     site_key='6Le-wvkSVVABCPBMRTvw0Q4Muexq1bi0DJwx_mJ-',
-                    page_url='https://example.com'
+                    page_url='https://example.com',
                 )
+                twocaptcha_api.PingCaptchaId.call(client=client, request=request)
 
         self.assertEqual(mocked_get_api_key.call_count, 1)
         self.assertEqual(mocked_ping_captcha_id.call_count, 1)

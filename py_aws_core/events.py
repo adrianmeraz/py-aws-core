@@ -1,7 +1,9 @@
 import json
 import typing
 
-from py_aws_core import utils
+from . import cookies, exceptions, logs, utils
+
+logger = logs.logger
 
 
 class LambdaEvent:
@@ -61,3 +63,18 @@ class LambdaEvent:
     @property
     def lower_headers(self) -> typing.Dict:
         return {k.lower(): v for k, v in self.headers.items()}
+
+    def get_cookie(self, cookie_name: str):
+        if cookie := self.cookies.get(cookie_name):
+            logger.info(f'Cookie "{cookie_name}" found: {cookie}')
+            return cookie
+        raise exceptions.MissingCookieException(missing_cookie=cookie_name)
+
+    def generate_cookie_header(self, name: str, value: str, expires_in_seconds: int) -> str:
+        return cookies.CookieUtil.build_set_cookie_header(
+            name=name,
+            domain=self.request_context.domain_name,
+            value=value,
+            path='/',
+            expires_in_seconds=expires_in_seconds
+        )

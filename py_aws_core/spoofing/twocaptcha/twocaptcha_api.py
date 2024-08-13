@@ -41,31 +41,48 @@ class TwoCaptchaResponse:
 
 
 class PingCaptchaId(TwoCaptchaAPI):
+    class Request:
+        def __init__(self, site_key: str, page_url: str, proxy_url: str = None, pingback: str = None):
+            self.proxy_url = proxy_url
+            self.site_key = site_key
+            self.page_url = page_url
+            self.pingback = pingback
+
+        @property
+        def proxy(self) -> str:
+            return self.proxy_url_parts.netloc
+
+        @property
+        def proxy_type(self) -> str:
+            return self.proxy_url_parts.scheme.upper()
+
+        @property
+        def proxy_url_parts(self):
+            return urlparse(self.proxy_url)
+
     class Response(TwoCaptchaResponse):
         pass
 
     @classmethod
     @decorators.error_check
-    def call(cls, client: Client, proxy: str, site_key: str, page_url: str, pingback: str = None) -> Response:
+    def call(cls, client: Client, request: Request) -> Response:
         url = f'{cls.ROOT_URL}/in.php'
-        proxy_parts = urlparse(proxy)
-        proxy_type = proxy_parts.scheme.upper()
 
         params = {
             'key': cls.get_api_key(),
             'method': 'userrecaptcha',
-            'googlekey': site_key,
-            'pageurl': page_url,
+            'googlekey': request.site_key,
+            'pageurl': request.page_url,
             'json': '1',
-            'proxy': proxy_parts.netloc,
-            'proxytype': proxy_type,
+            'proxy': request.proxy,
+            'proxytype': request.proxy_type,
         }
-        if pingback:
-            params['pingback'] = pingback
+        if request.pingback:
+            params['pingback'] = request.pingback
 
         r = client.post(url, params=params, follow_redirects=False)  # Disable redirects to network splash pages
         if not r.status_code == 200:
-            raise TwoCaptchaException(f'Non 200 Response. Proxy: {proxy}, Response: {r.text}')
+            raise TwoCaptchaException(f'Non 200 Response. Proxy: {request.proxy}, Response: {r.text}')
 
         return cls.Response(r.json())
 
