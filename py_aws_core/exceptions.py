@@ -25,6 +25,10 @@ class CookieDecodingError(APIException):
     ERROR_MESSAGE = 'Error while decoding binary cookies'
 
 
+class MissingCookieException(APIException):
+    ERROR_MESSAGE = 'Missing Cookie Exception'
+
+
 class AWSCoreException(CoreException):
     ERROR_MESSAGE = 'A generic AWS error occurred'
 
