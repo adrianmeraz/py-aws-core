@@ -3,7 +3,9 @@ import os
 
 logger = logging.getLogger(__name__)
 
-LOG_LEVEL = getattr(logging, os.environ.get('LOG_LEVEL', 'DEBUG').upper())
+log_level_upper = os.environ.get('LOG_LEVEL', 'DEBUG').upper()
+logger.info(f'LOG_LEVEL: {log_level_upper}')
+LOG_LEVEL = getattr(logging, log_level_upper)
 
 LOGGING_CONFIG = {
     'version': 1,

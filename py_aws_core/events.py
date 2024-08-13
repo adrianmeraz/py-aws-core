@@ -3,6 +3,10 @@ import typing
 
 from py_aws_core import utils
 
+from . import const, exceptions, logs
+
+logger = logs.logger
+
 
 class LambdaEvent:
     class MultiValueHeaders:
@@ -61,3 +65,9 @@ class LambdaEvent:
     @property
     def lower_headers(self) -> typing.Dict:
         return {k.lower(): v for k, v in self.headers.items()}
+
+    def get_cookie(self, cookie_name: str):
+        if cookie := self.cookies.get(cookie_name):
+            logger.info(f'Cookie "{cookie_name}" found: {cookie}')
+            return cookie
+        raise exceptions.MissingCookieException(missing_cookie=cookie_name)
