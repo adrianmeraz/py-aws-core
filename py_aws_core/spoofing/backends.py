@@ -29,18 +29,3 @@ class ProxyBackend(ABC):
     @classmethod
     def get_proxy_username(cls):
         return secrets_manager.get_secret(secret_name='PROXY_USERNAME')
-
-
-class CaptchaBackend(ABC):
-
-    def get_captcha_id(self, client: Client, site_key: str, page_url: str,  *args, **kwargs):
-        raise NotImplemented
-
-    def get_gcaptcha_token(self, client: Client, captcha_id: str, *args, **kwargs):
-        raise NotImplemented
-
-    def report_bad_captcha_id(self, client: Client, captcha_id: str, *args, **kwargs):
-        raise NotImplemented
-
-    def report_good_captcha_id(self, client: Client, captcha_id: str, *args, **kwargs):
-        raise NotImplemented
