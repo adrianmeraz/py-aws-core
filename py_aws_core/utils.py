@@ -10,6 +10,7 @@ from datetime import datetime, timezone, timedelta, UTC
 def build_lambda_response(
     status_code: int,
     body: typing.Dict | str = None,
+    content_type: str = 'application/json',
     multi_value_headers: typing.Dict[str, typing.List[str]] = None,
     exc: Exception = None
 ):
@@ -19,9 +20,11 @@ def build_lambda_response(
       See below for further details:
       https://stackoverflow.com/a/54089431
       https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html#apigateway-enable-cors-proxy
-    :param multi_value_headers:
+
     :param status_code:
     :param body:
+    :param content_type:
+    :param multi_value_headers:
     :param exc:
     :return:
     """
@@ -32,7 +35,7 @@ def build_lambda_response(
     if isinstance(body, dict):
         body = json.dumps(body)
     response_headers = {
-        'Content-Type': ['application/json'],
+        'Content-Type': [content_type],
         'Access-Control-Allow-Credentials': [True],
         'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
         'Access-Control-Allow-Origin': ['*'],
