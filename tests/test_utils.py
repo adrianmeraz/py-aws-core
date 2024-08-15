@@ -28,6 +28,28 @@ class BuildLambdaResponseTests(TestCase):
             }
         )
 
+    def test_text_plain_content_type(self):
+        val = utils.build_lambda_response(
+            status_code=200,
+            body={'message': 'Lorem Ipsum'},
+            content_type='text/plain;charset=utf-8',
+        )
+        self.assertEqual(
+            val,
+            {
+                'isBase64Encoded': False,
+                'statusCode': 200,
+                'body': '{"message": "Lorem Ipsum"}',
+                'multiValueHeaders': {
+                    'Access-Control-Allow-Credentials': [True],
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['text/plain;charset=utf-8'],
+                }
+            }
+        )
+
     def test_headers(self):
         val = utils.build_lambda_response(
             status_code=200,
