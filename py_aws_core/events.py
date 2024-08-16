@@ -9,17 +9,11 @@ logger = logs.logger
 class LambdaEvent:
     class MultiValueHeaders:
         def __init__(self, data: dict):
-            self.accept = data['Accept'][0]
-            self.accept_encoding = data['Accept-Encoding'][0]
-            self._authorization = data.get('Authorization')
+            self.accept = self.get_first_element(data, 'Accept')
+            self.accept_encoding = self.get_first_element(data, 'Accept-Encoding')
+            self.authorization = self.get_first_element(data, 'Authorization')
             self._cookies = data.get('Cookie')
-            self.user_agent = data['User-Agent'][0]
-
-        @property
-        def authorization(self):
-            if self._authorization:
-                return self._authorization[0]
-            return None
+            self.user_agent = self.get_first_element(data, 'User-Agent')
 
         @property
         def cookies(self) -> typing.Dict:
@@ -30,6 +24,12 @@ class LambdaEvent:
                 k, v = part.strip().split('=')
                 val[k] = v
             return val
+
+        @staticmethod
+        def get_first_element(items: dict, key: str) -> typing.AnyStr | None:
+            if vals := items.get(key):
+                return vals[0]
+            return None
 
     class RequestContext:
         def __init__(self, data):
