@@ -9,11 +9,23 @@ logger = logs.logger
 class LambdaEvent:
     class MultiValueHeaders:
         def __init__(self, data: dict):
-            self.accept = data['Accept'][0]
-            self.accept_encoding = data['Accept-Encoding'][0]
+            self._accept = data.get('Accept')
+            self._accept_encoding = data.get('Accept-Encoding')
             self._authorization = data.get('Authorization')
             self._cookies = data.get('Cookie')
-            self.user_agent = data['User-Agent'][0]
+            self._user_agent = data.get('User-Agent')
+
+        @property
+        def accept(self):
+            if self._accept:
+                return self._accept[0]
+            return None
+
+        @property
+        def accept_encoding(self):
+            if self._accept_encoding:
+                return self._accept_encoding[0]
+            return None
 
         @property
         def authorization(self):
@@ -30,6 +42,12 @@ class LambdaEvent:
                 k, v = part.strip().split('=')
                 val[k] = v
             return val
+
+        @property
+        def user_agent(self):
+            if self._user_agent:
+                return self._user_agent[0]
+            return None
 
     class RequestContext:
         def __init__(self, data):
