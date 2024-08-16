@@ -55,12 +55,12 @@ jobs:
         poetry run coverage run -m unittest
         poetry run coverage xml
 
-    - name: Upload Coverage Report to Codecov
-      uses: codecov/codecov-action@v4.0.1
-      with:
-        files: coverage.xml
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+#    - name: Upload Coverage Report to Codecov
+#      uses: codecov/codecov-action@v4.0.1
+#      with:
+#        files: coverage.xml
+#        fail_ci_if_error: true
+#        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
     - name: Checkout Main Branch
       uses: actions/checkout@v4
