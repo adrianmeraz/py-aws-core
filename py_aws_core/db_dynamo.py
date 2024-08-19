@@ -101,6 +101,7 @@ class DDBClient:
         update_expression: str,
         expression_attribute_names: typing.Dict,
         expression_attribute_values: typing.Dict,
+        return_values: str = None,
         **kwargs
     ):
         return self.boto_client.update_item(
@@ -110,6 +111,7 @@ class DDBClient:
             UpdateExpression=update_expression,
             ExpressionAttributeNames=expression_attribute_names,
             ExpressionAttributeValues=expression_attribute_values,
+            ReturnValues=return_values,
             **kwargs
         )
 
