@@ -99,6 +99,7 @@ class DDBClient:
         *args,
         key: typing.Dict,
         update_expression: str,
+        expression_attribute_names: typing.Dict,
         expression_attribute_values: typing.Dict,
         **kwargs
     ):
@@ -107,6 +108,7 @@ class DDBClient:
             TableName=self.get_table_name(),
             Key=key,
             UpdateExpression=update_expression,
+            ExpressionAttributeNames=expression_attribute_names,
             ExpressionAttributeValues=expression_attribute_values,
             **kwargs
         )
