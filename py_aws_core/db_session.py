@@ -72,7 +72,11 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
                     'PK': {'S': pk},
                     'SK': {'S': sk},
                 },
-                update_expression='SET Base64Cookies = :b64, ModifiedAt = :mda',
+                update_expression='SET #b64 = :b64, #mda = :mda',
+                expression_attribute_names={
+                    '#b64': 'Base64Cookies',
+                    '#mda': 'ModifiedAt',
+                },
                 expression_attribute_values={
                     ':b64': {'B': b64_cookies},
                     ':mda': {'S': SessionDBAPI.iso_8601_now_timestamp()}
