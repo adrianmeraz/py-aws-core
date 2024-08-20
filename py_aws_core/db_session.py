@@ -27,12 +27,12 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
     class GetSessionQuery:
         class Response(db_dynamo.QueryResponse):
             @property
-            def sessions(self) -> typing.List:
-                return self.get_by_type(entities.Session.type())
+            def sessions(self) -> typing.List[entities.Session]:
+                return [entities.Session(s) for s in self.get_by_type(entities.Session.TYPE)]
 
             @property
             def session_b64_cookies(self):
-                return self.sessions[0]['Base64Cookies']['B']
+                return self.sessions[0].Base64Cookies.value
 
         @classmethod
         @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
