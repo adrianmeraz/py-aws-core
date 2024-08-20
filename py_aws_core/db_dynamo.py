@@ -143,15 +143,17 @@ def get_db_client():
 
 
 class QueryResponse(ABC):
+    ENTITY_TYPE = entities.ABCEntity
+
     def __init__(self, data):
-        self.Items = data.get('Items')
-        self.Count = data.get('Count')
-        self.ScannedCount = data.get('ScannedCount')
-        self.ResponseMetadata = ResponseMetadata(data['ResponseMetadata'])
+        self._items = data.get('Items') or list()
+        self.count = data.get('Count')
+        self.scanned_count = data.get('ScannedCount')
+        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
 
     def get_by_type(self, _type: str) -> typing.List:
-        if self.Items:
-            return [item for item in self.Items if entities.BaseModel(item).Type == _type]
+        if self._items:
+            return [i for i in self._items if i['Type']['S'] == _type]
         return list()
 
 
