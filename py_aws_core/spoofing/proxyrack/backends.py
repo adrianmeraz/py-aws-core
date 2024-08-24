@@ -18,7 +18,7 @@ class ProxyRackProxyBackend(ProxyBackend):
         isps: typing.List[str] = None,
         proxy_ip: str = None,
         proxy_os: const.ProxyOs = None,
-        session_id: str | uuid.UUID = None,
+        session_id: str = None,
         **kwargs
     ) -> str:
         config = utils.ProxyBuilder.Config(

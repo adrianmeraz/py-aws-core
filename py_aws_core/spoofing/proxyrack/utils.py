@@ -1,5 +1,4 @@
 import typing
-import uuid
 
 from py_aws_core.spoofing.proxyrack import const
 
@@ -15,7 +14,7 @@ class ProxyBuilder:
             proxy_ip: str = None,
             proxy_os: const.ProxyOs = None,
             refresh_minutes: int = 10,
-            session_id: uuid.UUID | str = None,
+            session_id: str | str = None,
             **kwargs
         ):
             self._cities = cities
