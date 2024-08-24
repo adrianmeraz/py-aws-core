@@ -1,4 +1,3 @@
-import uuid
 from abc import ABC, abstractmethod
 
 from boto3.dynamodb import types
@@ -55,5 +54,5 @@ class Session(ABCEntity):
         self.Base64Cookies = self.data['Base64Cookies']
 
     @classmethod
-    def create_key(cls, _id: uuid.UUID) -> str:
-        return f'{cls.type()}#{_id.hex}'
+    def create_key(cls, _id: str) -> str:
+        return f'{cls.type()}#{str(_id)}'

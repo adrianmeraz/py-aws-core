@@ -88,8 +88,8 @@ def sleep(seconds: float) -> None:
     return time.sleep(seconds)
 
 
-def get_uuid() -> uuid.UUID:
-    return uuid.uuid4()
+def get_uuid_hex() -> str:
+    return uuid.uuid4().hex
 
 
 def get_environment_variable(secret_name: str, default=None) -> str:

@@ -37,7 +37,7 @@ class RetryClient(Client):
         504,
     )
 
-    def __init__(self, session_id: uuid.UUID = None, follow_redirects: bool = True, verify: bool = None, *args, **kwargs):
+    def __init__(self, session_id: str = None, follow_redirects: bool = True, verify: bool = None, *args, **kwargs):
         super().__init__(
             follow_redirects=follow_redirects,
             default_encoding="utf-8",
@@ -45,7 +45,7 @@ class RetryClient(Client):
             *args,
             **kwargs
         )
-        self._session_id = session_id or utils.get_uuid()
+        self._session_id = session_id or utils.get_uuid_hex()
 
     @decorators.retry(retry_exceptions=RETRY_EXCEPTIONS)
     @decorators.http_status_check(reraise_status_codes=RETRY_STATUS_CODES)
@@ -53,7 +53,7 @@ class RetryClient(Client):
         return super().send(*args, **kwargs)
 
     @property
-    def session_id(self) -> uuid.UUID:
+    def session_id(self) -> str:
         return self._session_id
 
     @property

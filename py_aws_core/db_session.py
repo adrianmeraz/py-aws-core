@@ -1,5 +1,4 @@
 import typing
-import uuid
 
 from py_aws_core import const, decorators, db_dynamo, entities, exceptions, logs
 from py_aws_core.db_dynamo import DDBClient
@@ -11,7 +10,7 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
     @classmethod
     def build_session_map(
         cls,
-        _id: uuid.UUID,
+        _id: str,
         b64_cookies: bytes,
         expire_in_seconds: int = const.DB_DEFAULT_EXPIRES_IN_SECONDS
     ):
@@ -39,7 +38,7 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
         def call(
             cls,
             db_client: DDBClient,
-            _id: uuid.UUID,
+            _id: str,
         ) -> Response:
             pk = entities.Session.create_key(_id=_id)
             response = db_client.query(
@@ -63,7 +62,7 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
         def call(
             cls,
             db_client: DDBClient,
-            _id: uuid.UUID,
+            _id: str,
             b64_cookies: bytes
         ):
             pk = sk = entities.Session.create_key(_id=_id)
