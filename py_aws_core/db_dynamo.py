@@ -101,6 +101,7 @@ class DDBClient:
         update_expression: str,
         expression_attribute_names: typing.Dict,
         expression_attribute_values: typing.Dict,
+        condition_expression: str = None,
         return_values: str = None,
         **kwargs
     ):
@@ -109,6 +110,7 @@ class DDBClient:
             TableName=self.get_table_name(),
             Key=key,
             UpdateExpression=update_expression,
+            ConditionExpression=condition_expression,
             ExpressionAttributeNames=expression_attribute_names,
             ExpressionAttributeValues=expression_attribute_values,
             ReturnValues=return_values,

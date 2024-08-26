@@ -3,7 +3,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 
-from py_aws_core import exceptions, logs, utils
+from . import exceptions, logs, utils
 
 logger = logs.logger
 
