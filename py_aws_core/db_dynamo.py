@@ -101,7 +101,7 @@ class DDBClient:
         update_expression: str,
         expression_attribute_names: typing.Dict,
         expression_attribute_values: typing.Dict,
-        condition_expression: str = None,
+        condition_expression: str = '',
         return_values: str = None,
         **kwargs
     ):
