@@ -42,16 +42,16 @@ class SessionDBAPI(db_dynamo.ABCCommonAPI):
         ) -> Response:
             pk = entities.Session.create_key(_id=_id)
             response = db_client.query(
-                key_condition_expression="#pk = :pk",
-                expression_attribute_names={
+                KeyConditionExpression="#pk = :pk",
+                ExpressionAttributeNames={
                     "#pk": "PK",
                     "#cookies": "Base64Cookies",
                     "#typ": "Type"
                 },
-                expression_attribute_values={
+                ExpressionAttributeValues={
                     ":pk": {"S": pk},
                 },
-                projection_expression='#cookies, #typ'
+                ProjectionExpression='#cookies, #typ'
             )
             logger.debug(f'{cls.__qualname__}.call#: response: {response}')
             return cls.Response(response)

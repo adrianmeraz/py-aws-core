@@ -63,24 +63,8 @@ class DDBClient:
         dynamodb = boto3.resource('dynamodb')
         return dynamodb.Table(self.get_table_name())
 
-    def query(
-        self,
-        *args,
-        key_condition_expression: str,
-        expression_attribute_names: typing.Dict,
-        expression_attribute_values: typing.Dict,
-        projection_expression: str = None,
-        **kwargs
-    ):
-        return self.boto_client.query(
-            TableName=self.get_table_name(),
-            KeyConditionExpression=key_condition_expression,
-            ExpressionAttributeNames=expression_attribute_names,
-            ExpressionAttributeValues=expression_attribute_values,
-            ProjectionExpression=projection_expression,
-            *args,
-            **kwargs
-        )
+    def query(self, *args, **kwargs):
+        return self.boto_client.query(TableName=self.get_table_name(), *args, **kwargs)
 
     def scan(self, *args, **kwargs):
         return self.boto_client.scan(TableName=self.get_table_name(), *args, **kwargs)
