@@ -63,24 +63,8 @@ class DDBClient:
         dynamodb = boto3.resource('dynamodb')
         return dynamodb.Table(self.get_table_name())
 
-    def query(
-        self,
-        *args,
-        key_condition_expression: str,
-        expression_attribute_names: typing.Dict,
-        expression_attribute_values: typing.Dict,
-        projection_expression: str = None,
-        **kwargs
-    ):
-        return self.boto_client.query(
-            TableName=self.get_table_name(),
-            KeyConditionExpression=key_condition_expression,
-            ExpressionAttributeNames=expression_attribute_names,
-            ExpressionAttributeValues=expression_attribute_values,
-            ProjectionExpression=projection_expression,
-            *args,
-            **kwargs
-        )
+    def query(self, *args, **kwargs):
+        return self.boto_client.query(TableName=self.get_table_name(), *args, **kwargs)
 
     def scan(self, *args, **kwargs):
         return self.boto_client.scan(TableName=self.get_table_name(), *args, **kwargs)
@@ -94,26 +78,8 @@ class DDBClient:
     def delete_item(self, *args, **kwargs):
         return self.boto_client.delete_item(TableName=self.get_table_name(), *args, **kwargs)
 
-    def update_item(
-        self,
-        *args,
-        key: typing.Dict,
-        update_expression: str,
-        expression_attribute_names: typing.Dict,
-        expression_attribute_values: typing.Dict,
-        return_values: str = None,
-        **kwargs
-    ):
-        return self.boto_client.update_item(
-            *args,
-            TableName=self.get_table_name(),
-            Key=key,
-            UpdateExpression=update_expression,
-            ExpressionAttributeNames=expression_attribute_names,
-            ExpressionAttributeValues=expression_attribute_values,
-            ReturnValues=return_values,
-            **kwargs
-        )
+    def update_item(self, *args, **kwargs):
+        return self.boto_client.update_item(TableName=self.get_table_name(), *args, **kwargs)
 
     def batch_write_item(self, *args, **kwargs):
         return self.boto_client.batch_write_item(*args, **kwargs)
