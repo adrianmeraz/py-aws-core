@@ -5,7 +5,7 @@ from decimal import Decimal
 logger = logs.logger
 
 
-class DBEncoder(json.JSONEncoder):
+class JsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set):
             return list(obj)
