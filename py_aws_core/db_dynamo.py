@@ -111,7 +111,7 @@ def get_db_client():
 class GetItemResponse:
     def __init__(self, data):
         self.item = data.get('Item')
-        self.response_metadata = data['ResponseMetadata']
+        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
 
 
 class QueryResponse:
