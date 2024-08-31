@@ -40,3 +40,6 @@ class ABCCommonAPITests(TestCase):
             val = GetItemResponse(_json)
 
         self.assertIsNone(val.item)
+
+    def test_get_put_item_map(self):
+        ABCCommonAPI.get_put_item_map()

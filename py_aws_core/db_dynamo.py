@@ -2,6 +2,7 @@ import typing
 from abc import ABC
 
 import boto3
+from boto3.dynamodb import types
 from botocore.config import Config
 
 from py_aws_core import const, logs, utils
@@ -108,30 +109,6 @@ def get_db_client():
     return __db_client
 
 
-class GetItemResponse:
-    def __init__(self, data):
-        self.item = data.get('Item')
-        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
-
-
-class QueryResponse:
-    def __init__(self, data):
-        self._items = data.get('Items') or list()
-        self.count = data.get('Count')
-        self.scanned_count = data.get('ScannedCount')
-        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
-
-    def get_by_type(self, _type: str) -> typing.List:
-        if self._items:
-            return [i for i in self._items if i['Type']['S'] == _type]
-        return list()
-
-
-class UpdateItemResponse:
-    def __init__(self, data: typing.Dict):
-        self.attributes = data['Attributes']
-
-
 class ABCCommonAPI(ABC):
     """
         https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
@@ -176,6 +153,42 @@ class ABCCommonAPI(ABC):
         } | kwargs
 
     @classmethod
+    def get_put_item_map(
+        cls,
+        pk: str,
+        sk: str,
+        _type: str,
+        created_by: str = '',
+        expire_in_seconds: int | None = const.DB_DEFAULT_EXPIRES_IN_SECONDS,
+        **kwargs,
+    ):
+        vals = {
+           'PK': pk,
+           'SK': sk,
+           'Type': _type,
+           'CreatedAt': cls.iso_8601_now_timestamp(),
+           'CreatedBy': created_by,
+           'ModifiedAt': '',
+           'ModifiedBy': '',
+           'ExpiresAt': cls.calc_expire_at_timestamp(expire_in_seconds=expire_in_seconds),
+        } | kwargs
+        return cls.serialize_types(vals)
+
+    @staticmethod
+    def serialize_types(data: dict):
+        """
+        Converts normalized json to low level dynamo json
+        """
+        return {k: types.TypeSerializer().serialize(v) for k, v in data.items()}
+
+    @staticmethod
+    def deserialize_types(data: dict):
+        """
+        Converts low level dynamo json to normalized json
+        """
+        return {k: types.TypeDeserializer().deserialize(v) for k, v in data.items()}
+
+    @classmethod
     def iso_8601_now_timestamp(cls) -> str:
         return utils.to_iso_8601()
 
@@ -215,7 +228,7 @@ class ErrorResponse:
                 raise exc
 
 
-class DDBItemResponse(ABC):
+class DDBItemResponse:
     def __init__(self, data):
         self._data = data
         self.Type = data.get('__type')
@@ -223,7 +236,31 @@ class DDBItemResponse(ABC):
         self.ResponseMetadata = ResponseMetadata(data.get('ResponseMetadata', dict()))
 
 
-class DynamoDBTransactResponse(ABC):
+class GetItemResponse:
+    def __init__(self, data):
+        self.item = data.get('Item')
+        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
+
+
+class QueryResponse:
+    def __init__(self, data):
+        self._items = data.get('Items') or list()
+        self.count = data.get('Count')
+        self.scanned_count = data.get('ScannedCount')
+        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
+
+    def get_by_type(self, _type: str) -> typing.List:
+        if self._items:
+            return [i for i in self._items if i['Type']['S'] == _type]
+        return list()
+
+
+class UpdateItemResponse:
+    def __init__(self, data: typing.Dict):
+        self.attributes = data['Attributes']
+
+
+class DynamoDBTransactResponse:
     def __init__(self, data):
         self._data = data
         self.Responses = data.get('Responses')
