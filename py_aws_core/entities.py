@@ -1,13 +1,12 @@
+import typing
 from abc import ABC, abstractmethod
 
-from boto3.dynamodb import types
-
-from py_aws_core import encoders
+from py_aws_core import db_dynamo, encoders
 
 
 class BaseModel:
     def __init__(self, data):
-        self.__data = self.to_normalized_data(data)
+        self.__data = self.deserialize_data(data)
         self.PK = self.data.get('PK')
         self.SK = self.data.get('SK')
         self.Type = self.data.get('Type')
@@ -21,16 +20,13 @@ class BaseModel:
     def data(self):
         return self.__data
 
-    @staticmethod
-    def to_normalized_data(data: dict) -> dict:
-        """
-        Converts low level dynamo json to normalized json
-        """
-        return {k: types.TypeDeserializer().deserialize(v) for k, v in data.items()}
-
     @property
     def to_json(self):
         return encoders.JsonEncoder().serialize_to_json(self)
+
+    @staticmethod
+    def deserialize_data(data: dict) -> typing.Dict:
+        return db_dynamo.ABCCommonAPI.deserialize_types(data)
 
 
 class ABCEntity(ABC, BaseModel):
