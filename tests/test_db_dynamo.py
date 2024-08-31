@@ -4,7 +4,7 @@ from importlib.resources import as_file
 from unittest import mock, TestCase
 
 from py_aws_core import const, db_dynamo, utils
-from py_aws_core.db_dynamo import DDBClient
+from py_aws_core.db_dynamo import DDBClient, GetItemResponse
 from tests import const as test_const
 
 
@@ -30,3 +30,13 @@ class ABCCommonAPITests(TestCase):
             session = _json['Items'][0]
             session['Base64Cookies']['B'] = bytes(session['Base64Cookies']['B'], 'utf-8')
             mocked_query.return_value = _json
+
+    @mock.patch.object(DDBClient, 'get_item')
+    def test_get_item_empty(self, mocked_get_item):
+        source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#get_item#empty.json')
+        with as_file(source) as get_item:
+            _json = json.loads(get_item.read_text(encoding='utf-8'))
+            mocked_get_item.return_value = _json
+            val = GetItemResponse(_json)
+
+        self.assertIsNone(val.item)

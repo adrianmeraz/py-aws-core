@@ -4,7 +4,7 @@ from abc import ABC
 import boto3
 from botocore.config import Config
 
-from py_aws_core import const, entities, logs, utils
+from py_aws_core import const, logs, utils
 from .secrets_manager import get_secrets_manager
 
 secrets_manager = get_secrets_manager()
@@ -110,7 +110,7 @@ def get_db_client():
 
 class GetItemResponse:
     def __init__(self, data):
-        self.item = data['Item']
+        self.item = data.get('Item')
         self.response_metadata = data['ResponseMetadata']
 
 
