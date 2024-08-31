@@ -108,9 +108,13 @@ def get_db_client():
     return __db_client
 
 
-class QueryResponse(ABC):
-    ENTITY_TYPE = entities.ABCEntity
+class GetItemResponse:
+    def __init__(self, data):
+        self.item = data['Item']
+        self.response_metadata = data['ResponseMetadata']
 
+
+class QueryResponse:
     def __init__(self, data):
         self._items = data.get('Items') or list()
         self.count = data.get('Count')
@@ -121,6 +125,11 @@ class QueryResponse(ABC):
         if self._items:
             return [i for i in self._items if i['Type']['S'] == _type]
         return list()
+
+
+class UpdateItemResponse:
+    def __init__(self, data: typing.Dict):
+        self.attributes = data['Attributes']
 
 
 class ABCCommonAPI(ABC):
