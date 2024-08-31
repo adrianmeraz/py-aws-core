@@ -4,7 +4,7 @@ from importlib.resources import as_file
 from unittest import mock, TestCase
 
 from py_aws_core import const, db_dynamo, utils
-from py_aws_core.db_dynamo import DDBClient, GetItemResponse
+from py_aws_core.db_dynamo import DDBClient, GetItemResponse, ABCCommonAPI
 from tests import const as test_const
 
 
@@ -41,5 +41,35 @@ class ABCCommonAPITests(TestCase):
 
         self.assertIsNone(val.item)
 
-    def test_get_put_item_map(self):
-        ABCCommonAPI.get_put_item_map()
+    @mock.patch.object(utils, 'get_now_datetime')
+    def test_get_put_item_map(self, mocked_get_now_datetime):
+        dt = datetime.datetime(year=2003, month=9, day=5, hour=15, minute=33, second=28, tzinfo=datetime.timezone.utc)
+        mocked_get_now_datetime.return_value = dt
+
+        pk = sk = 'TEST_ABC#999777555'
+        val = ABCCommonAPI.get_put_item_map(
+            _type='TEST_ABC',
+            pk=pk,
+            sk=sk,
+            SessionId='a728b36c01f',
+            NewData={
+                'key_678': 'val_234',
+                'key_234': 'val_090'
+            }
+        )
+        self.maxDiff = None
+        self.assertDictEqual(
+            val,
+            {
+                'CreatedAt': {'S': '2003-09-05T15:33:28+00:00'},
+                'CreatedBy': {'S': ''},
+                'ExpiresAt': {'N': '1065368008'},
+                'ModifiedAt': {'S': ''},
+                'ModifiedBy': {'S': ''},
+                'NewData': {'M': {'key_234': {'S': 'val_090'}, 'key_678': {'S': 'val_234'}}},
+                'PK': {'S': 'TEST_ABC#999777555'},
+                'SK': {'S': 'TEST_ABC#999777555'},
+                'SessionId': {'S': 'a728b36c01f'},
+                'Type': {'S': 'TEST_ABC'}
+            }
+        )

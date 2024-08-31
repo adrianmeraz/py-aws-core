@@ -30,7 +30,7 @@ class BaseModel:
 
     @property
     def to_json(self):
-        return encoders.DBEncoder().serialize_to_json(self)
+        return encoders.JsonEncoder().serialize_to_json(self)
 
 
 class ABCEntity(ABC, BaseModel):
