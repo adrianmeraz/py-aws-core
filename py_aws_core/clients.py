@@ -78,8 +78,9 @@ class RetryClient(Client):
 
 class SessionPersistClient(RetryClient):
     def __enter__(self):
+        super().__enter__()
         services.rehydrate_session_from_database(self)
-        return super().__enter__()
+        return self
 
     def __exit__(self, *args, **kwargs):
         services.write_session_to_database(self)
