@@ -73,3 +73,18 @@ class ABCCommonAPITests(TestCase):
                 'Type': {'S': 'TEST_ABC'}
             }
         )
+
+    def test_serialize_types(self):
+        val = db_dynamo.ABCCommonAPI.serialize_types({
+            ':ty': 'TEST_TYPE',
+            ':si': '3b7529c92f',
+            ':ea': 1000050000,
+        })
+        self.assertDictEqual(
+            val,
+            {
+                ':ea': {'N': '1000050000'},
+                ':si': {'S': '3b7529c92f'},
+                ':ty': {'S': 'TEST_TYPE'}
+            }
+        )
