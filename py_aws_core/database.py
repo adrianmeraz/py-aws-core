@@ -12,6 +12,14 @@ class DynamoDatabase(IDatabase):
         return db_session.GetSessionItem.call(db_client=db_client, session_id=session_id).session
 
     @classmethod
+    def get_or_create_session(cls, session_id: str, b64_cookies: bytes) -> entities.Session:
+        return db_session.GetOrCreateSession.call(
+            db_client=db_client,
+            b64_cookies=b64_cookies,
+            session_id=session_id
+        ).session
+
+    @classmethod
     def put_session(cls, session_id: str, b64_cookies: bytes):
         logger.info(f'Session ID: {session_id} -> Writing cookies to database...')
         db_session.PutSession.call(
