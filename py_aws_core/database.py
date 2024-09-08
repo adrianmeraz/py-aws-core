@@ -21,3 +21,11 @@ class DynamoDatabase(IDatabase):
             b64_cookies=b64_cookies
         )
         logger.info(f'Session ID: {session_id} -> Wrote cookies to database')
+
+    @classmethod
+    def update_session_cookies(cls, session_id: str, b64_cookies: bytes) -> entities.Session:
+        return db_session.UpdateSessionCookies.call(
+            db_client=db_client,
+            session_id=session_id,
+            b64_cookies=b64_cookies
+        ).session

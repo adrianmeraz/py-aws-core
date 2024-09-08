@@ -34,40 +34,6 @@ class GetSessionItem(SessionDDBAPI):
         return cls.Response(response)
 
 
-class GetOrCreateSession(SessionDDBAPI):
-    class Response(UpdateItemResponse):
-        @property
-        def session(self) -> entities.Session:
-            return entities.Session(self.attributes)
-
-    @classmethod
-    @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DDBClient, session_id: str):
-        pk = sk = entities.Session.create_key(_id=session_id)
-        _type = entities.Session.type()
-        response = db_client.update_item(
-            Key={
-                'PK': {'S': pk},
-                'SK': {'S': sk},
-            },
-            UpdateExpression='SET #ty = :ty, #si = :si, #ea = :ea',
-            ExpressionAttributeNames={
-                '#ty': 'Type',
-                "#si": 'SessionId',
-                '#ea': 'ExpiresAt',
-            },
-            ExpressionAttributeValues=cls.serialize_types({
-                ':ty': _type,
-                ':si': session_id,
-                ':ea': cls.calc_expire_at_timestamp(expire_in_seconds=None),
-            }),
-            ReturnValues='ALL_NEW'
-        )
-
-        logger.debug(f'{cls.__qualname__}.call# -> response: {response}')
-        return cls.Response(response)
-
-
 class PutSession(SessionDDBAPI):
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
@@ -89,16 +55,21 @@ class PutSession(SessionDDBAPI):
 
 
 class UpdateSessionCookies(SessionDDBAPI):
+    class Response(UpdateItemResponse):
+        @property
+        def session(self) -> entities.Session:
+            return entities.Session(self.attributes)
+
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
     def call(
         cls,
         db_client: DDBClient,
-        _id: str,
+        session_id: str,
         b64_cookies: bytes
     ):
-        pk = sk = entities.Session.create_key(_id=_id)
-        return db_client.update_item(
+        pk = sk = entities.Session.create_key(_id=session_id)
+        response = db_client.update_item(
             Key={
                 'PK': {'S': pk},
                 'SK': {'S': sk},
@@ -111,5 +82,8 @@ class UpdateSessionCookies(SessionDDBAPI):
             ExpressionAttributeValues={
                 ':b64': {'B': b64_cookies},
                 ':mda': {'S': cls.iso_8601_now_timestamp()}
-            }
+            },
+            ReturnValues='ALL_NEW'
         )
+        logger.debug(f'{cls.__qualname__}.call# -> response: {response}')
+        return cls.Response(response)

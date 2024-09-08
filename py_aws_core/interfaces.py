@@ -14,3 +14,8 @@ class IDatabase(ABC):
     @abstractmethod
     def put_session(cls, session_id: str, b64_cookies: bytes):
         pass
+
+    @classmethod
+    @abstractmethod
+    def update_session_cookies(cls, session_id: str, b64_cookies: bytes) -> entities.Session:
+        pass
