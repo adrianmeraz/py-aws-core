@@ -47,8 +47,8 @@ class Session(ABCEntity):
 
     def __init__(self, data):
         super().__init__(data)
-        self.Base64Cookies = self.data['Base64Cookies']
-        self.SessionId = self.data['SessionId']
+        self.Base64Cookies = self.data.get('Base64Cookies')
+        self.SessionId = self.data.get('SessionId')
 
     @classmethod
     def create_key(cls, _id: str) -> str:
