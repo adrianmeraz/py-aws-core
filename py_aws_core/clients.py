@@ -7,8 +7,6 @@ from http.cookiejar import CookieJar
 from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, ProxyError
 
 from py_aws_core import database, decorators, exceptions, logs, utils
-from py_aws_core.db_dynamo import get_db_client
-from py_aws_core.db_session import SessionDBAPI
 from py_aws_core.sessions import ABCPersistSession
 
 logger = logs.logger
@@ -75,6 +73,7 @@ class RetryClient(Client):
                 logger.info(f'Session ID: {self.session_id} -> Setting CookieJar Cookie: "{c}"')
                 cookie_jar.set_cookie(c)
             self.cookies.jar = cookie_jar
+            logger.info(f'Session ID: {self.session_id} -> Rehydrated {len(self.cookies.jar)} cookies')
         except (pickle.PickleError, binascii.Error) as e:
             raise exceptions.CookieDecodingError(info=f'Session ID: {self.session_id} -> Cookie Error: {str(e)}')
 
@@ -97,9 +96,6 @@ class SessionPersistClient(RetryClient, ABCPersistSession):
             logger.info(f'Session ID: {session_id} -> No prior session found.')
             return
         self.b64_decode_and_set_cookies(b64_cookies=session.b64_cookies_bytes)
-        logger.info(f'Session ID: {session_id} -> Rehydrated {len(self.cookies.jar)} cookies')
 
     def write_session(self, session_id):
-        logger.info(f'Session ID: {session_id} -> Writing cookies to database...')
         db.put_session(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
-        logger.info(f'Session ID: {session_id} -> Wrote cookies to database')

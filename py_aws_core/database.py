@@ -16,8 +16,10 @@ class DynamoDatabase(IDatabase):
 
     @classmethod
     def put_session(cls, session_id: str, b64_cookies: bytes):
-        return SessionDBAPI.PutSession.call(
+        logger.info(f'Session ID: {session_id} -> Writing cookies to database...')
+        SessionDBAPI.PutSession.call(
             db_client=db_client,
             session_id=session_id,
             b64_cookies=b64_cookies
         )
+        logger.info(f'Session ID: {session_id} -> Wrote cookies to database')
