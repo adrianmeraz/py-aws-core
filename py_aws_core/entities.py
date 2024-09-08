@@ -52,3 +52,7 @@ class Session(ABCEntity):
     @classmethod
     def create_key(cls, _id: str) -> str:
         return f'{cls.type()}#{str(_id)}'
+
+    @property
+    def b64_cookies_bytes(self):
+        return self.Base64Cookies.value

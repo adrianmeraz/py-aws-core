@@ -1,12 +1,15 @@
+import json
 from http.cookiejar import CookieJar
+from importlib.resources import as_file
 from unittest import mock
 
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
-from py_aws_core import exceptions, services
+from py_aws_core import entities, exceptions
 from py_aws_core.clients import RetryClient, SessionPersistClient
 from py_aws_core.exceptions import APIException
 from py_aws_core.testing import BaseTestFixture
+from tests import const as test_const
 
 
 class RetryClientTests(BaseTestFixture):
@@ -102,14 +105,23 @@ class SessionPersistClientTests(BaseTestFixture):
         cls.request = Request(url='', method='')  # Must add a non null request to avoid raising Runtime exception
         cls.mocked_sleep = mock.patch('py_aws_core.utils.sleep', return_value=None).start()
 
-    @mock.patch.object(services, 'rehydrate_session_from_database')
-    @mock.patch.object(services, 'write_session_to_database')
-    def test_ok(self, mocked_rehydrate_session_from_database, mocked_write_session_to_database):
-        mocked_rehydrate_session_from_database.return_value = True
-        mocked_write_session_to_database.return_value = True
+    @mock.patch.object(SessionPersistClient, 'read_session')
+    @mock.patch.object(SessionPersistClient, 'write_session')
+    def test_ok(
+        self,
+        mocked_write_session,
+        mocked_read_session
+    ):
+        mocked_write_session.return_value = True
+
+        source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#get_session_item.json')
+        with as_file(source) as get_session_item:
+            session_json = json.loads(get_session_item.read_text(encoding='utf-8'))
+            session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
+        mocked_read_session.return_value = entities.Session(session_json['Item'])
 
         with SessionPersistClient() as client:
             self.assertEqual(len(client.cookies.jar), 0)
 
-        self.assertEqual(mocked_rehydrate_session_from_database.call_count, 1)
-        self.assertEqual(mocked_write_session_to_database.call_count, 1)
+        self.assertEqual(mocked_write_session.call_count, 1)
+        self.assertEqual(mocked_read_session.call_count, 1)

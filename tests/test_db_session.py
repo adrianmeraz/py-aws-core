@@ -4,21 +4,25 @@ from unittest import mock, TestCase
 
 from py_aws_core import db_session
 from py_aws_core.db_dynamo import DDBClient
+
 from tests import const as test_const
+from py_aws_core.testing import BaseTestFixture
 
 
-class DBSessionTests(TestCase):
+class DBSessionTests(BaseTestFixture):
 
-    @mock.patch.object(DDBClient, 'query')
-    def test_sessions(self, mocked_query):
-        source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#query_sessions.json')
-        with as_file(source) as query_sessions:
-            _json = json.loads(query_sessions.read_text(encoding='utf-8'))
-            session = _json['Items'][0]
-            session['Base64Cookies']['B'] = bytes(session['Base64Cookies']['B'], 'utf-8')
-            mocked_query.return_value = _json
+    @mock.patch.object(DDBClient, 'get_item')
+    def test_get_session_item(self, mocked_get_item):
+        source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#get_session_item.json')
+        with as_file(source) as get_session_item:
+            session_json = json.loads(get_session_item.read_text(encoding='utf-8'))
+            session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
+            mocked_get_item.return_value = session_json
 
         db_client = DDBClient()
-        r_query = db_session.SessionDBAPI.GetSessionQuery.call(db_client=db_client, _id='10c7676f77a34605b5ed76c210369c66')
-        self.assertEqual(len(r_query.session_b64_cookies), 1241)
-        self.assertEqual(mocked_query.call_count, 1)
+        r_get_item = db_session.SessionDBAPI.GetSessionItem.call(
+            db_client=db_client,
+            session_id='10c7676f77a34605b5ed76c210369c66'
+        )
+        self.assertEqual(len(r_get_item.session.Base64Cookies.value), 1241)
+        self.assertEqual(mocked_get_item.call_count, 1)
