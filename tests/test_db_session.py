@@ -1,12 +1,11 @@
 import json
 from importlib.resources import as_file
-from unittest import mock, TestCase
+from unittest import mock
 
 from py_aws_core import db_session
 from py_aws_core.db_dynamo import DDBClient
-
-from tests import const as test_const
 from py_aws_core.testing import BaseTestFixture
+from tests import const as test_const
 
 
 class DBSessionTests(BaseTestFixture):
@@ -20,7 +19,7 @@ class DBSessionTests(BaseTestFixture):
             mocked_get_item.return_value = session_json
 
         db_client = DDBClient()
-        r_get_item = db_session.SessionDBAPI.GetSessionItem.call(
+        r_get_item = db_session.GetSessionItem.call(
             db_client=db_client,
             session_id='10c7676f77a34605b5ed76c210369c66'
         )

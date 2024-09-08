@@ -1,9 +1,7 @@
 import entities
-from . import logs
-from .db_session import SessionDBAPI
+from . import logs, db_session
 from .db_dynamo import get_db_client
 from .interfaces import IDatabase
-
 
 db_client = get_db_client()
 logger = logs.logger
@@ -12,12 +10,12 @@ logger = logs.logger
 class DynamoDatabase(IDatabase):
     @classmethod
     def get_session(cls, session_id: str) -> entities.Session:
-        return SessionDBAPI.GetSessionItem.call(db_client=db_client, session_id=session_id).session
+        return db_session.GetSessionItem.call(db_client=db_client, session_id=session_id).session
 
     @classmethod
     def put_session(cls, session_id: str, b64_cookies: bytes):
         logger.info(f'Session ID: {session_id} -> Writing cookies to database...')
-        SessionDBAPI.PutSession.call(
+        db_session.PutSession.call(
             db_client=db_client,
             session_id=session_id,
             b64_cookies=b64_cookies
