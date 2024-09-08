@@ -5,6 +5,8 @@ from unittest import TestCase
 import respx
 from httpx import Response, codes
 
+from py_aws_core import utils
+
 
 class BaseTestFixture(TestCase):
     def setUp(self):
@@ -74,3 +76,7 @@ class BaseTestFixture(TestCase):
             comment_url=None,
             rest=dict(),
         )
+
+    @classmethod
+    def to_utf8_bytes(cls, s: str):
+        return utils.to_utf8_bytes(s)

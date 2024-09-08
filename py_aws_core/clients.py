@@ -2,14 +2,15 @@ import base64
 import binascii
 import pickle
 import ssl
-import uuid
 from http.cookiejar import CookieJar
 
 from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, ProxyError
 
-from py_aws_core import decorators, exceptions, logs, services, utils
+from py_aws_core import database, decorators, exceptions, logs, utils
+from py_aws_core.sessions import ABCPersistSession
 
 logger = logs.logger
+db = database.DynamoDatabase()
 # Using same ssl context for all clients to save on loading SSL bundles
 # See https://github.com/python/cpython/issues/95031#issuecomment-1749489998
 # Also results in _tests running about 9 times faster
@@ -72,16 +73,29 @@ class RetryClient(Client):
                 logger.info(f'Session ID: {self.session_id} -> Setting CookieJar Cookie: "{c}"')
                 cookie_jar.set_cookie(c)
             self.cookies.jar = cookie_jar
+            logger.info(f'Session ID: {self.session_id} -> Rehydrated {len(self.cookies.jar)} cookies')
         except (pickle.PickleError, binascii.Error) as e:
             raise exceptions.CookieDecodingError(info=f'Session ID: {self.session_id} -> Cookie Error: {str(e)}')
 
 
-class SessionPersistClient(RetryClient):
+class SessionPersistClient(RetryClient, ABCPersistSession):
     def __enter__(self):
         super().__enter__()
-        services.rehydrate_session_from_database(self)
+        self.read_session()
         return self
 
     def __exit__(self, *args, **kwargs):
-        services.write_session_to_database(self)
+        self.write_session(session_id=self.session_id)
         super().__exit__(*args, **kwargs)
+
+    def read_session(self):
+        session_id = self.session_id
+        logger.info(f'Session ID: {session_id} -> Rehydrating session...')
+        session = db.get_session(session_id=session_id)
+        if not session:
+            logger.info(f'Session ID: {session_id} -> No prior session found.')
+            return
+        self.b64_decode_and_set_cookies(b64_cookies=session.b64_cookies_bytes)
+
+    def write_session(self, session_id):
+        db.put_session(session_id=session_id, b64_cookies=self.b64_encoded_cookies)

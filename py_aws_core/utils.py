@@ -115,3 +115,7 @@ def unix_timestamp_to_iso8601(unix_ts: int):
 
 def remove_whitespace(s: str) -> str:
     return ''.join([line.strip() for line in s.split('\\r\\n')])
+
+
+def to_utf8_bytes(s: str) -> bytes:
+    return bytes(s, 'utf-8')
