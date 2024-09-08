@@ -1,5 +1,4 @@
-import entities
-from . import logs, db_session
+from . import logs, db_session, entities
 from .db_dynamo import get_db_client
 from .interfaces import IDatabase
 
