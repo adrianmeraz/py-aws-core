@@ -16,7 +16,7 @@ class GetOrCreateSession(SessionDDBAPI):
 
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DDBClient, session_id: str, b64_cookies: bytes):
+    def call(cls, db_client: DDBClient, session_id: str):
         pk = sk = entities.Session.create_key(_id=session_id)
         _type = entities.Session.type()
         response = db_client.update_item(
@@ -24,16 +24,14 @@ class GetOrCreateSession(SessionDDBAPI):
                 'PK': {'S': pk},
                 'SK': {'S': sk},
             },
-            UpdateExpression='SET #ty = :ty, #bc = :bc, #si = :si, #ea = :ea',
+            UpdateExpression='SET #ty = :ty, #si = :si, #ea = :ea',
             ExpressionAttributeNames={
                 '#ty': 'Type',
-                '#bc': 'Base64Cookies',
                 "#si": 'SessionId',
                 '#ea': 'ExpiresAt',
             },
             ExpressionAttributeValues=cls.serialize_types({
                 ':ty': _type,
-                ':bc': b64_cookies,
                 ':si': session_id,
                 ':ea': cls.calc_expire_at_timestamp(expire_in_seconds=const.DB_DEFAULT_EXPIRES_IN_SECONDS),
             }),

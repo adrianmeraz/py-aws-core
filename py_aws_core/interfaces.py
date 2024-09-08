@@ -12,7 +12,7 @@ class IDatabase(ABC):
 
     @classmethod
     @abstractmethod
-    def get_or_create_session(cls, session_id: str, b64_cookies: bytes) -> entities.Session:
+    def get_or_create_session(cls, session_id: str) -> entities.Session:
         pass
 
     @classmethod
