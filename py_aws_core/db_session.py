@@ -7,22 +7,6 @@ logger = logs.logger
 
 
 class SessionDBAPI(db_dynamo.ABCCommonAPI):
-    @classmethod
-    def build_session_map(
-        cls,
-        session_id: str,
-        b64_cookies: bytes,
-        expire_in_seconds: int = const.DB_DEFAULT_EXPIRES_IN_SECONDS
-    ):
-        pk = sk = entities.Session.create_key(_id=session_id)
-        return cls.get_batch_entity_create_map(
-            expire_in_seconds=expire_in_seconds,
-            pk=pk,
-            sk=sk,
-            _type=entities.Session.type(),
-            Base64Cookies=b64_cookies,
-        )
-
     class GetSessionItem:
         class Response(GetItemResponse):
             @property
