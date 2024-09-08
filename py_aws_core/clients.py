@@ -90,11 +90,8 @@ class SessionPersistClient(RetryClient, ABCPersistSession):
 
     def read_session(self):
         session_id = self.session_id
-        logger.info(f'Session ID: {session_id} -> Rehydrating session...')
-        session = db.get_session(session_id=session_id)
-        if not session:
-            logger.info(f'Session ID: {session_id} -> No prior session found.')
-            return
+        logger.info(f'Session ID: {session_id} -> Attempting to read session...')
+        session = db.get_or_create_session(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
         self.b64_decode_and_set_cookies(b64_cookies=session.b64_cookies_bytes)
 
     def write_session(self, session_id):
