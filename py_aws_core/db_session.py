@@ -25,10 +25,10 @@ class GetSessionItem(SessionDDBAPI):
             },
             ExpressionAttributeNames={
                 "#pk": "PK",
-                "#ck": "Base64Cookies",
+                "#bc": "Base64Cookies",
                 "#tp": "Type"
             },
-            ProjectionExpression='#ck, #tp'
+            ProjectionExpression='#pk, #bc, #tp'
         )
         logger.debug(f'{cls.__qualname__}.call# -> response: {response}')
         return cls.Response(response)
