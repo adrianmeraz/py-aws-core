@@ -56,4 +56,6 @@ class Session(ABCEntity):
 
     @property
     def b64_cookies_bytes(self):
-        return self.Base64Cookies.value
+        if self.Base64Cookies:
+            return self.Base64Cookies.value
+        return None
