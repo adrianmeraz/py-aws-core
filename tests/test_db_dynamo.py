@@ -96,3 +96,15 @@ class ABCCommonAPITests(TestCase):
                 'request_token_4': {'S': ''}
             }
         )
+
+        val_2 = ABCCommonAPI.serialize_types({
+            'PK': 'TEST#123456',
+            'SK': 'SK#89076',
+        })
+        self.assertEqual(
+            val_2,
+            {
+                'PK': {'S': 'TEST#123456'},
+                'SK': {'S': 'SK#89076'}
+            }
+        )
