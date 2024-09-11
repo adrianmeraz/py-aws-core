@@ -39,7 +39,7 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
                 logger.debug(f'{func.__name__} -> response: {response}')
                 return response
             except ClientError as e:
-                logger.error(f'ClientError detected -> {e}')
+                logger.error(f'{func.__name__} -> ClientError detected -> {e}, response: {e.response}')
                 e_response = db_dynamo.ErrorResponse(e.response)
                 if e_response.CancellationReasons:
                     e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
