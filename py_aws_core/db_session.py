@@ -19,20 +19,25 @@ class GetOrCreateSession(SessionDDBAPI):
     def call(cls, db_client: DDBClient, session_id: str):
         pk = sk = entities.Session.create_key(_id=session_id)
         _type = entities.Session.type()
+        now = cls.iso_8601_now_timestamp()
         response = db_client.update_item(
             Key={
                 'PK': {'S': pk},
                 'SK': {'S': sk},
             },
-            UpdateExpression='SET #ty = :ty, #si = :si, #ea = :ea',
+            UpdateExpression='SET #ty = :ty, #si = :si, #ea = :ea, #ca = attribute_not_exists(#pk, :ca), #ma = attribute_exists(#pk, :ma)',
             ExpressionAttributeNames={
                 '#ty': 'Type',
                 "#si": 'SessionId',
+                '#ca': 'CreatedAt',
+                '#ma': 'ModifiedAt',
                 '#ea': 'ExpiresAt',
             },
             ExpressionAttributeValues=cls.serialize_types({
                 ':ty': _type,
                 ':si': session_id,
+                ':ca': now,
+                ':ma': now,
                 ':ea': cls.calc_expire_at_timestamp(expire_in_seconds=const.DB_DEFAULT_EXPIRES_IN_SECONDS),
             }),
             ReturnValues='ALL_NEW'
