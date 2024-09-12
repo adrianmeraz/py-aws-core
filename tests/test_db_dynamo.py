@@ -108,3 +108,13 @@ class ABCCommonAPITests(TestCase):
                 'SK': {'S': 'SK#89076'}
             }
         )
+
+    def test_build_update_expression(self):
+        fields = [
+            ABCCommonAPI.UpdateField(expression_attr='ab', set_once=True),
+            ABCCommonAPI.UpdateField(expression_attr='gh', set_once=False),
+            ABCCommonAPI.UpdateField(expression_attr='yu', set_once=True),
+        ]
+        val = ABCCommonAPI.build_update_expression(fields)
+        self.assertEqual(('SET #ab = :ab, #gh = :gh, #yu = :yu, #ab = if_not_exists(PK, :ab), '
+                          '#gh = if_not_exists(PK, :gh), #yu = if_not_exists(PK, :yu)'), val)
