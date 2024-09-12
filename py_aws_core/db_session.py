@@ -32,7 +32,7 @@ class GetOrCreateSession(SessionDDBAPI):
                 'PK': {'S': pk},
                 'SK': {'S': sk},
             },
-            UpdateExpression='SET #ty = :ty, #si = :si, #ea = if_not_exists(#pk = :ea), #ca = if_not_exists(#pk, :ca), #ma = :ma',
+            UpdateExpression=cls.build_update_expression(update_fields),
             ExpressionAttributeNames={
                 '#pk': 'PK',
                 '#ty': 'Type',
