@@ -34,7 +34,6 @@ class GetOrCreateSession(SessionDDBAPI):
             },
             UpdateExpression=cls.build_update_expression(update_fields),
             ExpressionAttributeNames={
-                '#pk': 'PK',
                 '#ty': 'Type',
                 "#si": 'SessionId',
                 '#ca': 'CreatedAt',
