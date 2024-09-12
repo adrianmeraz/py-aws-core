@@ -1,5 +1,6 @@
 import typing
 from abc import ABC
+from dataclasses import dataclass
 
 import boto3
 from boto3.dynamodb import types
@@ -203,6 +204,18 @@ class ABCCommonAPI(ABC):
         if expire_in_seconds is None:
             return ''
         return utils.add_seconds_to_current_unix_timestamp(seconds=expire_in_seconds)
+
+    @dataclass
+    class UpdateField:
+        expression_attr: str
+        pk_name: str = 'PK'
+        set_once: bool = False
+
+    @staticmethod
+    def build_update_expression(fields: typing.List[UpdateField]):
+        normal_fields = [f'#{f.expression_attr} = :{f.expression_attr}' for f in fields]
+        set_once_fields = [f'#{f.expression_attr} = if_not_exists({f.pk_name}, :{f.expression_attr})' for f in fields]
+        return f'SET {', '.join(normal_fields + set_once_fields)}'
 
 
 class ErrorResponse:
