@@ -116,5 +116,4 @@ class ABCCommonAPITests(TestCase):
             ABCCommonAPI.UpdateField(expression_attr='yu', set_once=True),
         ]
         val = ABCCommonAPI.build_update_expression(fields)
-        self.assertEqual(('SET #ab = :ab, #gh = :gh, #yu = :yu, #ab = if_not_exists(PK, :ab), '
-                          '#gh = if_not_exists(PK, :gh), #yu = if_not_exists(PK, :yu)'), val)
+        self.assertEqual('SET #gh = :gh, #ab = if_not_exists(PK, :ab), #yu = if_not_exists(PK, :yu)', val)

@@ -213,9 +213,9 @@ class ABCCommonAPI(ABC):
 
     @staticmethod
     def build_update_expression(fields: typing.List[UpdateField]):
-        normal_fields = [f'#{f.expression_attr} = :{f.expression_attr}' for f in fields]
-        set_once_fields = [f'#{f.expression_attr} = if_not_exists({f.pk_name}, :{f.expression_attr})' for f in fields]
-        return f'SET {', '.join(normal_fields + set_once_fields)}'
+        n_fields = [f'#{f.expression_attr} = :{f.expression_attr}' for f in fields if not f.set_once]
+        o_fields = [f'#{f.expression_attr} = if_not_exists({f.pk_name}, :{f.expression_attr})' for f in fields if f.set_once]
+        return f'SET {', '.join(n_fields + o_fields)}'
 
 
 class ErrorResponse:
