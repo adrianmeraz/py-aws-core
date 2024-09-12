@@ -25,7 +25,7 @@ class GetOrCreateSession(SessionDDBAPI):
                 'PK': {'S': pk},
                 'SK': {'S': sk},
             },
-            UpdateExpression='SET #ty = :ty, #si = :si, #ea = :ea, #ca = attribute_not_exists(#pk, :ca), #ma = attribute_exists(#pk, :ma)',
+            UpdateExpression='SET #ty = :ty, #si = :si, #ea = if_not_exists(#pk = :ea), #ca = if_not_exists(#pk, :ca), #ma = :ma',
             ExpressionAttributeNames={
                 '#ty': 'Type',
                 "#si": 'SessionId',
