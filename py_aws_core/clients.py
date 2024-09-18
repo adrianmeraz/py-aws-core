@@ -38,11 +38,20 @@ class RetryClient(Client):
         504,
     )
 
-    def __init__(self, session_id: str = None, follow_redirects: bool = True, verify: bool = None, *args, **kwargs):
+    def __init__(
+        self,
+        session_id: str = None,
+        follow_redirects: bool = True,
+        verify: bool = None,
+        timeout=10.0,
+        *args,
+        **kwargs
+    ):
         super().__init__(
             follow_redirects=follow_redirects,
             default_encoding="utf-8",
             verify=verify or SSL_CONTEXT,
+            timeout=timeout,
             *args,
             **kwargs
         )
