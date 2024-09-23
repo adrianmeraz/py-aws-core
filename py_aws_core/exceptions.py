@@ -53,6 +53,18 @@ class SecretsManagerException(AWSCoreException):
     ERROR_MESSAGE = 'An error occurred while fetching secrets'
 
 
+class RouteAlreadyExists(CoreException):
+    ERROR_MESSAGE = 'Route already exists'
+
+
+class RouteNotFound(CoreException):
+    ERROR_MESSAGE = 'Route not found'
+
+
+class RouteInvalidHttpMethod(CoreException):
+    ERROR_MESSAGE = 'Invalid HTTP Method'
+
+
 ERR_CODE_MAP = {
     'ConditionalCheckFailedException': DBConditionCheckFailed,
     'TransactionCanceledException': DBTransactionCanceledException
