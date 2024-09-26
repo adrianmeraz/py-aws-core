@@ -114,10 +114,8 @@ class SessionPersistClientTests(BaseTestFixture):
     ):
         mocked_write_session.return_value = True
 
-        source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#get_session_item.json')
-        with as_file(source) as get_session_item:
-            session_json = json.loads(get_session_item.read_text(encoding='utf-8'))
-            session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
+        session_json = self.get_resource_json('db#get_session_item.json', path=test_const.TEST_DB_RESOURCES_PATH)
+        session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
         mocked_read_session.return_value = entities.Session(session_json['Item'])
 
         with SessionPersistClient() as client:

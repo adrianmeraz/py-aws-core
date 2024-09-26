@@ -85,13 +85,13 @@ class BaseTestFixture(TestCase):
         return utils.to_utf8_bytes(s)
 
     @classmethod
-    def get_resource_json(cls, path: Traversable, *descendants: str):
+    def get_resource_json(cls, *descendants: str, path: Traversable,):
         source = path.joinpath(*descendants)
         with as_file(source) as file_text:
             return json.loads(file_text.read_text(encoding='utf-8'))
 
     @classmethod
-    def get_resource_text(cls, path: Traversable, *descendants: str):
+    def get_resource_text(cls, *descendants: str, path: Traversable):
         source = path.joinpath(*descendants)
         with as_file(source) as file_text:
             return file_text.read_text(encoding='utf-8')
