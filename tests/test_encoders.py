@@ -1,13 +1,13 @@
 import json
-from importlib.resources import as_file
-from unittest import TestCase
 from decimal import Decimal
+from importlib.resources import as_file
 
 from py_aws_core import encoders
+from py_aws_core.testing import BaseTestFixture
 from tests import const as test_const
 
 
-class JsonEncoderTests(TestCase):
+class JsonEncoderTests(BaseTestFixture):
     def test_serialize_to_json(self):
         source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#get_items.json')
         with as_file(source) as entities_json:
