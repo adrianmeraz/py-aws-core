@@ -1,5 +1,8 @@
+import json
 import time
 from http.cookiejar import Cookie
+from importlib.abc import Traversable
+from importlib.resources import as_file
 from unittest import TestCase
 
 import respx
@@ -80,3 +83,15 @@ class BaseTestFixture(TestCase):
     @classmethod
     def to_utf8_bytes(cls, s: str):
         return utils.to_utf8_bytes(s)
+
+    @classmethod
+    def get_resource_json(cls, path: Traversable, *descendants: str):
+        source = path.joinpath(*descendants)
+        with as_file(source) as file_text:
+            return json.loads(file_text.read_text(encoding='utf-8'))
+
+    @classmethod
+    def get_resource_text(cls, path: Traversable, *descendants: str):
+        source = path.joinpath(*descendants)
+        with as_file(source) as file_text:
+            return file_text.read_text(encoding='utf-8')
