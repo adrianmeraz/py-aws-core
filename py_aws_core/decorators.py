@@ -1,6 +1,6 @@
 import typing
 from functools import wraps
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Type
 
 from botocore.exceptions import ClientError
 from httpx import codes, HTTPStatusError
@@ -10,7 +10,7 @@ from py_aws_core import db_dynamo, exceptions, logs, utils
 logger = logs.logger
 
 
-def boto3_handler(raise_as, client_error_map: dict):
+def boto3_handler(raise_as, client_error_map: Dict):
     def deco_func(func):
         @wraps(func)
         def wrapper_func(*args, **kwargs):
@@ -50,7 +50,7 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
     return deco_func
 
 
-def lambda_response_handler(raise_as):
+def lambda_response_handler(raise_as: Type[exceptions.CoreException]):
     """
     Passes through any exceptions that inherit from the
     :param raise_as:
@@ -66,9 +66,9 @@ def lambda_response_handler(raise_as):
                 exc = e
             except Exception as e:
                 logger.exception(str(e))
-                exc = raise_as(e)
+                exc = raise_as()
             return utils.build_lambda_response(
-                status_code=400,
+                status_code=raise_as.HTTP_STATUS_CODE,
                 exc=exc
             )
         return wrapper_func  # true decorator

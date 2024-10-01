@@ -18,8 +18,8 @@ class Boto3Tests(TestCase):
 
         val = func(7)
         self.assertEqual(
-            val,
-            14
+            14,
+            val
         )
 
     def test_raise_mapped_client_error(self):
@@ -77,8 +77,8 @@ class DynamodbHandlerTests(TestCase):
 
         val = func(7)
         self.assertEqual(
+            14,
             val,
-            14
         )
 
     def test_raise_client_error(self):
@@ -151,8 +151,8 @@ class LambdaResponseHandlerTests(TestCase):
             return 2*x
         val = func(7)
         self.assertEqual(
-            val,
-            14
+            14,
+            val
         )
 
     def test_pass_thru_exception(self):
@@ -161,7 +161,6 @@ class LambdaResponseHandlerTests(TestCase):
             raise exceptions.DBConditionCheckFailed('This is a test')
         val = func()
         self.assertEqual(
-            val,
             {
                 'body': '{"error": "DBConditionCheckFailed: Condition Check Failed"}',
                 'multiValueHeaders': {
@@ -173,18 +172,18 @@ class LambdaResponseHandlerTests(TestCase):
                 },
                 'isBase64Encoded': False,
                 'statusCode': 400
-            }
+            },
+            val
         )
 
     def test_wrapped_exception(self):
-        @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
+        @decorators.lambda_response_handler(raise_as=exceptions.RouteNotFound)
         def func():
             raise RuntimeError('This is a test')
         val = func()
         self.assertEqual(
-            val,
             {
-                'body': '{"error": "CoreException: A generic error has occurred"}',
+                'body': '{"error": "RouteNotFound: Route Path Not Found"}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
@@ -193,8 +192,9 @@ class LambdaResponseHandlerTests(TestCase):
                     'Content-Type': ['application/json']
                 },
                 'isBase64Encoded': False,
-                'statusCode': 400
-            }
+                'statusCode': 404
+            },
+            val
         )
 
 

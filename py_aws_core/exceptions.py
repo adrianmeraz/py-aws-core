@@ -1,4 +1,5 @@
 class CoreException(Exception):
+    HTTP_STATUS_CODE = 400
     ERROR_MESSAGE = 'A generic error has occurred'
 
     def __init__(self, *args, **kwargs):
@@ -18,6 +19,7 @@ class APIException(CoreException):
 
 
 class NotAuthorizedException(APIException):
+    HTTP_STATUS_CODE = 401
     ERROR_MESSAGE = 'Client is not authorized to take action'
 
 
@@ -58,11 +60,13 @@ class RouteAlreadyExists(CoreException):
 
 
 class RouteNotFound(CoreException):
-    ERROR_MESSAGE = 'Route not found'
+    HTTP_STATUS_CODE = 404
+    ERROR_MESSAGE = 'Route Path Not Found'
 
 
-class RouteInvalidHttpMethod(CoreException):
-    ERROR_MESSAGE = 'Invalid HTTP Method'
+class RouteMethodNotAllowed(CoreException):
+    HTTP_STATUS_CODE = 405
+    ERROR_MESSAGE = 'Route Method Not Allowed'
 
 
 ERR_CODE_MAP = {

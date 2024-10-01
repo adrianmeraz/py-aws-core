@@ -22,7 +22,7 @@ class APIGatewayRouter:
 
     def add_route(self, fn: typing.Callable, http_method: str, path: str):
         if http_method not in self.VALID_METHODS:
-            raise exceptions.RouteInvalidHttpMethod(http_method=http_method, valid_methods=self.VALID_METHODS)
+            raise exceptions.RouteMethodNotAllowed(http_method=http_method, valid_methods=self.VALID_METHODS)
         if http_method in self._route_map and path in self._route_map[http_method]:
             raise exceptions.RouteAlreadyExists(method=http_method, path=path)
         if http_method not in self._route_map:

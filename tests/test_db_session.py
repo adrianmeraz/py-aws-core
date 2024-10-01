@@ -1,5 +1,3 @@
-import json
-from importlib.resources import as_file
 from unittest import mock
 
 from py_aws_core import db_session
