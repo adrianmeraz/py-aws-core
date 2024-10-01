@@ -177,13 +177,13 @@ class LambdaResponseHandlerTests(TestCase):
         )
 
     def test_wrapped_exception(self):
-        @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
+        @decorators.lambda_response_handler(raise_as=exceptions.RouteNotFound)
         def func():
             raise RuntimeError('This is a test')
         val = func()
         self.assertEqual(
             {
-                'body': '{"error": "CoreException: A generic error has occurred"}',
+                'body': '{"error": "RouteNotFound: Route Path Not Found"}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
@@ -192,7 +192,7 @@ class LambdaResponseHandlerTests(TestCase):
                     'Content-Type': ['application/json']
                 },
                 'isBase64Encoded': False,
-                'statusCode': 400
+                'statusCode': 404
             },
             val
         )
