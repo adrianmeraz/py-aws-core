@@ -52,7 +52,9 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
 
 def lambda_response_handler(raise_as: Type[exceptions.CoreException]):
     """
-    Passes through any exceptions that inherit from the
+    Handler for any exceptions raised by wrapped function
+    Any uncaught exceptions are wrapped and re-raised as the "raise_as" parameter
+    Standard lambda response is returned
     :param raise_as:
     :return:
     """
@@ -62,13 +64,12 @@ def lambda_response_handler(raise_as: Type[exceptions.CoreException]):
             try:
                 return func(*args, **kwargs)
             except raise_as as e:
-                logger.exception(str(e))
                 exc = e
             except Exception as e:
-                logger.exception(str(e))
-                exc = raise_as()
+                exc = raise_as(e)
+            logger.exception(str(exc))
             return utils.build_lambda_response(
-                status_code=raise_as.HTTP_STATUS_CODE,
+                status_code=exc.HTTP_STATUS_CODE,
                 exc=exc
             )
         return wrapper_func  # true decorator

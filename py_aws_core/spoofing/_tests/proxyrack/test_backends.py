@@ -25,6 +25,6 @@ class ProxyRackProxyBackendTests(BaseTestFixture):
         )
 
         self.assertEqual(
-            proxy_url,
-            'http://user123;city=Dallas;osName=Windows;proxyIp=192.168.86.250;session=user123;refreshMinutes=60:pass456@megaproxy.rotating.proxyrack.net:10000'
+            'http://user123;city=Dallas;osName=Windows;proxyIp=192.168.86.250;session=user123;refreshMinutes=60:pass456@megaproxy.rotating.proxyrack.net:10000',
+            proxy_url
         )
