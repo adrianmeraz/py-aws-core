@@ -37,12 +37,12 @@ class CognitoClient:
     def boto_client(self, value):
         self._boto_client = value
 
-    @property
-    def aws_cognito_pool_client_id(self):
+    @classmethod
+    def get_aws_cognito_pool_client_id(cls):
         return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_CLIENT_ID')
 
-    @property
-    def aws_cognito_pool_id(self):
+    @classmethod
+    def get_aws_cognito_pool_id(cls):
         return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_ID')
 
     @classmethod
@@ -97,7 +97,7 @@ class AdminCreateUser:
             DesiredDeliveryMediums=desired_delivery_mediums,
             Username=username,
             UserAttributes=user_attributes,
-            UserPoolId=client.aws_cognito_pool_id()
+            UserPoolId=client.get_aws_cognito_pool_id()
         )
         return cls.Response(response)
 
@@ -140,7 +140,7 @@ class UserPasswordAuth(ABCInitiateAuth):
                 'USERNAME': username,
                 'PASSWORD': password,
             },
-            ClientId=client.aws_cognito_pool_client_id(),
+            ClientId=client.get_aws_cognito_pool_client_id(),
         )
         return cls.Response(response)
 
@@ -157,6 +157,6 @@ class RefreshTokenAuth(ABCInitiateAuth):
             AuthParameters={
                 'REFRESH_TOKEN': refresh_token,
             },
-            ClientId=client.aws_cognito_pool_client_id(),
+            ClientId=client.get_aws_cognito_pool_client_id(),
         )
         return cls.Response(response)

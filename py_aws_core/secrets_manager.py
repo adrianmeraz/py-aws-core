@@ -46,7 +46,6 @@ class SecretsManager:
     def boto_client(self, value):
         self._boto_client = value
 
-    @property
     def get_aws_secret_id(self) -> str:
         if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME):
             return aws_secret_id
