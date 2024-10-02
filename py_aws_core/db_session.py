@@ -1,5 +1,5 @@
 from py_aws_core import const, decorators, db_dynamo, entities, exceptions, logs
-from py_aws_core.db_dynamo import DDBClient, GetItemResponse, UpdateItemResponse
+from py_aws_core.db_dynamo import DDBClient, DDBItemResponse, UpdateItemResponse
 
 logger = logs.logger
 
@@ -55,10 +55,10 @@ class GetOrCreateSession(SessionDDBAPI):
 
 
 class GetSessionItem(SessionDDBAPI):
-    class Response(GetItemResponse):
+    class Response(DDBItemResponse):
         @property
         def session(self) -> entities.Session:
-            return entities.Session(data=self.item)
+            return entities.Session(data=self.Item)
 
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])

@@ -242,16 +242,8 @@ class ErrorResponse:
 
 class DDBItemResponse:
     def __init__(self, data):
-        self._data = data
-        self.Type = data.get('__type')
         self.Item = data.get('Item')
         self.ResponseMetadata = ResponseMetadata(data.get('ResponseMetadata', dict()))
-
-
-class GetItemResponse:
-    def __init__(self, data):
-        self.item = data.get('Item')
-        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
 
 
 class QueryResponse:

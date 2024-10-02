@@ -4,7 +4,7 @@ from importlib.resources import as_file
 from unittest import mock, TestCase
 
 from py_aws_core import const, db_dynamo, utils
-from py_aws_core.db_dynamo import DDBClient, GetItemResponse, ABCCommonAPI
+from py_aws_core.db_dynamo import DDBClient, DDBItemResponse, ABCCommonAPI
 from tests import const as test_const
 
 
@@ -28,9 +28,9 @@ class ABCCommonAPITests(TestCase):
         with as_file(source) as get_item:
             _json = json.loads(get_item.read_text(encoding='utf-8'))
             mocked_get_item.return_value = _json
-            val = GetItemResponse(_json)
+            val = DDBItemResponse(_json)
 
-        self.assertIsNone(val.item)
+        self.assertIsNone(val.Item)
 
     @mock.patch.object(utils, 'get_now_datetime')
     def test_get_put_item_map(self, mocked_get_now_datetime):
