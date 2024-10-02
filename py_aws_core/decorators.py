@@ -62,11 +62,10 @@ def lambda_response_handler(raise_as: Type[exceptions.CoreException]):
             try:
                 return func(*args, **kwargs)
             except raise_as as e:
-                logger.exception(str(e))
                 exc = e
             except Exception as e:
-                logger.exception(str(e))
                 exc = raise_as(e)
+            logger.exception(str(exc))
             return utils.build_lambda_response(
                 status_code=exc.HTTP_STATUS_CODE,
                 exc=exc
