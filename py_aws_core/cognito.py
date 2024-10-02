@@ -140,7 +140,7 @@ class UserPasswordAuth(ABCInitiateAuth):
                 'USERNAME': username,
                 'PASSWORD': password,
             },
-            ClientId=client.aws_cognito_pool_client_id(),
+            ClientId=client.aws_cognito_pool_client_id,
         )
         return cls.Response(response)
 
@@ -157,6 +157,6 @@ class RefreshTokenAuth(ABCInitiateAuth):
             AuthParameters={
                 'REFRESH_TOKEN': refresh_token,
             },
-            ClientId=client.aws_cognito_pool_client_id(),
+            ClientId=client.aws_cognito_pool_client_id,
         )
         return cls.Response(response)
