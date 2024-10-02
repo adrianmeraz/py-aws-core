@@ -18,7 +18,7 @@ class SecretsManagerTests(TestCase):
         stubber = Stubber(sm.boto_client)
         stubber.activate()
         val = sm.get_secret(secret_name='TEST_KEY_1')
-        self.assertEqual(val, 'TEST_VAL_1')
+        self.assertEqual('TEST_VAL_1', val)
 
     @mock.patch.object(SecretsManager, new_callable=PropertyMock, attribute='get_aws_secret_id')
     def test_get_secret_caching(self, mock_get_aws_secret_id):
@@ -31,8 +31,8 @@ class SecretsManagerTests(TestCase):
         with as_file(source) as admin_create_user_json:
             stubber.add_response('get_secret_value', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
             val = sm.get_secret(secret_name='test_key_1')
-        self.assertEqual(val, 'test_val_1')
+        self.assertEqual('test_val_1', val)
 
         # Now checking cache
         val = sm.get_secret(secret_name='test_key_1')
-        self.assertEqual(val, 'test_val_1')
+        self.assertEqual('test_val_1', val)

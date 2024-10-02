@@ -26,9 +26,9 @@ class ActiveConnectionsTests(BaseTestFixture):
 
         with RetryClient() as client:
             r_active_connections = proxyrack_api.GetActiveConnections.call(client)
-            self.assertEqual(len(r_active_connections.connections), 2)
+            self.assertEqual(2, len(r_active_connections.connections))
 
-        self.assertEqual(mocked_route_active_conns.call_count, 1)
+        self.assertEqual(1, mocked_route_active_conns.call_count)
 
     @respx.mock
     def test_ProxyRackError(self):
@@ -45,7 +45,7 @@ class ActiveConnectionsTests(BaseTestFixture):
             with self.assertRaises(exceptions.ProxyRackException):
                 proxyrack_api.GetActiveConnections.call(client)
 
-        self.assertEqual(mocked_route_active_conns.call_count, 1)
+        self.assertEqual(1, mocked_route_active_conns.call_count)
 
 
 class PostTempAPIKeyTests(BaseTestFixture):
@@ -66,9 +66,9 @@ class PostTempAPIKeyTests(BaseTestFixture):
 
         with RetryClient() as client:
             r_generate_temp_api_key = proxyrack_api.PostTempAPIKey.call(client, expiration_seconds=60)
-            self.assertEqual(r_generate_temp_api_key.api_key, 'temp-bf3702-be83a4-0bbfc1-be7f58-62cfff')
+            self.assertEqual('temp-bf3702-be83a4-0bbfc1-be7f58-62cfff', r_generate_temp_api_key.api_key)
 
-        self.assertEqual(mocked_route_passwords.call_count, 1)
+        self.assertEqual(1, mocked_route_passwords.call_count)
 
     @respx.mock
     def test_ProxyRackError(self):
@@ -87,7 +87,7 @@ class PostTempAPIKeyTests(BaseTestFixture):
                     client,
                     expiration_seconds=60
                 )
-        self.assertEqual(mocked_route_passwords.call_count, 1)
+        self.assertEqual(1, mocked_route_passwords.call_count)
 
 
 class StatsTests(BaseTestFixture):
