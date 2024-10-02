@@ -177,9 +177,9 @@ class LambdaResponseHandlerTests(TestCase):
         )
 
     def test_wrapped_exception(self):
-        @decorators.lambda_response_handler(raise_as=exceptions.RouteNotFound)
+        @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
         def func():
-            raise RuntimeError('This is a test')
+            raise exceptions.RouteNotFound()
         val = func()
         self.assertEqual(
             {
