@@ -27,7 +27,7 @@ class SecretsManager:
             logger.debug(f'Secret "{secret_name}" found in cached secrets')
             return val
         try:
-            r_secrets = self.boto_client.get_secret_value(SecretId=self.get_aws_secret_id)
+            r_secrets = self.boto_client.get_secret_value(SecretId=self.aws_secret_id)
             self._secrets_map = json.loads(r_secrets['SecretString'])
             return self._secrets_map[secret_name]
         except ClientError as e:
@@ -47,7 +47,7 @@ class SecretsManager:
         self._boto_client = value
 
     @property
-    def get_aws_secret_id(self) -> str:
+    def aws_secret_id(self) -> str:
         if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME):
             return aws_secret_id
         raise exceptions.SecretsManagerException(f'Missing environment variable "{self.AWS_SECRET_NAME}"')

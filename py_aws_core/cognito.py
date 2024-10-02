@@ -97,7 +97,7 @@ class AdminCreateUser:
             DesiredDeliveryMediums=desired_delivery_mediums,
             Username=username,
             UserAttributes=user_attributes,
-            UserPoolId=client.aws_cognito_pool_id()
+            UserPoolId=client.aws_cognito_pool_id
         )
         return cls.Response(response)
 
