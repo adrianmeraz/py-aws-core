@@ -9,7 +9,7 @@ from tests import const as test_const
 
 
 class AdminCreateUserTests(TestCase):
-    @mock.patch.object(cognito.CognitoClient, 'aws_cognito_pool_id')
+    @mock.patch.object(cognito.CognitoClient, 'get_aws_cognito_pool_id')
     def test_ok(
         self,
         mocked_aws_cognito_pool_id
@@ -48,7 +48,7 @@ class AdminCreateUserTests(TestCase):
 
 
 class UserPasswordAuthTests(TestCase):
-    @mock.patch.object(cognito.CognitoClient, 'aws_cognito_pool_client_id')
+    @mock.patch.object(cognito.CognitoClient, 'get_aws_cognito_pool_client_id')
     def test_ok(
         self,
         mocked_aws_cognito_pool_client_id
@@ -74,7 +74,7 @@ class UserPasswordAuthTests(TestCase):
 
 
 class RefreshTokenAuthTests(TestCase):
-    @mock.patch.object(cognito.CognitoClient, 'aws_cognito_pool_client_id')
+    @mock.patch.object(cognito.CognitoClient, 'get_aws_cognito_pool_client_id')
     def test_ok(
         self,
         mocked_aws_cognito_pool_client_id
