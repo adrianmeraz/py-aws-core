@@ -156,30 +156,9 @@ class LambdaResponseHandlerTests(TestCase):
         )
 
     def test_pass_thru_exception(self):
-        @decorators.lambda_response_handler(raise_as=exceptions.DynamoDBException)
-        def func():
-            raise exceptions.DBConditionCheckFailed('This is a test')
-        val = func()
-        self.assertEqual(
-            {
-                'body': '{"error": "DBConditionCheckFailed: Condition Check Failed"}',
-                'multiValueHeaders': {
-                    'Access-Control-Allow-Credentials': [True],
-                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
-                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
-                    'Access-Control-Allow-Origin': ['*'],
-                    'Content-Type': ['application/json']
-                },
-                'isBase64Encoded': False,
-                'statusCode': 400
-            },
-            val
-        )
-
-    def test_wrapped_exception(self):
         @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
         def func():
-            raise exceptions.RouteNotFound()
+            raise exceptions.RouteNotFound('Route Path Not Found')
         val = func()
         self.assertEqual(
             {
@@ -193,6 +172,27 @@ class LambdaResponseHandlerTests(TestCase):
                 },
                 'isBase64Encoded': False,
                 'statusCode': 404
+            },
+            val
+        )
+
+    def test_catch_all_exception(self):
+        @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
+        def func():
+            raise RuntimeError('This is an error')
+        val = func()
+        self.assertEqual(
+            {
+                'body': '{"error": "CoreException: A generic error has occurred"}',
+                'multiValueHeaders': {
+                    'Access-Control-Allow-Credentials': [True],
+                    'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
+                    'Access-Control-Allow-Methods': ['DELETE,GET,POST,PUT'],
+                    'Access-Control-Allow-Origin': ['*'],
+                    'Content-Type': ['application/json']
+                },
+                'isBase64Encoded': False,
+                'statusCode': 400
             },
             val
         )
