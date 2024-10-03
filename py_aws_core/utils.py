@@ -125,7 +125,7 @@ def to_utf8_bytes(s: str) -> bytes:
 
 
 def import_all_package_modules(package: str):
-    f = files(__name__)
+    f = files(package)
     modules = [fp for fp in f.iterdir() if fp.is_file and fp.name.endswith('.py')]
     for fp in modules:
         module_name = Path(fp.name).stem
