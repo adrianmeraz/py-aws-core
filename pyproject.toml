@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-aws-core"
-version = "0.2.3"
+version = "0.2.4"
 description = "Core package for interfacing with AWS"
 authors = ["services <services@rydeas.com>"]
 readme = "README.md"
