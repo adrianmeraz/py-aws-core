@@ -1,3 +1,4 @@
+import importlib
 import json
 import os
 import random
@@ -5,6 +6,8 @@ import time
 import typing
 import uuid
 from datetime import datetime, timezone, timedelta, UTC
+from importlib.resources import files
+from pathlib import Path
 
 
 def build_lambda_response(
@@ -119,3 +122,15 @@ def remove_whitespace(s: str) -> str:
 
 def to_utf8_bytes(s: str) -> bytes:
     return bytes(s, 'utf-8')
+
+
+def import_all_package_modules(package: str):
+    f = files(__name__)
+    modules = [fp for fp in f.iterdir() if fp.is_file and fp.name.endswith('.py')]
+    for fp in modules:
+        module_name = Path(fp.name).stem
+        full_name = f'{package}.{module_name}'
+        try:
+            importlib.import_module(full_name)
+        except ModuleNotFoundError:
+            continue
