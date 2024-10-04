@@ -16,7 +16,7 @@ def boto3_handler(raise_as, client_error_map: Dict):
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'boto response', response=response, qfunc_name=f'{func!r}')
+                logger.debug(f'boto response', response=response, wrapped_func_name=f'{func!r}')
                 return response
             except ClientError as e:
                 error_code = e.response['Error']['Code']
@@ -36,10 +36,10 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'{func.__name__} -> response: {response}')
+                logger.debug(f'response from dynamodb', response=response, wrapped_func_name=f'{func!r}')
                 return response
             except ClientError as e:
-                logger.error(f'{func.__name__} -> ClientError detected -> {e}, response: {e.response}')
+                logger.error(f'dynamodb ClientError detected', e=e, response=e.response, wrapped_func_name=f'{func!r}')
                 e_response = db_dynamo.ErrorResponse(e.response)
                 if e_response.CancellationReasons:
                     e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
@@ -112,13 +112,13 @@ def retry(
                         max_tries=tries,
                         exception=str(e),
                         exception_type=type(e),
-                        qfunc_name=f'{f_qname!r}'
+                        wrapped_func_name=f'{func!r}'
                     )
                     utils.sleep(j_delay)
                     m_tries += 1
                     m_delay *= backoff
 
-            logger.warning(f'Max tries reached', num_tries=m_tries, max_tries=tries, qfunc_name=f'{f_qname!r}')
+            logger.warning(f'Max tries reached', num_tries=m_tries, max_tries=tries, wrapped_func_name=f'{func!r}')
             return func(*args, **kwargs)
 
         return wrapper_func  # true decorator

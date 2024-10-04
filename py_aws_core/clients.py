@@ -79,7 +79,7 @@ class RetryClient(Client):
             cookie_jar = CookieJar()
             decoded_bytes = base64.decodebytes(b64_cookies)
             for c in pickle.loads(decoded_bytes):
-                logger.info(f'Setting CookieJar Cookie: "{c}"', session_id=self.session_id)
+                logger.info(f'Setting CookieJar Cookie: {getattr(c, 'name')}', session_id=self.session_id)
                 cookie_jar.set_cookie(c)
             self.cookies.jar = cookie_jar
             logger.info(f'Rehydrated {len(self.cookies.jar)} cookies', session_id=self.session_id)

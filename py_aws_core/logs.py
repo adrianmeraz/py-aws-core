@@ -22,6 +22,7 @@ if 'unittest' in sys.modules or sys.stderr.isatty():
     processors = shared_processors + [
         structlog.dev.ConsoleRenderer(
             colors=True,
+            event_key='message'
         ),
     ]
 else:
