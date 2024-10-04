@@ -53,7 +53,7 @@ class APIGatewayRouter:
     def handle_event(self, aws_event, aws_context):
         path = aws_event['path']
         http_method = aws_event['httpMethod']
-        logger.info(f'Routing event', path=path, http_method=http_method)
+        logger.info(f'Routing event', path=path, http_method=http_method, aws_event=aws_event)
         try:
             path_funcs = self._route_map[http_method][path]
             return path_funcs.fn(aws_event, aws_context, **path_funcs.kwargs)
