@@ -1,7 +1,7 @@
 from py_aws_core import const, decorators, db_dynamo, entities, exceptions, logs
 from py_aws_core.db_dynamo import DDBClient, DDBItemResponse, UpdateItemResponse
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class SessionDDBAPI(db_dynamo.ABCCommonAPI):
@@ -50,7 +50,7 @@ class GetOrCreateSession(SessionDDBAPI):
             ReturnValues='ALL_NEW'
         )
 
-        logger.debug(f'{cls.__qualname__}.call# -> response: {response}')
+        logger.debug(f'response: {response}')
         return cls.Response(response)
 
 
@@ -76,7 +76,7 @@ class GetSessionItem(SessionDDBAPI):
             },
             ProjectionExpression='#pk, #bc, #tp'
         )
-        logger.debug(f'{cls.__qualname__}.call# -> response: {response}')
+        logger.debug(f'response: {response}')
         return cls.Response(response)
 
 
@@ -97,7 +97,7 @@ class PutSession(SessionDDBAPI):
         response = db_client.put_item(
             Item=item,
         )
-        logger.debug(f'{cls.__qualname__}.call# -> response: {response}')
+        logger.debug(f'response: {response}')
         return response
 
 
@@ -132,5 +132,5 @@ class UpdateSessionCookies(SessionDDBAPI):
             },
             ReturnValues='ALL_NEW'
         )
-        logger.debug(f'{cls.__qualname__}.call# -> response: {response}')
+        logger.debug(f'response: {response}')
         return cls.Response(response)

@@ -7,7 +7,7 @@ from httpx import codes, HTTPStatusError
 
 from py_aws_core import db_dynamo, exceptions, logs, utils
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 def boto3_handler(raise_as, client_error_map: Dict):
@@ -16,11 +16,11 @@ def boto3_handler(raise_as, client_error_map: Dict):
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'{func.__name__} -> response: {response}')
+                logger.debug(f'boto response', response=response, wrapped_func_name=f'{func!r}')
                 return response
             except ClientError as e:
                 error_code = e.response['Error']['Code']
-                logger.error(f'boto3 client error: {str(e)}, response: {e.response}, error code: {error_code}')
+                logger.error(f'boto3 client error', exception=str(e), response=e.response, error_code=error_code)
                 if exc := client_error_map.get(error_code):
                     raise exc(e)
                 raise raise_as()
@@ -36,10 +36,10 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'{func.__name__} -> response: {response}')
+                logger.debug(f'response from dynamodb', response=response, wrapped_func_name=f'{func!r}')
                 return response
             except ClientError as e:
-                logger.error(f'{func.__name__} -> ClientError detected -> {e}, response: {e.response}')
+                logger.error(f'dynamodb ClientError detected', e=e, response=e.response, wrapped_func_name=f'{func!r}')
                 e_response = db_dynamo.ErrorResponse(e.response)
                 if e_response.CancellationReasons:
                     e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
@@ -107,13 +107,18 @@ def retry(
                 except retry_exceptions as e:
                     j_delay = utils.generate_jitter(midpoint=m_delay, floor=0, std_deviation=jitter)
                     logger.info(
-                        f'{f_qname!r} -> Exception: {type(e)}, {str(e)}, Tries: {m_tries} / {tries}, Retrying in {j_delay:.3f} seconds...'
+                        f'Retrying in {j_delay:.3f} seconds...',
+                        num_tries=m_tries,
+                        max_tries=tries,
+                        exception=str(e),
+                        exception_type=type(e),
+                        wrapped_func_name=f'{func!r}'
                     )
                     utils.sleep(j_delay)
                     m_tries += 1
                     m_delay *= backoff
 
-            logger.warning(f'{f_qname!r} -> Max tries reached: {m_tries} / {tries}')
+            logger.warning(f'Max tries reached', num_tries=m_tries, max_tries=tries, wrapped_func_name=f'{func!r}')
             return func(*args, **kwargs)
 
         return wrapper_func  # true decorator

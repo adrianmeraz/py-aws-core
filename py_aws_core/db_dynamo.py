@@ -11,7 +11,7 @@ from .secrets_manager import get_secrets_manager
 
 secrets_manager = get_secrets_manager()
 
-logger = logs.logger
+logger = logs.get_logger()
 
 DDB_CLIENT_CONNECT_TIMEOUT = 4.9
 DDB_CLIENT_READ_TIMEOUT = 4.9

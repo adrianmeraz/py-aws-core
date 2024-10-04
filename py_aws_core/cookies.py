@@ -1,7 +1,5 @@
 from http.cookies import SimpleCookie
 
-from py_aws_core import utils
-
 
 class CookieUtil:
     @classmethod

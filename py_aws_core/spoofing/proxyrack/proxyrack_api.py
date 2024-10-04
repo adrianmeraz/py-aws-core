@@ -1,11 +1,10 @@
-import logging
-
 from httpx import Client
 
 from py_aws_core import decorators
+from py_aws_core import logs
 from . import exceptions
 
-logger = logging.getLogger(__name__)
+logger = logs.get_logger()
 
 
 STATUS_ERRORS_MAP = {

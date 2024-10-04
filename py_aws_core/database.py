@@ -3,7 +3,7 @@ from .db_dynamo import get_db_client
 from .interfaces import IDatabase
 
 db_client = get_db_client()
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class DynamoDatabase(IDatabase):
@@ -20,13 +20,13 @@ class DynamoDatabase(IDatabase):
 
     @classmethod
     def put_session(cls, session_id: str, b64_cookies: bytes):
-        logger.info(f'Session ID: {session_id} -> Writing cookies to database...')
+        logger.info(f'Writing cookies to database...', session_id=session_id)
         db_session.PutSession.call(
             db_client=db_client,
             session_id=session_id,
             b64_cookies=b64_cookies
         )
-        logger.info(f'Session ID: {session_id} -> Wrote cookies to database')
+        logger.info(f'Wrote cookies to database', session_id=session_id)
 
     @classmethod
     def update_session_cookies(cls, session_id: str, b64_cookies: bytes) -> entities.Session:

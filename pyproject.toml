@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-aws-core"
-version = "0.2.6"
+version = "0.2.7"
 description = "Core package for interfacing with AWS"
 authors = ["services <services@rydeas.com>"]
 readme = "README.md"
@@ -13,6 +13,8 @@ python = "~3.12"
 python-dotenv = "~1.0"
 httpx = "^0.27"
 respx = "^0.21.1"
+structlog = "^24.4.0"
+colorama = "^0.4.6"
 
 
 [build-system]

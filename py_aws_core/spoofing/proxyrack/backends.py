@@ -1,11 +1,10 @@
-import logging
 import typing
-import uuid
 
+from py_aws_core import logs
 from py_aws_core.spoofing.backends import ProxyBackend
 from py_aws_core.spoofing.proxyrack import const, utils
 
-logger = logging.getLogger(__name__)
+logger = logs.get_logger()
 
 
 class ProxyRackProxyBackend(ProxyBackend):

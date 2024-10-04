@@ -1,13 +1,11 @@
-import logging
 import random
 from abc import ABC, abstractmethod
 
-from httpx import Client
-
+from py_aws_core import logs
 from py_aws_core.secrets_manager import get_secrets_manager
 from . import const
 
-logger = logging.getLogger(__name__)
+logger = logs.get_logger()
 secrets_manager = get_secrets_manager()
 
 
