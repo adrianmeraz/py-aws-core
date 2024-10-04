@@ -16,11 +16,11 @@ def boto3_handler(raise_as, client_error_map: Dict):
         def wrapper_func(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
-                logger.debug(f'{func.__name__} -> response: {response}')
+                logger.debug(f'boto response', response=response, qfunc_name=f'{func!r}')
                 return response
             except ClientError as e:
                 error_code = e.response['Error']['Code']
-                logger.error(f'boto3 client error: {str(e)}, response: {e.response}, error code: {error_code}')
+                logger.error(f'boto3 client error', exception=str(e), response=e.response, error_code=error_code)
                 if exc := client_error_map.get(error_code):
                     raise exc(e)
                 raise raise_as()
@@ -118,7 +118,7 @@ def retry(
                     m_tries += 1
                     m_delay *= backoff
 
-            logger.warning(f'{f_qname!r} -> Max tries reached: {m_tries} / {tries}')
+            logger.warning(f'Max tries reached', num_tries=m_tries, max_tries=tries, qfunc_name=f'{f_qname!r}')
             return func(*args, **kwargs)
 
         return wrapper_func  # true decorator
