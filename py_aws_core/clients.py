@@ -72,19 +72,19 @@ class RetryClient(Client):
 
     def b64_decode_and_set_cookies(self, b64_cookies: bytes):
         if not b64_cookies:
-            logger.info(f'Session ID: {self.session_id} -> No Cookies To Restore: {b64_cookies}')
+            logger.info(f'No Cookies To Restore', session_id=self.session_id, b64_cookies=b64_cookies)
             self.cookies.jar = CookieJar()
             return
         try:
             cookie_jar = CookieJar()
             decoded_bytes = base64.decodebytes(b64_cookies)
             for c in pickle.loads(decoded_bytes):
-                logger.info(f'Session ID: {self.session_id} -> Setting CookieJar Cookie: "{c}"')
+                logger.info(f'Setting CookieJar Cookie: "{c}"', session_id=self.session_id)
                 cookie_jar.set_cookie(c)
             self.cookies.jar = cookie_jar
-            logger.info(f'Session ID: {self.session_id} -> Rehydrated {len(self.cookies.jar)} cookies')
+            logger.info(f'Rehydrated {len(self.cookies.jar)} cookies', session_id=self.session_id)
         except (pickle.PickleError, binascii.Error) as e:
-            raise exceptions.CookieDecodingError(info=f'Session ID: {self.session_id} -> Cookie Error: {str(e)}')
+            raise exceptions.CookieDecodingError(info=f'Cookie Error: {str(e)}', session_id=self.session_id)
 
 
 class SessionPersistClient(RetryClient, ABCPersistSession):
@@ -99,11 +99,11 @@ class SessionPersistClient(RetryClient, ABCPersistSession):
 
     def read_session(self):
         session_id = self.session_id
-        logger.info(f'Session ID: {session_id} -> Attempting to read session...')
+        logger.info(f'Attempting to read session...', session_id=self.session_id)
         session = db.get_or_create_session(session_id=session_id)
-        logger.info(f'Session ID: {session_id} -> Successfully read session.')
+        logger.info(f'Successfully read session.', session_id=self.session_id)
         self.b64_decode_and_set_cookies(b64_cookies=session.b64_cookies_bytes)
 
     def write_session(self, session_id):
         db.update_session_cookies(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
-        logger.info(f'Session ID: {session_id} -> Wrote session cookies to database')
+        logger.info(f'Wrote session cookies to database', session_id=self.session_id)

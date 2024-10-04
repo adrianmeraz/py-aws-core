@@ -48,12 +48,12 @@ class APIGatewayRouter:
         if http_method not in self._route_map:
             self._route_map[http_method] = dict()
         self._route_map[http_method][path] = self.PathFuncs(fn=fn, kwargs=kwargs)
-        logger.info(f'Added route to router -> http_method: {http_method}, path: {path}')
+        logger.info(f'Added route to router', http_method=http_method, path=path)
 
     def handle_event(self, aws_event, aws_context):
         path = aws_event['path']
         http_method = aws_event['httpMethod']
-        logger.info(f'Routing event -> path: {path}, http_method: {http_method}')
+        logger.info(f'Routing event', path=path, http_method=http_method)
         try:
             path_funcs = self._route_map[http_method][path]
             return path_funcs.fn(aws_event, aws_context, **path_funcs.kwargs)

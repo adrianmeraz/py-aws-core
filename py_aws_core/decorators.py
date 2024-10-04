@@ -107,7 +107,12 @@ def retry(
                 except retry_exceptions as e:
                     j_delay = utils.generate_jitter(midpoint=m_delay, floor=0, std_deviation=jitter)
                     logger.info(
-                        f'{f_qname!r} -> Exception: {type(e)}, {str(e)}, Tries: {m_tries} / {tries}, Retrying in {j_delay:.3f} seconds...'
+                        f'Retrying in {j_delay:.3f} seconds...',
+                        num_tries=m_tries,
+                        max_tries=tries,
+                        exception=str(e),
+                        exception_type=type(e),
+                        qfunc_name=f'{f_qname!r}'
                     )
                     utils.sleep(j_delay)
                     m_tries += 1

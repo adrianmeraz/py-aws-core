@@ -66,7 +66,7 @@ class LambdaEvent:
 
     def get_cookie(self, cookie_name: str):
         if cookie := self.cookies.get(cookie_name):
-            logger.info(f'Cookie "{cookie_name}" found: {cookie}')
+            logger.info(f'Cookie "{cookie_name}" found', cookie=cookie)
             return cookie
         raise exceptions.MissingCookieException(missing_cookie=cookie_name)
 
