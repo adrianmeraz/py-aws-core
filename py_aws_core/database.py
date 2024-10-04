@@ -3,7 +3,7 @@ from .db_dynamo import get_db_client
 from .interfaces import IDatabase
 
 db_client = get_db_client()
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class DynamoDatabase(IDatabase):

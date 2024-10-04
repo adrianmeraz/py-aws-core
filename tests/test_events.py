@@ -13,12 +13,12 @@ class DBEncoderTests(TestCase):
         with as_file(source) as event_json:
             mock_event = events.LambdaEvent(json.loads(event_json.read_text()))
 
-        self.assertEqual(mock_event.headers["Accept-Encoding"], "gzip, deflate, br")
-        self.assertEqual(mock_event.http_method, "GET")
-        self.assertEqual(mock_event.path, "/get-travel-control-points")
-        self.assertEqual(mock_event.query_string_parameters, {'medium_transport_type': 'A'})
+        self.assertEqual("gzip, deflate, br", mock_event.headers["Accept-Encoding"])
+        self.assertEqual("GET", mock_event.http_method)
+        self.assertEqual("/get-travel-control-points", mock_event.path)
+        self.assertEqual({'medium_transport_type': 'A'}, mock_event.query_string_parameters)
         self.assertIsNone(mock_event.body)
-        self.assertEqual(mock_event.request_context.domain_name, 'owufix3875.execute-api.us-west-2.amazonaws.com')
+        self.assertEqual('owufix3875.execute-api.us-west-2.amazonaws.com', mock_event.request_context.domain_name)
 
     def test_multi_value_headers(self):
         source = test_const.TEST_LAMBDA_RESOURCES_PATH.joinpath('event#api_gateway.json')
@@ -27,12 +27,12 @@ class DBEncoderTests(TestCase):
 
         multi_value_headers = mock_event.multi_value_headers
         self.assertEqual(
-            multi_value_headers.cookies['travel#__RequestVerificationToken'],
-            'CfDJ8GcmGAmFYbdJgvkLq5_X6y4I3JNsdWDwMFwshaQcsrlqLZHWYA7yCFrr5H22IA4u-xXtksHExFYRhCe6tLTMekS-cnH_Ayh2DXQjU0118i_22okKT9t5_rVyRg-tFn-FT2yBjIPg0RpmUkvmvRO8wAo'
+            'CfDJ8GcmGAmFYbdJgvkLq5_X6y4I3JNsdWDwMFwshaQcsrlqLZHWYA7yCFrr5H22IA4u-xXtksHExFYRhCe6tLTMekS-cnH_Ayh2DXQjU0118i_22okKT9t5_rVyRg-tFn-FT2yBjIPg0RpmUkvmvRO8wAo',
+            multi_value_headers.cookies['travel#__RequestVerificationToken']
         )
         self.assertEqual(
+            '668638a6-e262-4d07-a0d6-d200d88e3be2',
             multi_value_headers.cookies['session_id'],
-            '668638a6-e262-4d07-a0d6-d200d88e3be2'
         )
         self.assertEqual(multi_value_headers.accept, '*/*')
         self.assertEqual(multi_value_headers.accept_encoding, 'gzip, deflate, br')
@@ -55,6 +55,6 @@ class DBEncoderTests(TestCase):
         )
 
         cookie_1 = mock_event.get_cookie(cookie_name='session_id')
-        self.assertEqual(cookie_1, '668638a6-e262-4d07-a0d6-d200d88e3be2')
+        self.assertEqual('668638a6-e262-4d07-a0d6-d200d88e3be2', cookie_1)
 
-        self.assertEqual(mocked_time.call_count, 2)
+        self.assertEqual(1, mocked_time.call_count)

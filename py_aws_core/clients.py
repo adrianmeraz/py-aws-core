@@ -9,7 +9,7 @@ from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, Proxy
 from py_aws_core import database, decorators, exceptions, logs, utils
 from py_aws_core.sessions import ABCPersistSession
 
-logger = logs.logger
+logger = logs.get_logger()
 db = database.DynamoDatabase()
 # Using same ssl context for all clients to save on loading SSL bundles
 # See https://github.com/python/cpython/issues/95031#issuecomment-1749489998

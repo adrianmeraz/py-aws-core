@@ -1,7 +1,7 @@
 from py_aws_core import const, decorators, db_dynamo, entities, exceptions, logs
 from py_aws_core.db_dynamo import DDBClient, DDBItemResponse, UpdateItemResponse
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class SessionDDBAPI(db_dynamo.ABCCommonAPI):

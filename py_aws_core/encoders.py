@@ -2,7 +2,7 @@ import json
 from py_aws_core import logs
 from decimal import Decimal
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class JsonEncoder(json.JSONEncoder):

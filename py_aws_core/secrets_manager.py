@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 
 from . import exceptions, logs, utils
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class SecretsManager:

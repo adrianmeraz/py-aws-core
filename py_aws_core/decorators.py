@@ -7,7 +7,7 @@ from httpx import codes, HTTPStatusError
 
 from py_aws_core import db_dynamo, exceptions, logs, utils
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 def boto3_handler(raise_as, client_error_map: Dict):

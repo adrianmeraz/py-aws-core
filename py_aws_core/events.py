@@ -3,7 +3,7 @@ import typing
 
 from . import cookies, exceptions, logs, utils
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class LambdaEvent:

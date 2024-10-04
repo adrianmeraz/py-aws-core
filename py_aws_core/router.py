@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from . import exceptions, logs
 
-logger = logs.logger
+logger = logs.get_logger()
 
 
 class APIGatewayRouter:
