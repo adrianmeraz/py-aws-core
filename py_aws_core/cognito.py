@@ -89,6 +89,7 @@ class AdminCreateUser:
     def call(
         cls,
         client: CognitoClient,
+        cognito_pool_id: str,
         username: str,
         user_attributes: typing.List[typing.Dict],
         desired_delivery_mediums: typing.List[str],
@@ -97,7 +98,7 @@ class AdminCreateUser:
             DesiredDeliveryMediums=desired_delivery_mediums,
             Username=username,
             UserAttributes=user_attributes,
-            UserPoolId=client.get_aws_cognito_pool_id()
+            UserPoolId=cognito_pool_id
         )
         return cls.Response(response)
 
@@ -131,8 +132,10 @@ class UserPasswordAuth(ABCInitiateAuth):
     def call(
         cls,
         client: CognitoClient,
+        cognito_pool_client_id: str,
         username: str,
         password: str,
+
     ):
         response = client.initiate_auth(
             AuthFlow='USER_PASSWORD_AUTH',
@@ -140,7 +143,7 @@ class UserPasswordAuth(ABCInitiateAuth):
                 'USERNAME': username,
                 'PASSWORD': password,
             },
-            ClientId=client.get_aws_cognito_pool_client_id(),
+            ClientId=cognito_pool_client_id,
         )
         return cls.Response(response)
 
@@ -150,6 +153,7 @@ class RefreshTokenAuth(ABCInitiateAuth):
     def call(
         cls,
         client: CognitoClient,
+        cognito_pool_client_id: str,
         refresh_token: str,
     ):
         response = client.initiate_auth(
@@ -157,6 +161,6 @@ class RefreshTokenAuth(ABCInitiateAuth):
             AuthParameters={
                 'REFRESH_TOKEN': refresh_token,
             },
-            ClientId=client.get_aws_cognito_pool_client_id(),
+            ClientId=cognito_pool_client_id,
         )
         return cls.Response(response)
