@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class ABCPersistSession(ABC):
+class ISession(ABC):
     @abstractmethod
     def read_session(self):
         pass

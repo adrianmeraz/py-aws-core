@@ -6,11 +6,12 @@ from http.cookiejar import CookieJar
 
 from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, ProxyError
 
-from py_aws_core import database, decorators, exceptions, logs, utils
-from py_aws_core.sessions import ABCPersistSession
+from py_aws_core import decorators, exceptions, logs, utils
+from py_aws_core.db_service import DatabaseServive
+from py_aws_core.session_interface import ISession
 
 logger = logs.get_logger()
-db = database.DynamoDatabase()
+db_service = DatabaseServive()
 # Using same ssl context for all clients to save on loading SSL bundles
 # See https://github.com/python/cpython/issues/95031#issuecomment-1749489998
 # Also results in _tests running about 9 times faster
@@ -87,7 +88,7 @@ class RetryClient(Client):
             raise exceptions.CookieDecodingError(info=f'Cookie Error: {str(e)}', session_id=self.session_id)
 
 
-class SessionPersistClient(RetryClient, ABCPersistSession):
+class SessionPersistClient(RetryClient, ISession):
     def __enter__(self):
         super().__enter__()
         self.read_session()
@@ -100,10 +101,10 @@ class SessionPersistClient(RetryClient, ABCPersistSession):
     def read_session(self):
         session_id = self.session_id
         logger.info(f'Attempting to read session...', session_id=self.session_id)
-        session = db.get_or_create_session(session_id=session_id)
+        session = db_service.get_or_create_session(session_id=session_id)
         logger.info(f'Successfully read session.', session_id=self.session_id)
         self.b64_decode_and_set_cookies(b64_cookies=session.b64_cookies_bytes)
 
     def write_session(self, session_id):
-        db.update_session_cookies(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
+        db_service.update_session_cookies(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
         logger.info(f'Wrote session cookies to database', session_id=self.session_id)

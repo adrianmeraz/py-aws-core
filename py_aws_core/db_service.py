@@ -1,12 +1,12 @@
 from . import logs, db_session, entities
 from .db_dynamo import get_db_client
-from .interfaces import IDatabase
+from .db_interface import IDatabase
 
 db_client = get_db_client()
 logger = logs.get_logger()
 
 
-class DynamoDatabase(IDatabase):
+class DatabaseServive(IDatabase):
     @classmethod
     def get_session(cls, session_id: str) -> entities.Session:
         return db_session.GetSessionItem.call(db_client=db_client, session_id=session_id).session
