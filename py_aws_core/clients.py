@@ -7,11 +7,11 @@ from http.cookiejar import CookieJar
 from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, ProxyError
 
 from py_aws_core import decorators, exceptions, logs, utils
-from py_aws_core.db_service import DatabaseServive
+from py_aws_core.db_service import DatabaseService
 from py_aws_core.session_interface import ISession
 
 logger = logs.get_logger()
-db_service = DatabaseServive()
+db_service = DatabaseService()
 # Using same ssl context for all clients to save on loading SSL bundles
 # See https://github.com/python/cpython/issues/95031#issuecomment-1749489998
 # Also results in _tests running about 9 times faster

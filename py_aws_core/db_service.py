@@ -6,7 +6,7 @@ db_client = get_db_client()
 logger = logs.get_logger()
 
 
-class DatabaseServive(IDatabase):
+class DatabaseService(IDatabase):
     @classmethod
     def get_session(cls, session_id: str) -> entities.Session:
         return db_session.GetSessionItem.call(db_client=db_client, session_id=session_id).session
