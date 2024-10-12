@@ -8,25 +8,33 @@ from . import exceptions, logs, utils
 logger = logs.get_logger()
 
 
-class SecretsManager:
+class SSMParameterStore:
+
     class Response:
+        class Parameter:
+            def __init__(self, data):
+                self.Name = data['Name']
+                self.Type = data['Type']
+                self.Value = data['Value']
+                self.Version = data['Version']
+                self.Selector = data['Selector']
+                self.SourceResult = data['SourceResult']
+                self.LastModifiedDate = data['LastModifiedDate']
+                self.ARN = data['ARN']
+                self.DataType = data['DataType']
+
         def __init__(self, data):
-            self.ARN = data['ARN']
-            self.Name = data['Name']
-            self.VersionId = data['VersionId']
-            self.SecretBinary = data['SecretBinary']
-            self.SecretString = data['SecretString']
-            self.VersionStages = data['VersionStages']
+            self.Parameter = self.Parameter(data['Parameter'])
 
         @property
-        def secret_json(self):
-            return json.loads(self.SecretString)
+        def parameter_json(self):
+            return json.loads(self.Parameter.Value)
 
     """
     First checks environment variables for secrets.
     If secret not found, will attempt to pull from secrets manager
     """
-    AWS_SECRET_NAME = 'AWS_SECRET_NAME'
+    AWS_SECRET_NAME_KEY = 'AWS_SECRET_NAME'
 
     def __init__(self):
         self._boto_client = None
@@ -40,8 +48,9 @@ class SecretsManager:
             logger.debug(f'Secret "{secret_name}" found in cached secrets')
             return val
         try:
-            r_secrets = self.Response(self.boto_client.get_secret_value(SecretId=self.get_aws_secret_name))
-            self._secrets_map = r_secrets.secret_json
+            r_get_parameter = self.boto_client.get_parameter(Name=self.get_aws_secret_name)
+            r_get_parameter = self.Response(r_get_parameter)
+            self._secrets_map = r_get_parameter.parameter_json
             return self._secrets_map[secret_name]
         except ClientError as e:
             logger.exception(f'Error while trying to find secret "{secret_name}"')
@@ -52,7 +61,7 @@ class SecretsManager:
     @property
     def boto_client(self):
         if not self._boto_client:
-            self._boto_client = boto3.client('secretsmanager')
+            self._boto_client = boto3.client('ssm')
         return self._boto_client
 
     @boto_client.setter
@@ -60,15 +69,15 @@ class SecretsManager:
         self._boto_client = value
 
     def get_aws_secret_name(self) -> str:
-        if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME):
+        if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME_KEY):
             return aws_secret_id
-        raise exceptions.SecretsManagerException(f'Missing environment variable "{self.AWS_SECRET_NAME}"')
+        raise exceptions.SecretsManagerException(f'Missing environment variable "{self.AWS_SECRET_NAME_KEY}"')
 
 
-__secrets_manager = SecretsManager()
+__secrets_manager = SSMParameterStore()
 
 
-def get_secrets_manager() -> SecretsManager:
+def get_secrets_manager() -> SSMParameterStore:
     """
     Reuses secrets manager across all modules for efficiency
     :return:

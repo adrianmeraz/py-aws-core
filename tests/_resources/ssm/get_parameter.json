@@ -1,0 +1,13 @@
+{
+  "Parameter": {
+    "Name": "string",
+    "Type": "SecureString",
+    "Value": "{\"test_key_1\":\"test_val_1\"}",
+    "Version": 123,
+    "Selector": "string",
+    "SourceResult": "string",
+    "LastModifiedDate": "2024-10-12 04:03:15",
+    "ARN": "string",
+    "DataType": "string"
+  }
+}
