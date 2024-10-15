@@ -3,6 +3,7 @@ from abc import ABC
 
 import boto3
 from botocore.config import Config
+from botocore.client import BaseClient
 
 from py_aws_core import logs
 from py_aws_core.secrets_manager import SecretsManager
@@ -24,18 +25,8 @@ class CognitoClient:
     )
     __boto3_session = boto3.Session()
 
-    def __init__(self):
-        self._boto_client = None
-
-    @property
-    def boto_client(self):
-        if not self._boto_client:
-            self._boto_client = self.get_new_client()
-        return self._boto_client
-
-    @boto_client.setter
-    def boto_client(self, value):
-        self._boto_client = value
+    def __init__(self, boto_client: BaseClient):
+        self._boto_client = boto_client
 
     @classmethod
     def get_aws_cognito_pool_client_id(cls):
@@ -54,10 +45,10 @@ class CognitoClient:
         )
 
     def admin_create_user(self, *args, **kwargs):
-        return self.boto_client.admin_create_user(*args, **kwargs)
+        return self._boto_client.admin_create_user(*args, **kwargs)
 
     def initiate_auth(self, *args, **kwargs):
-        return self.boto_client.initiate_auth(*args, **kwargs)
+        return self._boto_client.initiate_auth(*args, **kwargs)
 
 
 class AdminCreateUser:

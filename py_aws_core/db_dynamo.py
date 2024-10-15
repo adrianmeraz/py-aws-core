@@ -4,12 +4,10 @@ from dataclasses import dataclass
 
 import boto3
 from boto3.dynamodb import types
+from botocore.client import BaseClient
 from botocore.config import Config
 
 from py_aws_core import const, logs, utils
-from .secrets_manager import SecretsManager
-
-secrets_manager = SecretsManager()
 
 logger = logs.get_logger()
 
@@ -28,25 +26,10 @@ class DDBClient:
     )
     __boto3_session = boto3.Session()
 
-    def __init__(self):
-        self._boto_client = None
-        self._table_resource = None
-
-    @property
-    def boto_client(self):
-        if not self._boto_client:
-            self._boto_client = self.get_new_client()
-        return self._boto_client
-
-    @boto_client.setter
-    def boto_client(self, value):
-        self._boto_client = value
-
-    @property
-    def table_resource(self):
-        if not self._table_resource:
-            self._table_resource = self.get_new_table_resource()
-        return self._table_resource
+    def __init__(self, boto_client: BaseClient, dynamodb_table_name: str):
+        self._boto_client = boto_client
+        self._dynamodb_table_name = dynamodb_table_name
+        self._table_resource = self.get_new_table_resource()
 
     @classmethod
     def get_new_client(cls):
@@ -57,57 +40,46 @@ class DDBClient:
             verify=False  # Don't validate SSL certs for faster responses
         )
 
-    @classmethod
-    def get_table_name(cls):
-        return secrets_manager.get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
+    # def get_table_name(cls):
+        # return cls._dynamodb_table_name
+        # return secrets_manager.get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
 
     def get_new_table_resource(self):
         dynamodb = boto3.resource('dynamodb')
-        return dynamodb.Table(self.get_table_name())
+        return dynamodb.Table(self._dynamodb_table_name)
 
     def query(self, *args, **kwargs):
-        return self.boto_client.query(TableName=self.get_table_name(), *args, **kwargs)
+        return self._boto_client.query(TableName=self._dynamodb_table_name, *args, **kwargs)
 
     def scan(self, *args, **kwargs):
-        return self.boto_client.scan(TableName=self.get_table_name(), *args, **kwargs)
+        return self._boto_client.scan(TableName=self._dynamodb_table_name, *args, **kwargs)
 
     def get_item(self, *args, **kwargs):
-        return self.boto_client.get_item(TableName=self.get_table_name(), *args, **kwargs)
+        return self._boto_client.get_item(TableName=self._dynamodb_table_name, *args, **kwargs)
 
     def put_item(self, *args, **kwargs):
-        return self.boto_client.put_item(TableName=self.get_table_name(), *args, **kwargs)
+        return self._boto_client.put_item(TableName=self._dynamodb_table_name, *args, **kwargs)
 
     def delete_item(self, *args, **kwargs):
-        return self.boto_client.delete_item(TableName=self.get_table_name(), *args, **kwargs)
+        return self._boto_client.delete_item(TableName=self._dynamodb_table_name, *args, **kwargs)
 
     def update_item(self, *args, **kwargs):
-        return self.boto_client.update_item(TableName=self.get_table_name(), *args, **kwargs)
+        return self._boto_client.update_item(TableName=self._dynamodb_table_name, *args, **kwargs)
 
     def batch_write_item(self, *args, **kwargs):
-        return self.boto_client.batch_write_item(*args, **kwargs)
+        return self._boto_client.batch_write_item(*args, **kwargs)
 
     def transact_write_items(self, *args, **kwargs):
-        return self.boto_client.transact_write_items(*args, **kwargs)
+        return self._boto_client.transact_write_items(*args, **kwargs)
 
     def batch_write_item_maps(self, item_maps: typing.List[typing.Dict]) -> int:
-        with self.table_resource.batch_writer() as batch:
+        with self._table_resource.batch_writer() as batch:
             for _map in item_maps:
                 batch.put_item(Item=_map)
         return len(item_maps)
 
     def write_maps_to_db(self, item_maps: typing.List[typing.Dict]) -> int:
         return self.batch_write_item_maps(item_maps=item_maps)
-
-
-__db_client = DDBClient()
-
-
-def get_db_client():
-    """
-    Reuses db client across all modules for efficiency
-    :return:
-    """
-    return __db_client
 
 
 class ABCCommonAPI(ABC):

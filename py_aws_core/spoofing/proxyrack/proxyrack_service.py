@@ -1,13 +1,13 @@
 import typing
 
 from py_aws_core import logs
-from py_aws_core.spoofing.backends import ProxyBackend
+from py_aws_core.spoofing.proxy_interface import IProxy
 from py_aws_core.spoofing.proxyrack import const, utils
 
 logger = logs.get_logger()
 
 
-class ProxyRackProxyBackend(ProxyBackend):
+class ProxyRackService(IProxy):
     @classmethod
     def get_proxy_url(
         cls,

@@ -9,7 +9,7 @@ logger = logs.get_logger()
 secrets_manager = SecretsManager()
 
 
-class ProxyBackend(ABC):
+class IProxy(ABC):
     @classmethod
     @abstractmethod
     def get_proxy_url(cls, **kwargs) -> str:

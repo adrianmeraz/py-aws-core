@@ -28,7 +28,7 @@ class SecretsManager:
     """
     AWS_SECRET_NAME = 'AWS_SECRET_NAME'
 
-    def __init__(self):
+    def __init__(self, _boto_client):
         self._boto_client = None
         self._secrets_map = dict()
 

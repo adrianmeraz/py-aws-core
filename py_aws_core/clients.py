@@ -11,7 +11,6 @@ from py_aws_core.db_service import DatabaseService
 from py_aws_core.session_interface import ISession
 
 logger = logs.get_logger()
-db_service = DatabaseService()
 # Using same ssl context for all clients to save on loading SSL bundles
 # See https://github.com/python/cpython/issues/95031#issuecomment-1749489998
 # Also results in _tests running about 9 times faster
@@ -89,6 +88,10 @@ class RetryClient(Client):
 
 
 class SessionPersistClient(RetryClient, ISession):
+    def __init__(self, db_service: DatabaseService, *args, **kwargs):
+        self._db_service = db_service
+        super().__init__(*args, **kwargs)
+
     def __enter__(self):
         super().__enter__()
         self.read_session()
@@ -101,10 +104,10 @@ class SessionPersistClient(RetryClient, ISession):
     def read_session(self):
         session_id = self.session_id
         logger.info(f'Attempting to read session...', session_id=self.session_id)
-        session = db_service.get_or_create_session(session_id=session_id)
+        session = self._db_service.get_or_create_session(session_id=session_id)
         logger.info(f'Successfully read session.', session_id=self.session_id)
         self.b64_decode_and_set_cookies(b64_cookies=session.b64_cookies_bytes)
 
     def write_session(self, session_id):
-        db_service.update_session_cookies(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
+        self._db_service.update_session_cookies(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
         logger.info(f'Wrote session cookies to database', session_id=self.session_id)
