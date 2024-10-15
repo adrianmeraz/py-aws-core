@@ -2,11 +2,11 @@ import random
 from abc import ABC, abstractmethod
 
 from py_aws_core import logs
-from py_aws_core.secrets_manager import get_secrets_manager
+from py_aws_core.secrets_manager import SecretsManager
 from . import const
 
 logger = logs.get_logger()
-secrets_manager = get_secrets_manager()
+secrets_manager = SecretsManager()
 
 
 class ProxyBackend(ABC):

@@ -5,10 +5,10 @@ import boto3
 from botocore.config import Config
 
 from py_aws_core import logs
-from py_aws_core.secrets_manager import get_secrets_manager
+from py_aws_core.secrets_manager import SecretsManager
 
 logger = logs.get_logger()
-secrets_manager = get_secrets_manager()
+secrets_manager = SecretsManager()
 
 COGNITO_CLIENT_CONNECT_TIMEOUT = 4.9
 COGNITO_CLIENT_READ_TIMEOUT = 4.9

@@ -7,9 +7,9 @@ from boto3.dynamodb import types
 from botocore.config import Config
 
 from py_aws_core import const, logs, utils
-from .secrets_manager import get_secrets_manager
+from .secrets_manager import SecretsManager
 
-secrets_manager = get_secrets_manager()
+secrets_manager = SecretsManager()
 
 logger = logs.get_logger()
 
