@@ -63,14 +63,3 @@ class SecretsManager:
         if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME):
             return aws_secret_id
         raise exceptions.SecretsManagerException(f'Missing environment variable "{self.AWS_SECRET_NAME}"')
-
-
-__secrets_manager = SecretsManager()
-
-
-def get_secrets_manager() -> SecretsManager:
-    """
-    Reuses secrets manager across all modules for efficiency
-    :return:
-    """
-    return __secrets_manager
