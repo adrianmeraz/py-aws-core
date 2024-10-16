@@ -3,6 +3,7 @@ from unittest import mock
 from py_aws_core import db_session
 from py_aws_core.db_dynamo import DDBClient
 from py_aws_core.testing import BaseTestFixture
+from py_aws_core.boto_clients import DynamoDBClientFactory
 from tests import const as test_const
 
 
@@ -15,7 +16,8 @@ class DBSessionTests(BaseTestFixture):
             session_json['Attributes']['Base64Cookies']['B'])
         mocked_update_item.return_value = session_json
 
-        db_client = DDBClient()
+        boto_client = DynamoDBClientFactory.new_client()
+        db_client = DDBClient(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         r_get_item = db_session.GetOrCreateSession.call(
             db_client=db_client,
             session_id='10c7676f77a34605b5ed76c210369c66',
@@ -33,7 +35,8 @@ class DBSessionTests(BaseTestFixture):
         session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
         mocked_get_item.return_value = session_json
 
-        db_client = DDBClient()
+        boto_client = DynamoDBClientFactory.new_client()
+        db_client = DDBClient(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         r_get_item = db_session.GetSessionItem.call(
             db_client=db_client,
             session_id='10c7676f77a34605b5ed76c210369c66'
@@ -47,7 +50,8 @@ class DBSessionTests(BaseTestFixture):
         session_json['Attributes']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Attributes']['Base64Cookies']['B'])
         mocked_update_item.return_value = session_json
 
-        db_client = DDBClient()
+        boto_client = DynamoDBClientFactory.new_client()
+        db_client = DDBClient(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         r_get_item = db_session.UpdateSessionCookies.call(
             db_client=db_client,
             session_id='10c7676f77a34605b5ed76c210369c66',

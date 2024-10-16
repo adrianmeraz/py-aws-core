@@ -1,4 +1,6 @@
 from botocore.config import Config
+from botocore.client import BaseClient
+
 import boto3
 
 from abc import ABC, abstractmethod
@@ -8,10 +10,11 @@ class ABCBotoClientFactory(ABC):
     CLIENT_CONNECT_TIMEOUT = 4.9
     CLIENT_READ_TIMEOUT = 4.9
 
-    __boto3_session = boto3.Session()
+    _boto3_session = boto3.Session()
 
+    @classmethod
     @abstractmethod
-    def new_client(self) -> dict:
+    def new_client(cls) -> BaseClient:
         pass
 
     @classmethod
@@ -23,19 +26,37 @@ class ABCBotoClientFactory(ABC):
         return cls.CLIENT_READ_TIMEOUT
 
 
+class CognitoClientFactory(ABCBotoClientFactory):
+    @classmethod
+    def new_client(cls):
+        return cls._boto3_session.client(
+            service_name='cognito-idp',
+        )
+
+
 class DynamoDBClientFactory(ABCBotoClientFactory):
-    def new_client(self):
-        return self.__boto3_session.client(
-            config=self.get_config(),
+    @classmethod
+    def new_client(cls):
+        return cls._boto3_session.client(
+            config=cls.get_config(),
             service_name='dynamodb',
             verify=False  # Don't validate SSL certs for faster responses
         )
 
-    def get_config(self):
+    @classmethod
+    def get_config(cls):
         return Config(
-            connect_timeout=self.CLIENT_CONNECT_TIMEOUT,
-            read_timeout=self.CLIENT_READ_TIMEOUT,
+            connect_timeout=cls.CLIENT_CONNECT_TIMEOUT,
+            read_timeout=cls.CLIENT_READ_TIMEOUT,
             retries=dict(
                 total_max_attempts=2,
             )
+        )
+
+
+class SecretManagerClientFactory(ABCBotoClientFactory):
+    @classmethod
+    def new_client(cls):
+        return cls._boto3_session.client(
+            service_name='secretsmanager',
         )

@@ -1,6 +1,6 @@
 import json
 
-import boto3
+from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
 from . import exceptions, logs, utils
@@ -28,8 +28,8 @@ class SecretsManager:
     """
     AWS_SECRET_NAME = 'AWS_SECRET_NAME'
 
-    def __init__(self, _boto_client):
-        self._boto_client = None
+    def __init__(self, boto_client: BaseClient):
+        self._boto_client = boto_client
         self._secrets_map = dict()
 
     def get_secret(self, secret_name: str):
@@ -40,7 +40,7 @@ class SecretsManager:
             logger.debug(f'Secret "{secret_name}" found in cached secrets')
             return val
         try:
-            r_secrets = self.Response(self.boto_client.get_secret_value(SecretId=self.get_aws_secret_name))
+            r_secrets = self.Response(self._boto_client.get_secret_value(SecretId=self.get_aws_secret_name))
             self._secrets_map = r_secrets.secret_json
             return self._secrets_map[secret_name]
         except ClientError as e:
@@ -48,16 +48,6 @@ class SecretsManager:
             # For a list of exceptions thrown, see
             # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
             raise exceptions.SecretsManagerException(e)
-
-    @property
-    def boto_client(self):
-        if not self._boto_client:
-            self._boto_client = boto3.client('secretsmanager')
-        return self._boto_client
-
-    @boto_client.setter
-    def boto_client(self, value):
-        self._boto_client = value
 
     def get_aws_secret_name(self) -> str:
         if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME):

@@ -6,6 +6,7 @@ from unittest.mock import PropertyMock
 from botocore.stub import Stubber
 
 from py_aws_core import utils
+from py_aws_core.boto_clients import SecretManagerClientFactory
 from py_aws_core.secrets_manager import SecretsManager
 from tests import const as test_const
 
@@ -14,19 +15,24 @@ class SecretsManagerTests(TestCase):
     @mock.patch.object(utils, 'get_environment_variable')
     def test_get_secret_env_var(self, mocked_get_env_var):
         mocked_get_env_var.return_value = 'TEST_VAL_1'
-        sm = SecretsManager()
-        stubber = Stubber(sm.boto_client)
+        boto_client = SecretManagerClientFactory.new_client()
+
+        stubber = Stubber(boto_client)
         stubber.activate()
+
+        sm = SecretsManager(boto_client=boto_client)
         val = sm.get_secret(secret_name='TEST_KEY_1')
         self.assertEqual('TEST_VAL_1', val)
 
     @mock.patch.object(SecretsManager, new_callable=PropertyMock, attribute='get_aws_secret_name')
     def test_get_secret_caching(self, mock_get_aws_secret_name):
         mock_get_aws_secret_name.return_value = 'TEST_VAL_2'
+        boto_client = SecretManagerClientFactory.new_client()
 
-        sm = SecretsManager()
-        stubber = Stubber(sm.boto_client)
+        stubber = Stubber(boto_client)
         stubber.activate()
+
+        sm = SecretsManager(boto_client=boto_client)
         source = test_const.TEST_SECRETS_MANAGER_RESOURCES_PATH.joinpath('get_secret_value.json')
         with as_file(source) as admin_create_user_json:
             stubber.add_response('get_secret_value', json.loads(admin_create_user_json.read_text(encoding='utf-8')))

@@ -5,44 +5,17 @@ from dataclasses import dataclass
 import boto3
 from boto3.dynamodb import types
 from botocore.client import BaseClient
-from botocore.config import Config
 
 from py_aws_core import const, logs, utils
 
 logger = logs.get_logger()
 
-DDB_CLIENT_CONNECT_TIMEOUT = 4.9
-DDB_CLIENT_READ_TIMEOUT = 4.9
-
 
 class DDBClient:
-    __config = Config(
-        connect_timeout=DDB_CLIENT_CONNECT_TIMEOUT,
-        read_timeout=DDB_CLIENT_READ_TIMEOUT,
-        tcp_keepalive=True,  # Keep TCP connections open for faster response
-        retries=dict(
-            total_max_attempts=2,
-        )
-    )
-    __boto3_session = boto3.Session()
-
     def __init__(self, boto_client: BaseClient, dynamodb_table_name: str):
         self._boto_client = boto_client
         self._dynamodb_table_name = dynamodb_table_name
         self._table_resource = self.get_new_table_resource()
-
-    @classmethod
-    def get_new_client(cls):
-        logger.info(f'Getting new DynamoDB client')
-        return cls.__boto3_session.client(
-            config=cls.__config,
-            service_name='dynamodb',
-            verify=False  # Don't validate SSL certs for faster responses
-        )
-
-    # def get_table_name(cls):
-        # return cls._dynamodb_table_name
-        # return secrets_manager.get_secret(secret_name='AWS_DYNAMO_DB_TABLE_NAME')
 
     def get_new_table_resource(self):
         dynamodb = boto3.resource('dynamodb')
