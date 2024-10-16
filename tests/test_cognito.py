@@ -1,25 +1,25 @@
 import json
 from importlib.resources import as_file
-from unittest import mock, TestCase
 
 from botocore.stub import Stubber
 
-from py_aws_core import cognito
-from tests import const as test_const
+from py_aws_core import cognito_service
+from py_aws_core.boto_clients import CognitoClientFactory
+from py_aws_core.testing import BaseTestFixture
 
 
-class AdminCreateUserTests(TestCase):
+class AdminCreateUserTests(BaseTestFixture):
     def test_ok(self):
-        source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('admin_create_user.json')
-        cog_client = cognito.CognitoClient()
+        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('admin_create_user.json')
         with as_file(source) as admin_create_user_json:
-            stubber = Stubber(cog_client.boto_client)
+            boto_client = CognitoClientFactory.new_client()
+            stubber = Stubber(boto_client)
             stubber.activate()
             stubber.add_response('admin_create_user', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
 
-        r_call = cognito.AdminCreateUser.call(
-            client=cog_client,
-            cognito_pool_id=test_const.TEST_COGNITO_POOL_ID,
+        r_call = cognito_service.AdminCreateUser.call(
+            boto_client=boto_client,
+            cognito_pool_id=self.TEST_COGNITO_POOL_ID,
             username='thecreator44',
             user_attributes=[
                 {
@@ -40,18 +40,18 @@ class AdminCreateUserTests(TestCase):
         self.assertEqual(r_call.User.Username, 'string')
 
 
-class UserPasswordAuthTests(TestCase):
+class UserPasswordAuthTests(BaseTestFixture):
     def test_ok(self):
-        source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
-        cog_client = cognito.CognitoClient()
+        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
         with as_file(source) as initiate_auth_json:
-            stubber = Stubber(cog_client.boto_client)
+            boto_client = CognitoClientFactory.new_client()
+            stubber = Stubber(boto_client)
             stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
 
-        r_call = cognito.UserPasswordAuth.call(
-            client=cog_client,
-            cognito_pool_client_id=test_const.TEST_COGNITO_POOL_CLIENT_ID,
+        r_call = cognito_service.UserPasswordAuth.call(
+            boto_client=boto_client,
+            cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             username='thecreator44',
             password='pw123'
         )
@@ -60,18 +60,18 @@ class UserPasswordAuthTests(TestCase):
         self.assertEqual(r_call.AuthenticationResult.IdToken, 'eyJraWQiOiJzNndrcytDXC84WGxNOVF2OHNYeVhGczNjV1VsOVFwVzZsdE9rMGt5R2dDVT0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIzZTYyYzNjOC00OTcwLTRmYzctYTk5Ni04NjhkNGMxMzk3ZjYiLCJjdXN0b206cm9sZXMiOiJTVVBFUlVTRVIsTUVNQkVSLFNUQUZGIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtd2VzdC0yX0N4VlFXNU1wVSIsImN1c3RvbTpncm91cCI6Indob2FkZXJlanIiLCJjb2duaXRvOnVzZXJuYW1lIjoiaGVsbG9tb3RvIiwib3JpZ2luX2p0aSI6IjAyOTlmN2U2LWRiN2ItNDczZi04NmI4LTkzYWRjYTIwZDUwZSIsImF1ZCI6IjdtdWR1dGdiZGViY2g2YWVoMjF1ZXEyaDFtIiwiZXZlbnRfaWQiOiIxMTY0MTZhNC0wMTdhLTRjMmItYjkzYS1jZmRkYmFlMmM2MjciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTcxNTc4NTM0OCwiZXhwIjoxNzE1Nzg4OTQ4LCJpYXQiOjE3MTU3ODUzNDgsImp0aSI6IjhiMTJmMGQ2LTIyN2UtNDg2Mi1hMGY2LTIxMzEwNjFlMjg4NSIsImVtYWlsIjoiYWRyaWFuQHJ5ZGVhcy5jb20ifQ.fnMRLUYuzVe2cFPnDSrZXhT34bV8SY6SpXqmCtMbwXcFep13JleLdgQ52HNlR8d0OSF26yw612jCXg8DIHV6IxP7miazovAESF1nBrBpYXV70oXeXmi_6UJ6cYxr9XT4cG6iigsJufrc6LvEl_9iOGnvstotrSD_N0hsfpZG0QTeMY8odZIz71_eGFsJqtsIQFZMrAOqRfOxGf1Xnj0AhM9zf5amGAyWpmxKnRVDl2RFi-ZFhellzFZMcQMjawz-CBFQz5lXac-pukiWJgjTjx4macQl7d-7_kDnQWf_aIgsW27SEQKtc9Z885zubAkEXokbbpk1QUEKUtl5TR2EPQ')
 
 
-class RefreshTokenAuthTests(TestCase):
+class RefreshTokenAuthTests(BaseTestFixture):
     def test_ok(self):
-        source = test_const.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
-        cog_client = cognito.CognitoClient()
+        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
         with as_file(source) as initiate_auth_json:
-            stubber = Stubber(cog_client.boto_client)
+            boto_client = CognitoClientFactory.new_client()
+            stubber = Stubber(boto_client)
             stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
 
-        r_call = cognito.RefreshTokenAuth.call(
-            client=cog_client,
-            cognito_pool_client_id=test_const.TEST_COGNITO_POOL_CLIENT_ID,
+        r_call = cognito_service.RefreshTokenAuth.call(
+            boto_client=boto_client,
+            cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             refresh_token='eifuhwseduivfavhwveci',
         )
 

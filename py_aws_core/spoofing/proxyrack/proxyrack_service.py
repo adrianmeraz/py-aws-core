@@ -1,16 +1,15 @@
 import typing
 
 from py_aws_core import logs
-from py_aws_core.spoofing.backends import ProxyBackend
+from py_aws_core.spoofing.proxy_interface import IProxy
 from py_aws_core.spoofing.proxyrack import const, utils
 
 logger = logs.get_logger()
 
 
-class ProxyRackProxyBackend(ProxyBackend):
-    @classmethod
+class ProxyRackService(IProxy):
     def get_proxy_url(
-        cls,
+        self,
         netloc: str,
         cities: typing.List[str] = None,
         country: str = None,
@@ -30,8 +29,8 @@ class ProxyRackProxyBackend(ProxyBackend):
             refresh_minutes=60
         )
         return utils.ProxyBuilder(
-            username=cls.get_proxy_username(),
-            password=cls.get_proxy_password(),
+            username=self.proxy_username,
+            password=self.proxy_password,
             netloc=netloc,
             config=config
         ).http_url

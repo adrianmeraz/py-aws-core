@@ -1,15 +1,15 @@
-import json
 from http.cookiejar import CookieJar
-from importlib.resources import as_file
 from unittest import mock
 
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
 from py_aws_core import entities, exceptions
+from py_aws_core.boto_clients import DynamoDBClientFactory
 from py_aws_core.clients import RetryClient, SessionPersistClient
+from py_aws_core.db_service import DatabaseService
+from py_aws_core.dynamodb_service import DynamoDBService
 from py_aws_core.exceptions import APIException
 from py_aws_core.testing import BaseTestFixture
-from tests import const as test_const
 
 
 class RetryClientTests(BaseTestFixture):
@@ -114,11 +114,14 @@ class SessionPersistClientTests(BaseTestFixture):
     ):
         mocked_write_session.return_value = True
 
-        session_json = self.get_resource_json('db#get_session_item.json', path=test_const.TEST_DB_RESOURCES_PATH)
+        session_json = self.get_resource_json('db#get_session_item.json', path=self.TEST_DB_RESOURCES_PATH)
         session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
         mocked_read_session.return_value = entities.Session(session_json['Item'])
 
-        with SessionPersistClient() as client:
+        boto_client = DynamoDBClientFactory.new_client()
+        dynamodb_client = DynamoDBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
+        db_service = DatabaseService(dynamodb_client=dynamodb_client)
+        with SessionPersistClient(db_service=db_service) as client:
             self.assertEqual(len(client.cookies.jar), 0)
 
         self.assertEqual(mocked_write_session.call_count, 1)

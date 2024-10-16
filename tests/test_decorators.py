@@ -6,10 +6,10 @@ from botocore.exceptions import ClientError
 from httpx import HTTPStatusError, Request, Response
 
 from py_aws_core import decorators, exceptions
-from tests import const as test_const
+from py_aws_core.testing import BaseTestFixture
 
 
-class Boto3Tests(TestCase):
+class Boto3Tests(BaseTestFixture):
 
     def test_no_exception(self):
         @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=dict())
@@ -23,7 +23,7 @@ class Boto3Tests(TestCase):
         )
 
     def test_raise_mapped_client_error(self):
-        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
+        source = self.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
         with as_file(source) as err_json:
             err_json = json.loads(err_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
@@ -39,7 +39,7 @@ class Boto3Tests(TestCase):
             func()
 
     def test_raise_unmapped_client_error(self):
-        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
+        source = self.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
         with as_file(source) as err_json:
             err_json = json.loads(err_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
@@ -62,7 +62,7 @@ class Boto3Tests(TestCase):
             func()
 
 
-class DynamodbHandlerTests(TestCase):
+class DynamodbHandlerTests(BaseTestFixture):
 
     @classmethod
     def setUpClass(cls):
@@ -82,7 +82,7 @@ class DynamodbHandlerTests(TestCase):
         )
 
     def test_raise_client_error(self):
-        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
+        source = self.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
         with as_file(source) as err_json:
             err_json = json.loads(err_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
@@ -94,7 +94,7 @@ class DynamodbHandlerTests(TestCase):
             func()
 
     def test_raise_cancellation_error(self):
-        source = test_const.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error#ConditionalCheckFailed.json')
+        source = self.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error#ConditionalCheckFailed.json')
         with as_file(source) as initiate_auth_json:
             err_json = json.loads(initiate_auth_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')

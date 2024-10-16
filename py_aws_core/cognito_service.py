@@ -1,63 +1,11 @@
 import typing
 from abc import ABC
 
-import boto3
-from botocore.config import Config
+from botocore.client import BaseClient
 
 from py_aws_core import logs
-from py_aws_core.secrets_manager import get_secrets_manager
 
 logger = logs.get_logger()
-secrets_manager = get_secrets_manager()
-
-COGNITO_CLIENT_CONNECT_TIMEOUT = 4.9
-COGNITO_CLIENT_READ_TIMEOUT = 4.9
-
-
-class CognitoClient:
-    __CONFIG = Config(
-        connect_timeout=COGNITO_CLIENT_CONNECT_TIMEOUT,
-        read_timeout=COGNITO_CLIENT_READ_TIMEOUT,
-        retries=dict(
-            total_max_attempts=2,
-        )
-    )
-    __boto3_session = boto3.Session()
-
-    def __init__(self):
-        self._boto_client = None
-
-    @property
-    def boto_client(self):
-        if not self._boto_client:
-            self._boto_client = self.get_new_client()
-        return self._boto_client
-
-    @boto_client.setter
-    def boto_client(self, value):
-        self._boto_client = value
-
-    @classmethod
-    def get_aws_cognito_pool_client_id(cls):
-        return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_CLIENT_ID')
-
-    @classmethod
-    def get_aws_cognito_pool_id(cls):
-        return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_ID')
-
-    @classmethod
-    def get_new_client(cls):
-        logger.info(f'Getting new Cognito client')
-        return cls.__boto3_session.client(
-            config=cls.__CONFIG,
-            service_name='cognito-idp',
-        )
-
-    def admin_create_user(self, *args, **kwargs):
-        return self.boto_client.admin_create_user(*args, **kwargs)
-
-    def initiate_auth(self, *args, **kwargs):
-        return self.boto_client.initiate_auth(*args, **kwargs)
 
 
 class AdminCreateUser:
@@ -88,13 +36,13 @@ class AdminCreateUser:
     @classmethod
     def call(
         cls,
-        client: CognitoClient,
+        boto_client: BaseClient,
         cognito_pool_id: str,
         username: str,
         user_attributes: typing.List[typing.Dict],
         desired_delivery_mediums: typing.List[str],
     ):
-        response = client.admin_create_user(
+        response = boto_client.admin_create_user(
             DesiredDeliveryMediums=desired_delivery_mediums,
             Username=username,
             UserAttributes=user_attributes,
@@ -131,13 +79,13 @@ class UserPasswordAuth(ABCInitiateAuth):
     @classmethod
     def call(
         cls,
-        client: CognitoClient,
+        boto_client: BaseClient,
         cognito_pool_client_id: str,
         username: str,
         password: str,
 
     ):
-        response = client.initiate_auth(
+        response = boto_client.initiate_auth(
             AuthFlow='USER_PASSWORD_AUTH',
             AuthParameters={
                 'USERNAME': username,
@@ -152,11 +100,11 @@ class RefreshTokenAuth(ABCInitiateAuth):
     @classmethod
     def call(
         cls,
-        client: CognitoClient,
+        boto_client: BaseClient,
         cognito_pool_client_id: str,
         refresh_token: str,
     ):
-        response = client.initiate_auth(
+        response = boto_client.initiate_auth(
             AuthFlow='REFRESH_TOKEN',
             AuthParameters={
                 'REFRESH_TOKEN': refresh_token,
