@@ -2,17 +2,18 @@ import random
 from abc import ABC, abstractmethod
 
 from py_aws_core import logs
-from py_aws_core.secrets_manager import SecretsManager
 from . import const
 
 logger = logs.get_logger()
-secrets_manager = SecretsManager()
 
 
 class IProxy(ABC):
-    @classmethod
+    def __init__(self, proxy_username: str, proxy_password: str):
+        self._proxy_username = proxy_username
+        self._proxy_password = proxy_password
+
     @abstractmethod
-    def get_proxy_url(cls, **kwargs) -> str:
+    def get_proxy_url(self, **kwargs) -> str:
         raise NotImplemented
 
     @staticmethod
@@ -20,10 +21,10 @@ class IProxy(ABC):
         countries, weights = zip(const.PROXY_COUNTRY_WEIGHTS)
         return random.choices(population=countries, weights=weights, k=1)[0]
 
-    @classmethod
-    def get_proxy_password(cls):
-        return secrets_manager.get_secret(secret_name='PROXY_PASSWORD')
+    @property
+    def proxy_username(self):
+        return self._proxy_username
 
-    @classmethod
-    def get_proxy_username(cls):
-        return secrets_manager.get_secret(secret_name='PROXY_USERNAME')
+    @property
+    def proxy_password(self):
+        return self._proxy_password

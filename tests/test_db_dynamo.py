@@ -1,14 +1,14 @@
 import datetime
 import json
 from importlib.resources import as_file
-from unittest import mock, TestCase
+from unittest import mock
 
-from py_aws_core import const, db_dynamo, utils
-from py_aws_core.db_dynamo import DDBClient, DDBItemResponse, ABCCommonAPI
-from tests import const as test_const
+from py_aws_core import const, utils
+from py_aws_core.dynamodb_service import DynamoDBService, DDBItemResponse, ABCCommonAPI
+from py_aws_core.testing import BaseTestFixture
 
 
-class ABCCommonAPITests(TestCase):
+class ABCCommonAPITests(BaseTestFixture):
     @mock.patch.object(utils, 'get_now_datetime')
     def test_calc_expire_at_timestamp(self, mocked_get_now_datetime):
         dt = datetime.datetime(year=2003, month=9, day=5, hour=15, minute=33, second=28, tzinfo=datetime.timezone.utc)
@@ -22,9 +22,9 @@ class ABCCommonAPITests(TestCase):
         val = ABCCommonAPI.calc_expire_at_timestamp(expire_in_seconds=None)
         self.assertEqual(val, '')
 
-    @mock.patch.object(DDBClient, 'get_item')
+    @mock.patch.object(DynamoDBService, 'get_item')
     def test_get_item_empty(self, mocked_get_item):
-        source = test_const.TEST_DB_RESOURCES_PATH.joinpath('db#get_item#empty.json')
+        source = self.TEST_DB_RESOURCES_PATH.joinpath('db#get_item#empty.json')
         with as_file(source) as get_item:
             _json = json.loads(get_item.read_text(encoding='utf-8'))
             mocked_get_item.return_value = _json

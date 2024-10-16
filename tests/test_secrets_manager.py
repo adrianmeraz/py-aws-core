@@ -1,6 +1,6 @@
 import json
 from importlib.resources import as_file
-from unittest import mock, TestCase
+from unittest import mock
 from unittest.mock import PropertyMock
 
 from botocore.stub import Stubber
@@ -8,10 +8,10 @@ from botocore.stub import Stubber
 from py_aws_core import utils
 from py_aws_core.boto_clients import SecretManagerClientFactory
 from py_aws_core.secrets_manager import SecretsManager
-from tests import const as test_const
+from py_aws_core.testing import BaseTestFixture
 
 
-class SecretsManagerTests(TestCase):
+class SecretsManagerTests(BaseTestFixture):
     @mock.patch.object(utils, 'get_environment_variable')
     def test_get_secret_env_var(self, mocked_get_env_var):
         mocked_get_env_var.return_value = 'TEST_VAL_1'
@@ -33,7 +33,7 @@ class SecretsManagerTests(TestCase):
         stubber.activate()
 
         sm = SecretsManager(boto_client=boto_client)
-        source = test_const.TEST_SECRETS_MANAGER_RESOURCES_PATH.joinpath('get_secret_value.json')
+        source = self.TEST_SECRETS_MANAGER_RESOURCES_PATH.joinpath('get_secret_value.json')
         with as_file(source) as admin_create_user_json:
             stubber.add_response('get_secret_value', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
             val = sm.get_secret(secret_name='test_key_1')

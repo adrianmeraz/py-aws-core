@@ -11,7 +11,7 @@ from py_aws_core import const, logs, utils
 logger = logs.get_logger()
 
 
-class DDBClient:
+class DynamoDBService:
     def __init__(self, boto_client: BaseClient, dynamodb_table_name: str):
         self._boto_client = boto_client
         self._dynamodb_table_name = dynamodb_table_name

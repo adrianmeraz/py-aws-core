@@ -1,10 +1,10 @@
-from py_aws_core import const, decorators, db_dynamo, entities, exceptions, logs
-from py_aws_core.db_dynamo import DDBClient, DDBItemResponse, UpdateItemResponse
+from py_aws_core import const, decorators, dynamodb_service, entities, exceptions, logs
+from py_aws_core.dynamodb_service import DynamoDBService, DDBItemResponse, UpdateItemResponse
 
 logger = logs.get_logger()
 
 
-class SessionDDBAPI(db_dynamo.ABCCommonAPI):
+class SessionDDBAPI(dynamodb_service.ABCCommonAPI):
     pass
 
 
@@ -16,7 +16,7 @@ class GetOrCreateSession(SessionDDBAPI):
 
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DDBClient, session_id: str):
+    def call(cls, db_client: DynamoDBService, session_id: str):
         pk = sk = entities.Session.create_key(_id=session_id)
         _type = entities.Session.type()
         now = cls.iso_8601_now_timestamp()
@@ -62,7 +62,7 @@ class GetSessionItem(SessionDDBAPI):
 
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DDBClient, session_id: str) -> Response:
+    def call(cls, db_client: DynamoDBService, session_id: str) -> Response:
         pk = sk = entities.Session.create_key(_id=session_id)
         response = db_client.get_item(
             Key={
@@ -83,7 +83,7 @@ class GetSessionItem(SessionDDBAPI):
 class PutSession(SessionDDBAPI):
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DDBClient, session_id: str, b64_cookies: bytes):
+    def call(cls, db_client: DynamoDBService, session_id: str, b64_cookies: bytes):
         pk = sk = entities.Session.create_key(_id=session_id)
         _type = entities.Session.type()
         item = cls.get_put_item_map(
@@ -111,7 +111,7 @@ class UpdateSessionCookies(SessionDDBAPI):
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
     def call(
         cls,
-        db_client: DDBClient,
+        db_client: DynamoDBService,
         session_id: str,
         b64_cookies: bytes
     ):

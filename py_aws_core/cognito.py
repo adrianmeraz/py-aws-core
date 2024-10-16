@@ -1,48 +1,18 @@
 import typing
 from abc import ABC
 
-import boto3
-from botocore.config import Config
 from botocore.client import BaseClient
 
 from py_aws_core import logs
-from py_aws_core.secrets_manager import SecretsManager
 
 logger = logs.get_logger()
-secrets_manager = SecretsManager()
-
-COGNITO_CLIENT_CONNECT_TIMEOUT = 4.9
-COGNITO_CLIENT_READ_TIMEOUT = 4.9
 
 
 class CognitoClient:
-    __CONFIG = Config(
-        connect_timeout=COGNITO_CLIENT_CONNECT_TIMEOUT,
-        read_timeout=COGNITO_CLIENT_READ_TIMEOUT,
-        retries=dict(
-            total_max_attempts=2,
-        )
-    )
-    __boto3_session = boto3.Session()
-
-    def __init__(self, boto_client: BaseClient):
+    def __init__(self, boto_client: BaseClient, cognito_pool_client_id: str, cognito_pool_id: str):
         self._boto_client = boto_client
-
-    @classmethod
-    def get_aws_cognito_pool_client_id(cls):
-        return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_CLIENT_ID')
-
-    @classmethod
-    def get_aws_cognito_pool_id(cls):
-        return secrets_manager.get_secret(secret_name='AWS_COGNITO_POOL_ID')
-
-    @classmethod
-    def get_new_client(cls):
-        logger.info(f'Getting new Cognito client')
-        return cls.__boto3_session.client(
-            config=cls.__CONFIG,
-            service_name='cognito-idp',
-        )
+        self._cognito_pool_client_id = cognito_pool_client_id
+        self._cognito_pool_id = cognito_pool_id
 
     def admin_create_user(self, *args, **kwargs):
         return self._boto_client.admin_create_user(*args, **kwargs)

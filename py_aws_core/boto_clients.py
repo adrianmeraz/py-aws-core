@@ -1,9 +1,8 @@
-from botocore.config import Config
-from botocore.client import BaseClient
+from abc import ABC, abstractmethod
 
 import boto3
-
-from abc import ABC, abstractmethod
+from botocore.client import BaseClient
+from botocore.config import Config
 
 
 class ABCBotoClientFactory(ABC):
@@ -18,18 +17,21 @@ class ABCBotoClientFactory(ABC):
         pass
 
     @classmethod
-    def client_connect_timeout(cls):
-        return cls.CLIENT_CONNECT_TIMEOUT
-
-    @classmethod
-    def client_read_timeout(cls):
-        return cls.CLIENT_READ_TIMEOUT
+    def get_config(cls):
+        return Config(
+            connect_timeout=cls.CLIENT_CONNECT_TIMEOUT,
+            read_timeout=cls.CLIENT_READ_TIMEOUT,
+            retries=dict(
+                total_max_attempts=2,
+            )
+        )
 
 
 class CognitoClientFactory(ABCBotoClientFactory):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
+            config=cls.get_config(),
             service_name='cognito-idp',
         )
 
@@ -41,16 +43,6 @@ class DynamoDBClientFactory(ABCBotoClientFactory):
             config=cls.get_config(),
             service_name='dynamodb',
             verify=False  # Don't validate SSL certs for faster responses
-        )
-
-    @classmethod
-    def get_config(cls):
-        return Config(
-            connect_timeout=cls.CLIENT_CONNECT_TIMEOUT,
-            read_timeout=cls.CLIENT_READ_TIMEOUT,
-            retries=dict(
-                total_max_attempts=2,
-            )
         )
 
 

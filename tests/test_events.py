@@ -1,15 +1,15 @@
 import json
 import time
 from importlib.resources import as_file
-from unittest import mock, TestCase
+from unittest import mock
 
 from py_aws_core import events
-from tests import const as test_const
+from py_aws_core.testing import BaseTestFixture
 
 
-class DBEncoderTests(TestCase):
+class DBEncoderTests(BaseTestFixture):
     def test_serialize_to_json(self):
-        source = test_const.TEST_LAMBDA_RESOURCES_PATH.joinpath('event#api_gateway.json')
+        source = self.TEST_LAMBDA_RESOURCES_PATH.joinpath('event#api_gateway.json')
         with as_file(source) as event_json:
             mock_event = events.LambdaEvent(json.loads(event_json.read_text()))
 
@@ -21,7 +21,7 @@ class DBEncoderTests(TestCase):
         self.assertEqual('owufix3875.execute-api.us-west-2.amazonaws.com', mock_event.request_context.domain_name)
 
     def test_multi_value_headers(self):
-        source = test_const.TEST_LAMBDA_RESOURCES_PATH.joinpath('event#api_gateway.json')
+        source = self.TEST_LAMBDA_RESOURCES_PATH.joinpath('event#api_gateway.json')
         with as_file(source) as event_json:
             mock_event = events.LambdaEvent(json.loads(event_json.read_text()))
 
@@ -43,7 +43,7 @@ class DBEncoderTests(TestCase):
     def test_cookies(self, mocked_time):
         mocked_time.return_value = 1062776008  # Fri, 05 Sep 2003 15:33:28 GMT
 
-        source = test_const.TEST_LAMBDA_RESOURCES_PATH.joinpath('event#api_gateway.json')
+        source = self.TEST_LAMBDA_RESOURCES_PATH.joinpath('event#api_gateway.json')
         with as_file(source) as event_json:
             mock_event = events.LambdaEvent(json.loads(event_json.read_text()))
 
