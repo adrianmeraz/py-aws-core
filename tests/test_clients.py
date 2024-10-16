@@ -7,7 +7,7 @@ from py_aws_core import entities, exceptions
 from py_aws_core.boto_clients import DynamoDBClientFactory
 from py_aws_core.clients import RetryClient, SessionPersistClient
 from py_aws_core.db_service import DatabaseService
-from py_aws_core.dynamodb_service import DynamoDBService
+from py_aws_core.dynamodb_service import DynamoDBClient
 from py_aws_core.exceptions import APIException
 from py_aws_core.testing import BaseTestFixture
 
@@ -119,7 +119,7 @@ class SessionPersistClientTests(BaseTestFixture):
         mocked_read_session.return_value = entities.Session(session_json['Item'])
 
         boto_client = DynamoDBClientFactory.new_client()
-        dynamodb_client = DynamoDBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
+        dynamodb_client = DynamoDBClient(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         db_service = DatabaseService(dynamodb_client=dynamodb_client)
         with SessionPersistClient(db_service=db_service) as client:
             self.assertEqual(len(client.cookies.jar), 0)

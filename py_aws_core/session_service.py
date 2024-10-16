@@ -1,137 +1,44 @@
-from py_aws_core import const, decorators, dynamodb_service, entities, exceptions, logs
-from py_aws_core.dynamodb_service import DynamoDBService, DDBItemResponse, UpdateItemResponse
+from botocore.client import BaseClient
+
+from py_aws_core import const, dynamodb_api, logs, utils
 
 logger = logs.get_logger()
 
 
-class SessionService(DynamoDBService):
+class SessionService:
+    def __init__(self, boto_client: BaseClient, dynamodb_table_name: str):
+        self._boto_client = boto_client
+        self._dynamodb_table_name = dynamodb_table_name
+
     def get_or_create_session(self, session_id: str):
-        return GetOrCreateSession.call(session_id=session_id)
-
-
-class GetOrCreateSession(SessionService):
-    class Response(UpdateItemResponse):
-        @property
-        def session(self) -> entities.Session:
-            return entities.Session(data=self.attributes)
-
-    @classmethod
-    @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DynamoDBService, session_id: str):
-        pk = sk = entities.Session.create_key(_id=session_id)
-        _type = entities.Session.type()
-        now = cls.iso_8601_now_timestamp()
-        update_fields = [
-            cls.UpdateField(expression_attr='ty'),
-            cls.UpdateField(expression_attr='si'),
-            cls.UpdateField(expression_attr='ma'),
-            cls.UpdateField(expression_attr='ea', set_once=True),
-            cls.UpdateField(expression_attr='ca', set_once=True),
-        ]
-        response = db_client.update_item(
-            Key={
-                'PK': {'S': pk},
-                'SK': {'S': sk},
-            },
-            UpdateExpression=cls.build_update_expression(update_fields),
-            ExpressionAttributeNames={
-                '#ty': 'Type',
-                "#si": 'SessionId',
-                '#ca': 'CreatedAt',
-                '#ma': 'ModifiedAt',
-                '#ea': 'ExpiresAt',
-            },
-            ExpressionAttributeValues=cls.serialize_types({
-                ':ty': _type,
-                ':si': session_id,
-                ':ca': now,
-                ':ma': now,
-                ':ea': cls.calc_expire_at_timestamp(expire_in_seconds=const.DB_DEFAULT_EXPIRES_IN_SECONDS),
-            }),
-            ReturnValues='ALL_NEW'
+        return dynamodb_api.GetOrCreateSession.call(
+            boto_client=self._boto_client,
+            table_name=self._dynamodb_table_name,
+            session_id=session_id,
+            created_at_datetime=utils.to_iso_8601(),
+            expires_at=dynamodb_api.calc_expire_at_timestamp(expire_in_seconds=const.DB_DEFAULT_EXPIRES_IN_SECONDS)
         )
 
-        logger.debug(f'response: {response}')
-        return cls.Response(response)
-
-
-class GetSessionItem(SessionDDBAPI):
-    class Response(DDBItemResponse):
-        @property
-        def session(self) -> entities.Session:
-            return entities.Session(data=self.Item)
-
-    @classmethod
-    @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DynamoDBService, session_id: str) -> Response:
-        pk = sk = entities.Session.create_key(_id=session_id)
-        response = db_client.get_item(
-            Key={
-                'PK': {'S': pk},
-                'SK': {'S': sk}
-            },
-            ExpressionAttributeNames={
-                "#pk": "PK",
-                "#bc": "Base64Cookies",
-                "#tp": "Type"
-            },
-            ProjectionExpression='#pk, #bc, #tp'
+    def get_session_item(self, session_id: str):
+        return dynamodb_api.GetSessionItem.call(
+            boto_client=self._boto_client,
+            table_name=self._dynamodb_table_name,
+            session_id=session_id
         )
-        logger.debug(f'response: {response}')
-        return cls.Response(response)
 
-
-class PutSession(SessionDDBAPI):
-    @classmethod
-    @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(cls, db_client: DynamoDBService, session_id: str, b64_cookies: bytes):
-        pk = sk = entities.Session.create_key(_id=session_id)
-        _type = entities.Session.type()
-        item = cls.get_put_item_map(
-            pk=pk,
-            sk=sk,
-            _type=_type,
-            expire_in_seconds=None,
-            Base64Cookies=b64_cookies,
-            SessionId=session_id
+    def put_session_item(self, session_id: str, b64_cookies: bytes):
+        return dynamodb_api.PutSession.call(
+            boto_client=self._boto_client,
+            table_name=self._dynamodb_table_name,
+            session_id=session_id,
+            b64_cookies=b64_cookies
         )
-        response = db_client.put_item(
-            Item=item,
+
+    def update_session_cookies(self, session_id: str, b64_cookies: bytes):
+        return dynamodb_api.UpdateSessionCookies.call(
+            boto_client=self._boto_client,
+            table_name=self._dynamodb_table_name,
+            session_id=session_id,
+            b64_cookies=b64_cookies,
+            now_datetime=utils.to_iso_8601()
         )
-        logger.debug(f'response: {response}')
-        return response
-
-
-class UpdateSessionCookies(SessionDDBAPI):
-    class Response(UpdateItemResponse):
-        @property
-        def session(self) -> entities.Session:
-            return entities.Session(self.attributes)
-
-    @classmethod
-    @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
-    def call(
-        cls,
-        db_client: DynamoDBService,
-        session_id: str,
-        b64_cookies: bytes
-    ):
-        pk = sk = entities.Session.create_key(_id=session_id)
-        response = db_client.update_item(
-            Key={
-                'PK': {'S': pk},
-                'SK': {'S': sk},
-            },
-            UpdateExpression='SET #b64 = :b64, #mda = :mda',
-            ExpressionAttributeNames={
-                '#b64': 'Base64Cookies',
-                '#mda': 'ModifiedAt',
-            },
-            ExpressionAttributeValues={
-                ':b64': {'B': b64_cookies},
-                ':mda': {'S': cls.iso_8601_now_timestamp()}
-            },
-            ReturnValues='ALL_NEW'
-        )
-        logger.debug(f'response: {response}')
-        return cls.Response(response)

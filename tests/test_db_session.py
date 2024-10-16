@@ -2,12 +2,12 @@ from unittest import mock
 
 from py_aws_core import session_service
 from py_aws_core.boto_clients import DynamoDBClientFactory
-from py_aws_core.dynamodb_service import DynamoDBService
+from py_aws_core.dynamodb_service import DynamoDBClient
 from py_aws_core.testing import BaseTestFixture
 
 
 class DBSessionTests(BaseTestFixture):
-    @mock.patch.object(DynamoDBService, 'update_item')
+    @mock.patch.object(DynamoDBClient, 'update_item')
     def test_update_session(self, mocked_update_item):
         session_json = self.get_resource_json('db#update_session.json', path=self.TEST_DB_RESOURCES_PATH)
         session_json['Attributes']['Base64Cookies']['B'] = self.to_utf8_bytes(
@@ -15,7 +15,7 @@ class DBSessionTests(BaseTestFixture):
         mocked_update_item.return_value = session_json
 
         boto_client = DynamoDBClientFactory.new_client()
-        db_client = DynamoDBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
+        db_client = DynamoDBClient(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         r_get_item = db_session.GetOrCreateSession.call(
             db_client=db_client,
             session_id='10c7676f77a34605b5ed76c210369c66',
@@ -26,7 +26,7 @@ class DBSessionTests(BaseTestFixture):
         self.assertEqual(len(session.SessionId.value), '10c7676f77a34605b5ed76c210369c66')
         self.assertEqual(mocked_update_item.call_count, 1)
 
-    @mock.patch.object(DynamoDBService, 'get_item')
+    @mock.patch.object(DynamoDBClient, 'get_item')
     def test_get_session_item(self, mocked_get_item):
 
         session_json = self.get_resource_json('db#get_session_item.json', path=self.TEST_DB_RESOURCES_PATH)
@@ -34,7 +34,7 @@ class DBSessionTests(BaseTestFixture):
         mocked_get_item.return_value = session_json
 
         boto_client = DynamoDBClientFactory.new_client()
-        db_client = DynamoDBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
+        db_client = DynamoDBClient(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         r_get_item = db_session.GetSessionItem.call(
             db_client=db_client,
             session_id='10c7676f77a34605b5ed76c210369c66'
@@ -42,14 +42,14 @@ class DBSessionTests(BaseTestFixture):
         self.assertEqual(len(r_get_item.session.Base64Cookies.value), 1241)
         self.assertEqual(mocked_get_item.call_count, 1)
 
-    @mock.patch.object(DynamoDBService, 'update_item')
+    @mock.patch.object(DynamoDBClient, 'update_item')
     def test_update_session(self, mocked_update_item):
         session_json = self.get_resource_json('db#update_session.json', path=self.TEST_DB_RESOURCES_PATH)
         session_json['Attributes']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Attributes']['Base64Cookies']['B'])
         mocked_update_item.return_value = session_json
 
         boto_client = DynamoDBClientFactory.new_client()
-        db_client = DynamoDBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
+        db_client = DynamoDBClient(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         r_get_item = db_session.UpdateSessionCookies.call(
             db_client=db_client,
             session_id='10c7676f77a34605b5ed76c210369c66',
