@@ -1,5 +1,5 @@
 from py_aws_core.dynamodb_service import DynamoDBService
-from . import logs, db_session, entities
+from . import logs, session_service, entities
 from .db_interface import IDatabase
 
 logger = logs.get_logger()

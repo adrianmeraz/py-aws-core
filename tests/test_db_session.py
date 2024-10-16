@@ -1,6 +1,6 @@
 from unittest import mock
 
-from py_aws_core import db_session
+from py_aws_core import session_service
 from py_aws_core.boto_clients import DynamoDBClientFactory
 from py_aws_core.dynamodb_service import DynamoDBService
 from py_aws_core.testing import BaseTestFixture

@@ -1,5 +1,4 @@
 import typing
-from abc import ABC
 from dataclasses import dataclass
 
 import boto3
@@ -12,6 +11,12 @@ logger = logs.get_logger()
 
 
 class DynamoDBService:
+    """
+        https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
+        If your primary key consists of both a partition key(pk) and a sort key(sk),
+        the parameter will check whether attribute_not_exists(pk) AND attribute_not_exists(sk) evaluate to true or
+        false before attempting the write operation.
+    """
     def __init__(self, boto_client: BaseClient, dynamodb_table_name: str):
         self._boto_client = boto_client
         self._dynamodb_table_name = dynamodb_table_name
@@ -54,14 +59,6 @@ class DynamoDBService:
     def write_maps_to_db(self, item_maps: typing.List[typing.Dict]) -> int:
         return self.batch_write_item_maps(item_maps=item_maps)
 
-
-class ABCCommonAPI(ABC):
-    """
-        https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
-        If your primary key consists of both a partition key(pk) and a sort key(sk),
-        the parameter will check whether attribute_not_exists(pk) AND attribute_not_exists(sk) evaluate to true or
-        false before attempting the write operation.
-    """
     @classmethod
     def get_batch_entity_create_map(
         cls,
@@ -158,7 +155,8 @@ class ABCCommonAPI(ABC):
     @staticmethod
     def build_update_expression(fields: typing.List[UpdateField]):
         n_fields = [f'#{f.expression_attr} = :{f.expression_attr}' for f in fields if not f.set_once]
-        o_fields = [f'#{f.expression_attr} = if_not_exists(#{f.expression_attr}, :{f.expression_attr})' for f in fields if f.set_once]
+        o_fields = [f'#{f.expression_attr} = if_not_exists(#{f.expression_attr}, :{f.expression_attr})' for f in fields
+                    if f.set_once]
         return f'SET {', '.join(n_fields + o_fields)}'
 
 

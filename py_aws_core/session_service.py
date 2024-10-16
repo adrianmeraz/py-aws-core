@@ -4,11 +4,12 @@ from py_aws_core.dynamodb_service import DynamoDBService, DDBItemResponse, Updat
 logger = logs.get_logger()
 
 
-class SessionDDBAPI(dynamodb_service.ABCCommonAPI):
-    pass
+class SessionService(DynamoDBService):
+    def get_or_create_session(self, session_id: str):
+        return GetOrCreateSession.call(session_id=session_id)
 
 
-class GetOrCreateSession(SessionDDBAPI):
+class GetOrCreateSession(SessionService):
     class Response(UpdateItemResponse):
         @property
         def session(self) -> entities.Session:

@@ -26,7 +26,7 @@ class BaseModel:
 
     @staticmethod
     def deserialize_data(data: dict) -> typing.Dict:
-        return dynamodb_service.ABCCommonAPI.deserialize_types(data)
+        return dynamodb_service.DynamoDBAPI.deserialize_types(data)
 
 
 class ABCEntity(ABC, BaseModel):
