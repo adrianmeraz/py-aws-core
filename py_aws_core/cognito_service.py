@@ -8,19 +8,6 @@ from py_aws_core import logs
 logger = logs.get_logger()
 
 
-class CognitoClient:
-    def __init__(self, boto_client: BaseClient, cognito_pool_client_id: str, cognito_pool_id: str):
-        self._boto_client = boto_client
-        self._cognito_pool_client_id = cognito_pool_client_id
-        self._cognito_pool_id = cognito_pool_id
-
-    def admin_create_user(self, *args, **kwargs):
-        return self._boto_client.admin_create_user(*args, **kwargs)
-
-    def initiate_auth(self, *args, **kwargs):
-        return self._boto_client.initiate_auth(*args, **kwargs)
-
-
 class AdminCreateUser:
     class Response:
         class User:
@@ -49,13 +36,13 @@ class AdminCreateUser:
     @classmethod
     def call(
         cls,
-        client: CognitoClient,
+        boto_client: BaseClient,
         cognito_pool_id: str,
         username: str,
         user_attributes: typing.List[typing.Dict],
         desired_delivery_mediums: typing.List[str],
     ):
-        response = client.admin_create_user(
+        response = boto_client.admin_create_user(
             DesiredDeliveryMediums=desired_delivery_mediums,
             Username=username,
             UserAttributes=user_attributes,
@@ -92,13 +79,13 @@ class UserPasswordAuth(ABCInitiateAuth):
     @classmethod
     def call(
         cls,
-        client: CognitoClient,
+        boto_client: BaseClient,
         cognito_pool_client_id: str,
         username: str,
         password: str,
 
     ):
-        response = client.initiate_auth(
+        response = boto_client.initiate_auth(
             AuthFlow='USER_PASSWORD_AUTH',
             AuthParameters={
                 'USERNAME': username,
@@ -113,11 +100,11 @@ class RefreshTokenAuth(ABCInitiateAuth):
     @classmethod
     def call(
         cls,
-        client: CognitoClient,
+        boto_client: BaseClient,
         cognito_pool_client_id: str,
         refresh_token: str,
     ):
-        response = client.initiate_auth(
+        response = boto_client.initiate_auth(
             AuthFlow='REFRESH_TOKEN',
             AuthParameters={
                 'REFRESH_TOKEN': refresh_token,

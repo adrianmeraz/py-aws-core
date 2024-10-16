@@ -5,7 +5,7 @@ from unittest import mock, TestCase
 from botocore.stub import Stubber
 from py_aws_core.boto_clients import CognitoClientFactory
 
-from py_aws_core import cognito
+from py_aws_core import cognito_service
 from py_aws_core.testing import BaseTestFixture
 
 
@@ -18,13 +18,8 @@ class AdminCreateUserTests(BaseTestFixture):
             stubber.activate()
             stubber.add_response('admin_create_user', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
 
-        cog_client = cognito.CognitoClient(
+        r_call = cognito_service.AdminCreateUser.call(
             boto_client=boto_client,
-            cognito_pool_id=self.TEST_COGNITO_POOL_ID,
-            cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID
-        )
-        r_call = cognito.AdminCreateUser.call(
-            client=cog_client,
             cognito_pool_id=self.TEST_COGNITO_POOL_ID,
             username='thecreator44',
             user_attributes=[
@@ -55,13 +50,8 @@ class UserPasswordAuthTests(BaseTestFixture):
             stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
 
-        cog_client = cognito.CognitoClient(
+        r_call = cognito_service.UserPasswordAuth.call(
             boto_client=boto_client,
-            cognito_pool_id=self.TEST_COGNITO_POOL_ID,
-            cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID
-        )
-        r_call = cognito.UserPasswordAuth.call(
-            client=cog_client,
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             username='thecreator44',
             password='pw123'
@@ -80,13 +70,8 @@ class RefreshTokenAuthTests(BaseTestFixture):
             stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
 
-        cog_client = cognito.CognitoClient(
+        r_call = cognito_service.RefreshTokenAuth.call(
             boto_client=boto_client,
-            cognito_pool_id=self.TEST_COGNITO_POOL_ID,
-            cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID
-        )
-        r_call = cognito.RefreshTokenAuth.call(
-            client=cog_client,
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             refresh_token='eifuhwseduivfavhwveci',
         )
