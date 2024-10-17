@@ -17,6 +17,11 @@ class ABCBotoClientFactory(ABC):
         pass
 
     @classmethod
+    @abstractmethod
+    def service_name(cls) -> str:
+        pass
+
+    @classmethod
     def get_config(cls):
         return Config(
             connect_timeout=cls.CLIENT_CONNECT_TIMEOUT,
@@ -26,14 +31,22 @@ class ABCBotoClientFactory(ABC):
             )
         )
 
+    @classmethod
+    def new_resource_client(cls):
+        return cls._boto3_session.resource(service_name=cls.service_name())
+
 
 class CognitoClientFactory(ABCBotoClientFactory):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
             config=cls.get_config(),
-            service_name='cognito-idp',
+            service_name=cls.service_name(),
         )
+
+    @classmethod
+    def service_name(cls) -> str:
+        return 'cognito-idp'
 
 
 class DynamoDBClientFactory(ABCBotoClientFactory):
@@ -41,14 +54,22 @@ class DynamoDBClientFactory(ABCBotoClientFactory):
     def new_client(cls):
         return cls._boto3_session.client(
             config=cls.get_config(),
-            service_name='dynamodb',
+            service_name=cls.service_name(),
             verify=False  # Don't validate SSL certs for faster responses
         )
+
+    @classmethod
+    def service_name(cls) -> str:
+        return 'dynamodb'
 
 
 class SecretManagerClientFactory(ABCBotoClientFactory):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
-            service_name='secretsmanager',
+            service_name=cls.service_name(),
         )
+
+    @classmethod
+    def service_name(cls) -> str:
+        return 'secretsmanager'
