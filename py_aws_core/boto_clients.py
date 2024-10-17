@@ -73,3 +73,15 @@ class SecretManagerClientFactory(ABCBotoClientFactory):
     @classmethod
     def _service_name(cls) -> str:
         return 'secretsmanager'
+
+
+class SSMClientFactory(ABCBotoClientFactory):
+    @classmethod
+    def new_client(cls):
+        return cls._boto3_session.client(
+            service_name=cls._service_name(),
+        )
+
+    @classmethod
+    def _service_name(cls) -> str:
+        return 'ssm'

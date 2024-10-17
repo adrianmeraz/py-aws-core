@@ -3,10 +3,10 @@ from importlib.resources import as_file
 from unittest import mock
 from unittest.mock import PropertyMock
 
-import boto3
 from botocore.stub import Stubber
 
 from py_aws_core import utils
+from py_aws_core.boto_clients import SSMClientFactory
 from py_aws_core.ssm_parameter_store import SSMParameterStore
 from py_aws_core.testing import BaseTestFixture
 
@@ -15,7 +15,7 @@ class SSMParameterStoreTests(BaseTestFixture):
     @mock.patch.object(utils, 'get_environment_variable')
     def test_get_secret_env_var(self, mocked_get_env_var):
         mocked_get_env_var.return_value = 'TEST_VAL_1'
-        boto_client = boto3.client('ssm')
+        boto_client = SSMClientFactory.new_client()
 
         stubber = Stubber(boto_client)
         stubber.activate()
@@ -27,7 +27,7 @@ class SSMParameterStoreTests(BaseTestFixture):
     @mock.patch.object(SSMParameterStore, new_callable=PropertyMock, attribute='aws_secret_id')
     def test_get_secret_caching(self, mocked_aws_secret_id):
         mocked_aws_secret_id.return_value = 'TEST_VAL_2'
-        boto_client = boto3.client('ssm')
+        boto_client = SSMClientFactory.new_client()
 
         stubber = Stubber(boto_client)
         stubber.activate()
