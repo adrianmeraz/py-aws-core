@@ -8,7 +8,7 @@ from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, Proxy
 
 from py_aws_core import decorators, exceptions, logs, utils
 from py_aws_core.session_interface import ISession
-from py_aws_core.session_service import SessionService
+from py_aws_core.db_service import DBService
 
 logger = logs.get_logger()
 # Using same ssl context for all clients to save on loading SSL bundles
@@ -88,7 +88,7 @@ class RetryClient(Client):
 
 
 class SessionPersistClient(RetryClient, ISession):
-    def __init__(self, session_service: SessionService, *args, **kwargs):
+    def __init__(self, session_service: DBService, *args, **kwargs):
         self._session_service = session_service
         super().__init__(*args, **kwargs)
 
