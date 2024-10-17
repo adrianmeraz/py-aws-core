@@ -1,7 +1,8 @@
 import typing
 from abc import ABC, abstractmethod
 
-from py_aws_core import dynamodb_api, encoders
+from py_aws_core import encoders
+from py_aws_core.dynamodb_api import DynamoDBAPI
 
 
 class BaseModel:
@@ -26,7 +27,7 @@ class BaseModel:
 
     @staticmethod
     def deserialize_data(data: dict) -> typing.Dict:
-        return dynamodb_api.deserialize_types(data)
+        return DynamoDBAPI.deserialize_types(data)
 
 
 class ABCEntity(ABC, BaseModel):

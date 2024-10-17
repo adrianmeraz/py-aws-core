@@ -1,32 +1,31 @@
 import datetime
 import json
 from importlib.resources import as_file
-from botocore.stub import Stubber
-from py_aws_core.boto_clients import DynamoDBClientFactory
 from unittest import mock
 
-from py_aws_core import const, dynamodb_api, utils
+from py_aws_core import const, utils, dynamodb_entities
+from py_aws_core.dynamodb_api import DynamoDBAPI
 from py_aws_core.testing import BaseTestFixture
 
 
-class DynamoDBAPI(BaseTestFixture):
+class DynamoDBAPITests(BaseTestFixture):
     @mock.patch.object(utils, 'get_now_datetime')
     def test_calc_expire_at_timestamp(self, mocked_get_now_datetime):
         dt = datetime.datetime(year=2003, month=9, day=5, hour=15, minute=33, second=28, tzinfo=datetime.timezone.utc)
         mocked_get_now_datetime.return_value = dt
-        val = dynamodb_api.calc_expire_at_timestamp(expire_in_seconds=1 * const.SECONDS_IN_DAY)
+        val = DynamoDBAPI.calc_expire_at_timestamp(expire_in_seconds=1 * const.SECONDS_IN_DAY)
         self.assertEqual(val, 1062862408)
 
-        val = dynamodb_api.calc_expire_at_timestamp(expire_in_seconds=180 * const.SECONDS_IN_DAY)
+        val = DynamoDBAPI.calc_expire_at_timestamp(expire_in_seconds=180 * const.SECONDS_IN_DAY)
         self.assertEqual(val, 1078328008)
 
-        val = dynamodb_api.calc_expire_at_timestamp(expire_in_seconds=None)
+        val = DynamoDBAPI.calc_expire_at_timestamp(expire_in_seconds=None)
         self.assertEqual(val, '')
 
     def test_get_item_empty(self):
         source = self.TEST_DB_RESOURCES_PATH.joinpath('db#get_item#empty.json')
         with as_file(source) as r_json:
-            val = dynamodb_api.ItemResponse(json.loads(r_json.read_text(encoding='utf-8')))
+            val = dynamodb_entities.ItemResponse(json.loads(r_json.read_text(encoding='utf-8')))
 
         self.assertIsNone(val.Item)
 
@@ -36,7 +35,7 @@ class DynamoDBAPI(BaseTestFixture):
         mocked_get_now_datetime.return_value = dt
 
         pk = sk = 'TEST_ABC#999777555'
-        val = dynamodb_api.get_put_item_map(
+        val = DynamoDBAPI.get_put_item_map(
             _type='TEST_ABC',
             pk=pk,
             sk=sk,
@@ -64,7 +63,7 @@ class DynamoDBAPI(BaseTestFixture):
         )
 
     def test_serialize_types(self):
-        val = dynamodb_api.serialize_types({
+        val = DynamoDBAPI.serialize_types({
             ':ty': 'TEST_TYPE',
             ':si': '3b7529c92f',
             ':ea': 1000050000,
@@ -84,7 +83,7 @@ class DynamoDBAPI(BaseTestFixture):
             'request_token_3': 'test_token_3',
             'request_token_4': '',
         }
-        val_1 = dynamodb_api.serialize_types(test_dict)
+        val_1 = DynamoDBAPI.serialize_types(test_dict)
         self.assertEqual(
             val_1,
             {
@@ -95,7 +94,7 @@ class DynamoDBAPI(BaseTestFixture):
             }
         )
 
-        val_2 = dynamodb_api.serialize_types({
+        val_2 = DynamoDBAPI.serialize_types({
             'PK': 'TEST#123456',
             'SK': 'SK#89076',
         })
@@ -109,9 +108,9 @@ class DynamoDBAPI(BaseTestFixture):
 
     def test_build_update_expression(self):
         fields = [
-            dynamodb_api.UpdateField(expression_attr='ab', set_once=True),
-            dynamodb_api.UpdateField(expression_attr='gh', set_once=False),
-            dynamodb_api.UpdateField(expression_attr='yu', set_once=True),
+            DynamoDBAPI.UpdateField(expression_attr='ab', set_once=True),
+            DynamoDBAPI.UpdateField(expression_attr='gh', set_once=False),
+            DynamoDBAPI.UpdateField(expression_attr='yu', set_once=True),
         ]
-        val = dynamodb_api.build_update_expression(fields)
+        val = DynamoDBAPI.build_update_expression(fields)
         self.assertEqual('SET #gh = :gh, #ab = if_not_exists(#ab, :ab), #yu = if_not_exists(#yu, :yu)', val)
