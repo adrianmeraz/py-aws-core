@@ -7,8 +7,8 @@ from http.cookiejar import CookieJar
 from httpx import Client, HTTPStatusError, TimeoutException, NetworkError, ProxyError
 
 from py_aws_core import decorators, exceptions, logs, utils
-from py_aws_core.db_service import DatabaseService
 from py_aws_core.session_interface import ISession
+from py_aws_core.session_service import SessionService
 
 logger = logs.get_logger()
 # Using same ssl context for all clients to save on loading SSL bundles
@@ -88,8 +88,8 @@ class RetryClient(Client):
 
 
 class SessionPersistClient(RetryClient, ISession):
-    def __init__(self, db_service: DatabaseService, *args, **kwargs):
-        self._db_service = db_service
+    def __init__(self, session_service: SessionService, *args, **kwargs):
+        self._session_service = session_service
         super().__init__(*args, **kwargs)
 
     def __enter__(self):
@@ -104,10 +104,10 @@ class SessionPersistClient(RetryClient, ISession):
     def read_session(self):
         session_id = self.session_id
         logger.info(f'Attempting to read session...', session_id=self.session_id)
-        session = self._db_service.get_or_create_session(session_id=session_id)
+        session = self._session_service.get_or_create_session(session_id=session_id)
         logger.info(f'Successfully read session.', session_id=self.session_id)
         self.b64_decode_and_set_cookies(b64_cookies=session.b64_cookies_bytes)
 
     def write_session(self, session_id):
-        self._db_service.update_session_cookies(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
+        self._session_service.update_session_cookies(session_id=session_id, b64_cookies=self.b64_encoded_cookies)
         logger.info(f'Wrote session cookies to database', session_id=self.session_id)
