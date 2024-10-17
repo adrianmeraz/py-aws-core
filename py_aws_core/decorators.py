@@ -1,16 +1,17 @@
 import typing
 from functools import wraps
-from typing import Any, Dict, List, Type
+from typing import Any, Type
 
 from botocore.exceptions import ClientError
 from httpx import codes, HTTPStatusError
 
-from py_aws_core import dynamodb_service, exceptions, logs, utils
+from py_aws_core import exceptions, logs, utils
+from py_aws_core.dynamodb_entities import ErrorResponse
 
 logger = logs.get_logger()
 
 
-def boto3_handler(raise_as, client_error_map: Dict):
+def boto3_handler(raise_as, client_error_map: dict):
     def deco_func(func):
         @wraps(func)
         def wrapper_func(*args, **kwargs):
@@ -30,7 +31,7 @@ def boto3_handler(raise_as, client_error_map: Dict):
     return deco_func
 
 
-def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List[Dict[str, Any]]):
+def dynamodb_handler(client_err_map: dict[str, Any], cancellation_err_maps: list[dict[str, Any]]):
     def deco_func(func):
         @wraps(func)
         def wrapper_func(*args, **kwargs):
@@ -40,7 +41,7 @@ def dynamodb_handler(client_err_map: Dict[str, Any], cancellation_err_maps: List
                 return response
             except ClientError as e:
                 logger.error(f'dynamodb ClientError detected', e=e, response=e.response, wrapped_func_name=f'{func!r}')
-                e_response = dynamodb_service.ErrorResponse(e.response)
+                e_response = ErrorResponse(e.response)
                 if e_response.CancellationReasons:
                     e_response.raise_for_cancellation_reasons(error_maps=cancellation_err_maps)
                 if exc := client_err_map.get(e_response.Error.Code):
