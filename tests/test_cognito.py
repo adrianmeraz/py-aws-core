@@ -14,8 +14,8 @@ class AdminCreateUserTests(BaseTestFixture):
         with as_file(source) as admin_create_user_json:
             boto_client = CognitoClientFactory.new_client()
             stubber = Stubber(boto_client)
-            stubber.activate()
             stubber.add_response('admin_create_user', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
+            stubber.activate()
 
         r_call = cognito_service.AdminCreateUser.call(
             boto_client=boto_client,
@@ -46,8 +46,8 @@ class UserPasswordAuthTests(BaseTestFixture):
         with as_file(source) as initiate_auth_json:
             boto_client = CognitoClientFactory.new_client()
             stubber = Stubber(boto_client)
-            stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
+            stubber.activate()
 
         r_call = cognito_service.UserPasswordAuth.call(
             boto_client=boto_client,
@@ -66,8 +66,8 @@ class RefreshTokenAuthTests(BaseTestFixture):
         with as_file(source) as initiate_auth_json:
             boto_client = CognitoClientFactory.new_client()
             stubber = Stubber(boto_client)
-            stubber.activate()
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
+            stubber.activate()
 
         r_call = cognito_service.RefreshTokenAuth.call(
             boto_client=boto_client,

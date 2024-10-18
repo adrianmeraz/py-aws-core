@@ -13,8 +13,8 @@ class GetOrCreateSessionTests(BaseTestFixture):
 
         boto_client = DynamoDBClientFactory.new_client()
         stubber = Stubber(boto_client)
-        stubber.activate()
         stubber.add_response(method='update_item', service_response=session_json)
+        stubber.activate()
 
         session_service = DBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         session = session_service.get_or_create_session(
@@ -29,8 +29,8 @@ class GetOrCreateSessionTests(BaseTestFixture):
 
         boto_client = DynamoDBClientFactory.new_client()
         stubber = Stubber(boto_client)
-        stubber.activate()
         stubber.add_response(method='get_item', service_response=session_json)
+        stubber.activate()
 
         session_service = DBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         session = session_service.get_session_item(
@@ -41,8 +41,8 @@ class GetOrCreateSessionTests(BaseTestFixture):
     def test_put_session(self):
         boto_client = DynamoDBClientFactory.new_client()
         stubber = Stubber(boto_client)
-        stubber.activate()
         stubber.add_response(method='put_item', service_response=dict())
+        stubber.activate()
 
         session_service = DBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         r_put_item = session_service.put_session_item(
@@ -58,8 +58,8 @@ class GetOrCreateSessionTests(BaseTestFixture):
 
         boto_client = DynamoDBClientFactory.new_client()
         stubber = Stubber(boto_client)
-        stubber.activate()
         stubber.add_response('update_item', session_json)
+        stubber.activate()
 
         session_service = DBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
         session = session_service.update_session_cookies(
