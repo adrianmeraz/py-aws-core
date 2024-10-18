@@ -50,12 +50,12 @@ class APIGatewayRouter:
         self._route_map[http_method][path] = self.PathFuncs(fn=fn, kwargs=kwargs)
         logger.info(f'Added route to router', http_method=http_method, path=path)
 
-    def handle_event(self, aws_event, aws_context):
+    def handle_event(self, aws_event, aws_context, **kwargs):
         path = aws_event['path']
         http_method = aws_event['httpMethod']
         logger.info(f'Routing event', path=path, http_method=http_method, aws_event=aws_event)
         try:
             path_funcs = self._route_map[http_method][path]
-            return path_funcs.fn(aws_event, aws_context, **path_funcs.kwargs)
+            return path_funcs.fn(aws_event, aws_context, **path_funcs.kwargs, **kwargs)
         except KeyError:
             raise exceptions.RouteNotFound(http_method=http_method, path=path)

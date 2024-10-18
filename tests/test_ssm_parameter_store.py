@@ -23,6 +23,7 @@ class SSMParameterStoreTests(BaseTestFixture):
         sm = SSMParameterStore(boto_client=boto_client)
         val = sm.get_secret(secret_name='TEST_KEY_1')
         self.assertEqual('TEST_VAL_1', val)
+        stubber.assert_no_pending_responses()
 
     @mock.patch.object(SSMParameterStore, new_callable=PropertyMock, attribute='aws_secret_id')
     def test_get_secret_caching(self, mocked_aws_secret_id):
@@ -30,15 +31,17 @@ class SSMParameterStoreTests(BaseTestFixture):
         boto_client = SSMClientFactory.new_client()
 
         stubber = Stubber(boto_client)
+        parameter_json = self.get_resource_json('get_parameter.json', path=self.TEST_SSM_RESOURCES_PATH)
+        stubber.add_response(method='get_parameter', service_response=parameter_json)
         stubber.activate()
 
         ssm = SSMParameterStore(boto_client=boto_client)
-        source = self.TEST_SSM_RESOURCES_PATH.joinpath('get_parameter.json')
-        with as_file(source) as parameter_json:
-            stubber.add_response('get_parameter', json.loads(parameter_json.read_text(encoding='utf-8')))
-            val = ssm.get_secret(secret_name='test_key_1')
+
+        val = ssm.get_secret(secret_name='test_key_1')
         self.assertEqual('test_val_1', val)
 
         # Now checking cache
         val = ssm.get_secret(secret_name='test_key_1')
         self.assertEqual('test_val_1', val)
+
+        stubber.assert_no_pending_responses()

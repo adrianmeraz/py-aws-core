@@ -23,6 +23,7 @@ class SecretsManagerTests(BaseTestFixture):
         sm = SecretsManager(boto_client=boto_client)
         val = sm.get_secret(secret_name='TEST_KEY_1')
         self.assertEqual('TEST_VAL_1', val)
+        stubber.assert_no_pending_responses()
 
     @mock.patch.object(SecretsManager, new_callable=PropertyMock, attribute='get_aws_secret_name')
     def test_get_secret_caching(self, mock_get_aws_secret_name):
@@ -42,3 +43,4 @@ class SecretsManagerTests(BaseTestFixture):
         # Now checking cache
         val = sm.get_secret(secret_name='test_key_1')
         self.assertEqual('test_val_1', val)
+        stubber.assert_no_pending_responses()
