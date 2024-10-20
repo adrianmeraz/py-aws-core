@@ -3,7 +3,7 @@ from importlib.resources import as_file
 
 from botocore.stub import Stubber
 
-from py_aws_core import cognito_service
+from py_aws_core import cognito_api
 from py_aws_core.boto_clients import CognitoClientFactory
 from py_aws_core.testing import BaseTestFixture
 
