@@ -48,7 +48,7 @@ class AdminCreateUser:
             UserAttributes=user_attributes,
             UserPoolId=cognito_pool_id
         )
-        logger.info('Cognito Admin Create User called', response=response)
+        logger.info('Cognito AdminCreateUser called', response=response)
         return cls.Response(response)
 
 
@@ -94,7 +94,7 @@ class UserPasswordAuth(ABCInitiateAuth):
             },
             ClientId=cognito_pool_client_id,
         )
-        logger.info('Cognito User Password Auth called', response=response)
+        logger.info('Cognito UserPasswordAuth called', response=response)
         return cls.Response(response)
 
 
@@ -113,5 +113,5 @@ class RefreshTokenAuth(ABCInitiateAuth):
             },
             ClientId=cognito_pool_client_id,
         )
-        logger.info('Cognito Refresh Token called', response=response)
+        logger.info('Cognito RefreshTokenAuth called', response=response)
         return cls.Response(response)
