@@ -56,7 +56,7 @@ class GetOrCreateSession(DynamoDBAPI):
             ReturnValues='ALL_NEW'
         )
 
-        logger.debug(f'response: {response}')
+        logger.debug(f'GetOrCreateSession called', response=response)
         return cls.Response(response)
 
 
@@ -88,7 +88,7 @@ class GetSessionItem(DynamoDBAPI):
             },
             ProjectionExpression='#pk, #bc, #tp'
         )
-        logger.debug(f'response: {response}')
+        logger.debug(f'GetSessionItem called', response=response)
         return cls.Response(response)
 
 
@@ -116,7 +116,7 @@ class PutSession(DynamoDBAPI):
             TableName=table_name,
             Item=item,
         )
-        logger.debug(f'response: {response}')
+        logger.debug(f'PutSession called', response=response)
         return response
 
 
@@ -154,5 +154,5 @@ class UpdateSessionCookies(DynamoDBAPI):
             }),
             ReturnValues='ALL_NEW'
         )
-        logger.debug(f'response: {response}')
+        logger.debug(f'UpdateSessionCookies called', response=response)
         return cls.Response(response)
