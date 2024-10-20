@@ -17,7 +17,7 @@ class AdminCreateUserTests(BaseTestFixture):
             stubber.add_response('admin_create_user', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
             stubber.activate()
 
-        r_call = cognito_service.AdminCreateUser.call(
+        r_call = cognito_api.AdminCreateUser.call(
             boto_client=boto_client,
             cognito_pool_id=self.TEST_COGNITO_POOL_ID,
             username='thecreator44',
@@ -50,7 +50,7 @@ class UserPasswordAuthTests(BaseTestFixture):
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
             stubber.activate()
 
-        r_call = cognito_service.UserPasswordAuth.call(
+        r_call = cognito_api.UserPasswordAuth.call(
             boto_client=boto_client,
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             username='thecreator44',
@@ -71,7 +71,7 @@ class RefreshTokenAuthTests(BaseTestFixture):
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
             stubber.activate()
 
-        r_call = cognito_service.RefreshTokenAuth.call(
+        r_call = cognito_api.RefreshTokenAuth.call(
             boto_client=boto_client,
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             refresh_token='eifuhwseduivfavhwveci',
