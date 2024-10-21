@@ -69,6 +69,15 @@ class RouteMethodNotAllowed(CoreException):
     ERROR_MESSAGE = 'Route Method Not Allowed'
 
 
+# Cognito Exceptions
+class CognitoChallenge(CognitoException):
+    ERROR_MESSAGE = 'Cognito Challenge Detected'
+
+
+class InvalidRefreshToken(CognitoException):
+    ERROR_MESSAGE = 'Invalid Refresh Token'
+
+
 ERR_CODE_MAP = {
     'ConditionalCheckFailedException': DBConditionCheckFailed,
     'TransactionCanceledException': DBTransactionCanceledException
