@@ -8,9 +8,9 @@ package-mode = true
 
 [tool.poetry.dependencies]
 boto3 = "~1.34"
-coverage = "~7.6"
+coverage = "^7.6.4"
 python = "~3.12"
-python-dotenv = "~1.0"
+python-dotenv = "^1.0.1"
 httpx = "^0.27"
 respx = "^0.21.1"
 structlog = "^24.4.0"
