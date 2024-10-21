@@ -1,11 +1,25 @@
 import typing
 from abc import ABC
+from enum import Enum
 
 from botocore.client import BaseClient
-
-from py_aws_core import logs
+from py_aws_core import logs, mixins
 
 logger = logs.get_logger()
+
+
+class AuthChallenge(Enum):
+    SMS_MFA = 'SMS_MFA'
+    EMAIL_OTP = 'EMAIL_OTP'
+    SOFTWARE_TOKEN_MFA = 'SOFTWARE_TOKEN_MFA'
+    SELECT_MFA_TYPE = 'SELECT_MFA_TYPE'
+    MFA_SETUP = 'MFA_SETUP'
+    PASSWORD_VERIFIER = 'PASSWORD_VERIFIER'
+    CUSTOM_CHALLENGE = 'CUSTOM_CHALLENGE'
+    DEVICE_SRP_AUTH = 'DEVICE_SRP_AUTH'
+    DEVICE_PASSWORD_VERIFIER = 'DEVICE_PASSWORD_VERIFIER'
+    ADMIN_NO_SRP_AUTH = 'ADMIN_NO_SRP_AUTH'
+    NEW_PASSWORD_REQUIRED = 'NEW_PASSWORD_REQUIRED'
 
 
 class AdminCreateUser:
@@ -114,4 +128,32 @@ class RefreshTokenAuth(ABCInitiateAuth):
             ClientId=cognito_pool_client_id,
         )
         logger.info('Cognito RefreshTokenAuth called', response=response)
+        return cls.Response(response)
+
+
+class ABCChallengeResponse(ABC, mixins.AsDictMixin):
+    pass
+
+
+class NewPasswordChallengeResponse(ABCChallengeResponse):
+    def __init__(self, new_password: str, username: str):
+        self.NEW_PASSWORD = new_password
+        self.USERNAME = username
+
+
+class RespondToAuthChallenge(ABCInitiateAuth):
+    @classmethod
+    def call(
+        cls,
+        boto_client: BaseClient,
+        cognito_pool_client_id: str,
+        challenge_name: AuthChallenge,
+        challenge_responses: ABCChallengeResponse,
+    ):
+        response = boto_client.respond_to_auth_challenge(
+            ChallengeName=challenge_name.value,
+            ChallengeResponses=challenge_responses.as_dict(),
+            ClientId=cognito_pool_client_id,
+        )
+        logger.info('Cognito RespondToAuthChallenge called', response=response)
         return cls.Response(response)
