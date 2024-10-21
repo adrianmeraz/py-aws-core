@@ -1,4 +1,5 @@
 import json
+from botocore.stub import Stubber
 from importlib.resources import as_file
 from unittest import TestCase, mock
 
@@ -6,6 +7,7 @@ from botocore.exceptions import ClientError
 from httpx import HTTPStatusError, Request, Response
 
 from py_aws_core import decorators, exceptions
+from py_aws_core.boto_clients import CognitoClientFactory
 from py_aws_core.testing import BaseTestFixture
 
 
@@ -23,18 +25,31 @@ class Boto3HandlerTests(BaseTestFixture):
         )
 
     def test_handle_client_error(self):
-        source = self.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
-        with as_file(source) as err_json:
-            err_json = json.loads(err_json.read_text(encoding='utf-8'))
-            client_error = ClientError(error_response=err_json, operation_name='test1')
+        boto_client = CognitoClientFactory.new_client()
+        stubber = Stubber(boto_client)
+        stubber.add_client_error(
+            method='initiate_auth',
+            service_message='Invalid Refresh Token',
+            service_error_code='NotAuthorizedException'
+        )
+        stubber.activate()
 
         @decorators.boto3_handler(raise_as=exceptions.CognitoException)
         def func():
-            raise client_error
+            boto_client.initiate_auth(
+                AuthFlow='REFRESH_TOKEN',
+                AuthParameters={
+                    'REFRESH_TOKEN': self.TEST_AUTH_TOKEN,
+                },
+                ClientId=self.TEST_COGNITO_POOL_CLIENT_ID,
+            )
+
         with self.assertRaises(exceptions.CognitoException) as e:
             func()
-        exc = str(e.exception)
-        self.assertEqual('An error occurred while attempting to access Cognito', exc)
+
+        self.assertEqual('An error occurred while attempting to access Cognito', str(e.exception))
+        self.assertEqual('Invalid Refresh Token', str(e.exception.kwargs['message']))
+        stubber.assert_no_pending_responses()
 
     def test_handle_non_client_error(self):
         @decorators.boto3_handler(raise_as=exceptions.RouteNotFound)
