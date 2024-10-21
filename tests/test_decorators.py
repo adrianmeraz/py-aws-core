@@ -9,10 +9,10 @@ from py_aws_core import decorators, exceptions
 from py_aws_core.testing import BaseTestFixture
 
 
-class Boto3Tests(BaseTestFixture):
+class Boto3HandlerTests(BaseTestFixture):
 
     def test_no_exception(self):
-        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=dict())
+        @decorators.boto3_handler(raise_as=exceptions.CognitoException)
         def func(x):
             return 2 * x
 
@@ -22,43 +22,25 @@ class Boto3Tests(BaseTestFixture):
             val
         )
 
-    def test_raise_mapped_client_error(self):
+    def test_handle_client_error(self):
         source = self.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
         with as_file(source) as err_json:
             err_json = json.loads(err_json.read_text(encoding='utf-8'))
             client_error = ClientError(error_response=err_json, operation_name='test1')
 
-        client_err_map = {
-            'SomeServiceException': ArithmeticError
-        }
-
-        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=client_err_map)
+        @decorators.boto3_handler(raise_as=exceptions.CognitoException)
         def func():
             raise client_error
-        with self.assertRaises(ArithmeticError):
+        with self.assertRaises(exceptions.CognitoException) as e:
             func()
+        exc = str(e.exception)
+        self.assertEqual('An error occurred while attempting to access Cognito', exc)
 
-    def test_raise_unmapped_client_error(self):
-        source = self.TEST_BOTO3_ERROR_RESOURCES_PATH.joinpath('client_error.json')
-        with as_file(source) as err_json:
-            err_json = json.loads(err_json.read_text(encoding='utf-8'))
-            client_error = ClientError(error_response=err_json, operation_name='test1')
-
-        client_err_map = {
-            'OtherException': ArithmeticError
-        }
-
-        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=client_err_map)
+    def test_handle_non_client_error(self):
+        @decorators.boto3_handler(raise_as=exceptions.RouteNotFound)
         def func():
-            raise client_error
+            raise RuntimeError
         with self.assertRaises(RuntimeError):
-            func()
-
-    def test_reraise_uncaught_exception(self):
-        @decorators.boto3_handler(raise_as=RuntimeError, client_error_map=dict())
-        def func():
-            raise KeyError
-        with self.assertRaises(KeyError):
             func()
 
 

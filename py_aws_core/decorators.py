@@ -11,7 +11,7 @@ from py_aws_core.dynamodb_entities import ErrorResponse
 logger = logs.get_logger()
 
 
-def boto3_handler(raise_as, client_error_map: dict):
+def boto3_handler(raise_as: Type[exceptions.CoreException]):
     def deco_func(func):
         @wraps(func)
         def wrapper_func(*args, **kwargs):
@@ -20,11 +20,9 @@ def boto3_handler(raise_as, client_error_map: dict):
                 logger.debug(f'boto response', response=response, wrapped_func_name=f'{func!r}')
                 return response
             except ClientError as e:
-                error_code = e.response['Error']['Code']
-                logger.error(f'boto3 client error', exception=str(e), response=e.response, error_code=error_code)
-                if exc := client_error_map.get(error_code):
-                    raise exc(e)
-                raise raise_as()
+                error = e.response['Error']
+                logger.error(f'Boto client error', error_code=error['Code'], response=e.response)
+                raise raise_as(message=error['Message'])
             except Exception:  # Raise all other exceptions as is
                 raise
         return wrapper_func  # true decorator
@@ -146,7 +144,7 @@ def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
     return deco_func
 
 
-def wrap_exceptions(raise_as):
+def wrap_exceptions(raise_as: Type[exceptions.CoreException]):
 
     def deco_func(func):
 

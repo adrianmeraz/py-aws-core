@@ -10,7 +10,7 @@ from py_aws_core.testing import BaseTestFixture
 
 class AdminCreateUserTests(BaseTestFixture):
     def test_ok(self):
-        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('admin_create_user.json')
+        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('cognito#admin_create_user.json')
         with as_file(source) as admin_create_user_json:
             boto_client = CognitoClientFactory.new_client()
             stubber = Stubber(boto_client)
@@ -43,7 +43,7 @@ class AdminCreateUserTests(BaseTestFixture):
 
 class UserPasswordAuthTests(BaseTestFixture):
     def test_ok(self):
-        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
+        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('cognito#initiate_auth.json')
         with as_file(source) as initiate_auth_json:
             boto_client = CognitoClientFactory.new_client()
             stubber = Stubber(boto_client)
@@ -64,7 +64,7 @@ class UserPasswordAuthTests(BaseTestFixture):
 
 class RefreshTokenAuthTests(BaseTestFixture):
     def test_ok(self):
-        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('initiate_auth.json')
+        source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('cognito#initiate_auth.json')
         with as_file(source) as initiate_auth_json:
             boto_client = CognitoClientFactory.new_client()
             stubber = Stubber(boto_client)

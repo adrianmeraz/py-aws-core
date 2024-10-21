@@ -1,0 +1,21 @@
+{
+  "Error": {
+    "Message": "Invalid Refresh Token",
+    "Code": "NotAuthorizedException"
+  },
+  "ResponseMetadata": {
+    "RequestId": "fdc5be7d-bd7c-4aeb-bb98-4d3550d3df7a",
+    "HTTPStatusCode": 400,
+    "HTTPHeaders": {
+      "date": "Sun, 20 Oct 2024 14:33:04 GMT",
+      "content-type": "application/x-amz-json-1.1",
+      "content-length": "69",
+      "connection": "keep-alive",
+      "x-amzn-requestid": "fdc5be7d-bd7c-4aeb-bb98-4d3550d3df7a",
+      "x-amzn-errortype": "NotAuthorizedException:",
+      "x-amzn-errormessage": "Invalid Refresh Token"
+    },
+    "RetryAttempts": 0
+  },
+  "message": "Invalid Refresh Token"
+}
