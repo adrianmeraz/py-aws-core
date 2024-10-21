@@ -144,7 +144,7 @@ def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
     return deco_func
 
 
-def wrap_exceptions(raise_as):
+def wrap_exceptions(raise_as: Type[exceptions.CoreException]):
 
     def deco_func(func):
 
