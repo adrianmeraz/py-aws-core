@@ -1,8 +1,11 @@
+import json
 import typing
 from abc import ABC
+from dataclasses import asdict, dataclass
 from enum import Enum
 
 from botocore.client import BaseClient
+
 from py_aws_core import logs, mixins
 
 logger = logs.get_logger()
@@ -131,14 +134,24 @@ class RefreshTokenAuth(ABCInitiateAuth):
         return cls.Response(response)
 
 
+@dataclass
 class ABCChallengeResponse(ABC, mixins.AsDictMixin):
     pass
 
 
+@dataclass
 class NewPasswordChallengeResponse(ABCChallengeResponse):
-    def __init__(self, new_password: str, username: str):
-        self.NEW_PASSWORD = new_password
-        self.USERNAME = username
+    new_password: str
+    username: str
+    _user_attributes: str
+
+    def __post_init__(self):
+        self.set_attrs_from_user_attributes()
+
+    def set_attrs_from_user_attributes(self):
+        attr_map = json.loads(self._user_attributes)
+        for k, v in attr_map.items():
+            self.__dict__[f'userAttributes.{k}'] = v
 
 
 class RespondToAuthChallenge(ABCInitiateAuth):
