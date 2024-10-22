@@ -149,11 +149,13 @@ class RespondToAuthChallenge(ABCInitiateAuth):
         cognito_pool_client_id: str,
         challenge_name: AuthChallenge,
         challenge_responses: ABCChallengeResponse,
+        session: str = '',
     ):
         response = boto_client.respond_to_auth_challenge(
             ChallengeName=challenge_name.value,
             ChallengeResponses=challenge_responses.as_dict(),
             ClientId=cognito_pool_client_id,
+            Session=session,
         )
         logger.info('Cognito RespondToAuthChallenge called', response=response)
         return cls.Response(response)
