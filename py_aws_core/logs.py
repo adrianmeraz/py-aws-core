@@ -9,11 +9,14 @@ dotenv = load_dotenv()  # take environment variables from .env.
 level = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_LEVEL = getattr(logging, level)
 
+exception_transformer = structlog.processors.ExceptionDictTransformer(locals_max_length=10000, locals_max_string=10000)
+
 shared_processors = [
     structlog.processors.EventRenamer('message'),
     structlog.processors.CallsiteParameterAdder(),
-    structlog.processors.TimeStamper(fmt="iso"),
+    structlog.processors.TimeStamper(fmt='iso'),
     structlog.processors.add_log_level,
+    structlog.processors.ExceptionPrettyPrinter(exception_formatter=exception_transformer),
 ]
 val = sys.stderr.isatty()
 if 'unittest' in sys.modules or sys.stderr.isatty():
