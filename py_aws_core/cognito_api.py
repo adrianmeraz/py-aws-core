@@ -87,7 +87,7 @@ class ABCInitiateAuth(ABC):
             self.ChallengeName = data.get('ChallengeName')
             self.Session = data.get('Session')
             self.ChallengeParameters = data.get('ChallengeParameters')
-            self.AuthenticationResult = self.AuthenticationResult(data['AuthenticationResult'])
+            self.AuthenticationResult = self.AuthenticationResult(data.get('AuthenticationResult', dict()))
 
 
 class UserPasswordAuth(ABCInitiateAuth):
