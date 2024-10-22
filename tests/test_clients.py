@@ -3,7 +3,7 @@ from unittest import mock
 
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
-from py_aws_core import entities, exceptions
+from py_aws_core import dynamodb_entities, exceptions
 from py_aws_core.boto_clients import DynamoDBClientFactory
 from py_aws_core.clients import RetryClient, SessionPersistClient
 from py_aws_core.exceptions import APIException
@@ -115,7 +115,7 @@ class SessionPersistClientTests(BaseTestFixture):
 
         session_json = self.get_resource_json('db#get_session_item.json', path=self.TEST_DB_RESOURCES_PATH)
         session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
-        mocked_read_session.return_value = entities.Session(session_json['Item'])
+        mocked_read_session.return_value = dynamodb_entities.Session(session_json['Item'])
 
         boto_client = DynamoDBClientFactory.new_client()
         session_service = DBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')

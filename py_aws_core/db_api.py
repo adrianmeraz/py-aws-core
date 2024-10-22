@@ -1,8 +1,8 @@
 from botocore.client import BaseClient
 
-from py_aws_core import decorators, entities, exceptions, logs
+from py_aws_core import decorators, dynamodb_entities, exceptions, logs
+from py_aws_core.boto_entities import ItemResponse, UpdateItemResponse
 from py_aws_core.dynamodb_api import DynamoDBAPI
-from py_aws_core.dynamodb_entities import ItemResponse, UpdateItemResponse
 
 logger = logs.get_logger()
 
@@ -10,8 +10,8 @@ logger = logs.get_logger()
 class GetOrCreateSession(DynamoDBAPI):
     class Response(UpdateItemResponse):
         @property
-        def session(self) -> entities.Session:
-            return entities.Session(data=self.attributes)
+        def session(self) -> dynamodb_entities.Session:
+            return dynamodb_entities.Session(data=self.attributes)
 
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
@@ -23,8 +23,8 @@ class GetOrCreateSession(DynamoDBAPI):
         created_at_datetime: str,
         expires_at: int = None
     ):
-        pk = sk = entities.Session.create_key(_id=session_id)
-        _type = entities.Session.type()
+        pk = sk = dynamodb_entities.Session.create_key(_id=session_id)
+        _type = dynamodb_entities.Session.type()
         update_fields = [
             cls.UpdateField(expression_attr='ty'),
             cls.UpdateField(expression_attr='si'),
@@ -63,8 +63,8 @@ class GetOrCreateSession(DynamoDBAPI):
 class GetSessionItem(DynamoDBAPI):
     class Response(ItemResponse):
         @property
-        def session(self) -> entities.Session:
-            return entities.Session(data=self.Item)
+        def session(self) -> dynamodb_entities.Session:
+            return dynamodb_entities.Session(data=self.Item)
 
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
@@ -74,7 +74,7 @@ class GetSessionItem(DynamoDBAPI):
         table_name: str,
         session_id: str
     ) -> Response:
-        pk = sk = entities.Session.create_key(_id=session_id)
+        pk = sk = dynamodb_entities.Session.create_key(_id=session_id)
         response = boto_client.get_item(
             TableName=table_name,
             Key=cls.serialize_types({
@@ -102,8 +102,8 @@ class PutSession(DynamoDBAPI):
         session_id: str,
         b64_cookies: bytes
     ):
-        pk = sk = entities.Session.create_key(_id=session_id)
-        _type = entities.Session.type()
+        pk = sk = dynamodb_entities.Session.create_key(_id=session_id)
+        _type = dynamodb_entities.Session.type()
         item = cls.get_put_item_map(
             pk=pk,
             sk=sk,
@@ -123,8 +123,8 @@ class PutSession(DynamoDBAPI):
 class UpdateSessionCookies(DynamoDBAPI):
     class Response(UpdateItemResponse):
         @property
-        def session(self) -> entities.Session:
-            return entities.Session(self.attributes)
+        def session(self) -> dynamodb_entities.Session:
+            return dynamodb_entities.Session(self.attributes)
 
     @classmethod
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
@@ -136,7 +136,7 @@ class UpdateSessionCookies(DynamoDBAPI):
         b64_cookies: bytes,
         now_datetime: str
     ):
-        pk = sk = entities.Session.create_key(_id=session_id)
+        pk = sk = dynamodb_entities.Session.create_key(_id=session_id)
         response = boto_client.update_item(
             TableName=table_name,
             Key=cls.serialize_types({

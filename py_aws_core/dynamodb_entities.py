@@ -1,71 +1,62 @@
 import typing
+from abc import ABC, abstractmethod
+
+from py_aws_core import encoders
+from py_aws_core.dynamodb_api import DynamoDBAPI
 
 
-class ErrorResponse:
-    class Error:
-        def __init__(self, data):
-            self.Message = data['Message']
-            self.Code = data['Code']
-
-    class CancellationReason:
-        def __init__(self, data):
-            self.Code = data['Code']
-            self.Message = data.get('Message')
-
+class BaseModel:
     def __init__(self, data):
-        self.Error = self.Error(data.get('Error', dict()))
-        self.ResponseMetadata = ResponseMetadata(data.get('ResponseMetadata', dict()))
-        self.Message = data.get('Message')
-        self.CancellationReasons = [self.CancellationReason(r) for r in data.get('CancellationReasons', list())]
-
-    def raise_for_cancellation_reasons(self, error_maps: list[dict[str, typing.Any]]):
-        for reason, error_map in zip(self.CancellationReasons, error_maps):
-            if exc := error_map.get(reason.Code):
-                raise exc
-
-
-class ItemResponse:
-    def __init__(self, data):
-        self.Item = data.get('Item')
-        self.ResponseMetadata = ResponseMetadata(data.get('ResponseMetadata', dict()))
-
-
-class QueryResponse:
-    def __init__(self, data):
-        self._items = data.get('Items') or list()
-        self.count = data.get('Count')
-        self.scanned_count = data.get('ScannedCount')
-        self.response_metadata = ResponseMetadata(data['ResponseMetadata'])
-
-    def get_by_type(self, _type: str) -> list:
-        if self._items:
-            return [i for i in self._items if i['Type']['S'] == _type]
-        return list()
-
-
-class UpdateItemResponse:
-    def __init__(self, data: dict):
-        self.attributes = data['Attributes']
-
-
-class TransactionResponse:
-    def __init__(self, data):
-        self._data = data
-        self.Responses = data.get('Responses')
+        self.__data = self.deserialize_data(data)
+        self.PK = self.data.get('PK')
+        self.SK = self.data.get('SK')
+        self.Type = self.data.get('Type')
+        self.CreatedAt = self.data.get('CreatedAt')
+        self.CreatedBy = self.data.get('CreatedBy')
+        self.ModifiedAt = self.data.get('ModifiedAt')
+        self.ModifiedBy = self.data.get('ModifiedBy')
+        self.ExpiresAt = self.data.get('ExpiresAt')
 
     @property
     def data(self):
-        return self._data
+        return self.__data
+
+    @property
+    def to_json(self):
+        return encoders.JsonEncoder().serialize_to_json(self)
+
+    @staticmethod
+    def deserialize_data(data: dict) -> typing.Dict:
+        return DynamoDBAPI.deserialize_types(data)
 
 
-class ResponseMetadata:
-    class HTTPHeaders:
-        def __init__(self, data):
-            self.server = data.get('server')
-            self.date = data.get('date')
+class ABCEntity(ABC, BaseModel):
+    TYPE = 'ABC'
+
+    @classmethod
+    @abstractmethod
+    def create_key(cls, *args, **kwargs) -> str:
+        pass
+
+    @classmethod
+    def type(cls) -> str:
+        return cls.TYPE
+
+
+class Session(ABCEntity):
+    TYPE = 'SESSION'
 
     def __init__(self, data):
-        self.RequestId = data.get('RequestId')
-        self.HTTPStatusCode = data.get('HTTPStatusCode')
-        self.HTTPHeaders = self.HTTPHeaders(data.get('HTTPHeaders', dict()))
-        self.RetryAttempts = data.get('RetryAttempts')
+        super().__init__(data)
+        self.Base64Cookies = self.data.get('Base64Cookies')
+        self.SessionId = self.data.get('SessionId')
+
+    @classmethod
+    def create_key(cls, _id: str) -> str:
+        return f'{cls.type()}#{str(_id)}'
+
+    @property
+    def b64_cookies_bytes(self):
+        if self.Base64Cookies:
+            return self.Base64Cookies.value
+        return None
