@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 from httpx import codes, HTTPStatusError
 
 from py_aws_core import exceptions, logs, utils
-from py_aws_core.boto_entities import ErrorResponse
+from py_aws_core.boto_responses import ErrorResponse
 
 logger = logs.get_logger()
 

@@ -3,7 +3,7 @@ import json
 from importlib.resources import as_file
 from unittest import mock
 
-from py_aws_core import const, utils, boto_entities
+from py_aws_core import const, utils, boto_responses
 from py_aws_core.dynamodb_api import DynamoDBAPI
 from py_aws_core.testing import BaseTestFixture
 

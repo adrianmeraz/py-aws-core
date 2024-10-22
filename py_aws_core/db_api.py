@@ -1,7 +1,7 @@
 from botocore.client import BaseClient
 
 from py_aws_core import decorators, dynamodb_entities, exceptions, logs
-from py_aws_core.boto_entities import ItemResponse, UpdateItemResponse
+from py_aws_core.boto_responses import ItemResponse, UpdateItemResponse
 from py_aws_core.dynamodb_api import DynamoDBAPI
 
 logger = logs.get_logger()
