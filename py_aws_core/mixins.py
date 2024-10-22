@@ -1,12 +1,12 @@
-from dataclasses import asdict, dataclass
-
 from py_aws_core.encoders import JsonEncoder
 
 
-@dataclass
 class AsDictMixin:
+    """
+    Converts
+    """
     def as_dict(self):
-        return asdict(self)
+        return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
 
 
 class JsonMixin:
