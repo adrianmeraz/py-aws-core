@@ -149,7 +149,7 @@ class RespondToAuthChallenge(ABCInitiateAuth):
         cognito_pool_client_id: str,
         challenge_name: AuthChallenge,
         challenge_responses: ABCChallengeResponse,
-        session: str
+        session: str = '',
     ):
         response = boto_client.respond_to_auth_challenge(
             ChallengeName=challenge_name.value,
