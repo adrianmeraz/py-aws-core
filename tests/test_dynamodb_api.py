@@ -3,7 +3,7 @@ import json
 from importlib.resources import as_file
 from unittest import mock
 
-from py_aws_core import const, utils, dynamodb_entities
+from py_aws_core import const, utils, boto_responses
 from py_aws_core.dynamodb_api import DynamoDBAPI
 from py_aws_core.testing import BaseTestFixture
 
@@ -25,7 +25,7 @@ class DynamoDBAPITests(BaseTestFixture):
     def test_get_item_empty(self):
         source = self.TEST_DB_RESOURCES_PATH.joinpath('db#get_item#empty.json')
         with as_file(source) as r_json:
-            val = dynamodb_entities.ItemResponse(json.loads(r_json.read_text(encoding='utf-8')))
+            val = boto_responses.ItemResponse(json.loads(r_json.read_text(encoding='utf-8')))
 
         self.assertIsNone(val.Item)
 
