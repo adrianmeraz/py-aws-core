@@ -25,7 +25,7 @@ class DynamoDBAPITests(BaseTestFixture):
     def test_get_item_empty(self):
         source = self.TEST_DB_RESOURCES_PATH.joinpath('db#get_item#empty.json')
         with as_file(source) as r_json:
-            val = boto_entities.ItemResponse(json.loads(r_json.read_text(encoding='utf-8')))
+            val = boto_responses.ItemResponse(json.loads(r_json.read_text(encoding='utf-8')))
 
         self.assertIsNone(val.Item)
 
