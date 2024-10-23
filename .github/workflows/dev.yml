@@ -29,6 +29,7 @@ jobs:
       with:
         python-version: 3.12
         cache: 'poetry'
+        cache-dependency-path: poetry.lock
 
     - name: Load cached venv
       id: cache-virtualenv
