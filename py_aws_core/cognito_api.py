@@ -1,12 +1,12 @@
 import json
 import typing
 from abc import ABC
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from enum import Enum
 
 from botocore.client import BaseClient
 
-from py_aws_core import logs, mixins
+from py_aws_core import decorators, exceptions, logs, mixins
 
 logger = logs.get_logger()
 
@@ -51,6 +51,7 @@ class AdminCreateUser:
             self.User = self.User(data.get('User', dict()))
 
     @classmethod
+    @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
         boto_client: BaseClient,
@@ -95,6 +96,7 @@ class ABCInitiateAuth(ABC):
 
 class UserPasswordAuth(ABCInitiateAuth):
     @classmethod
+    @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
         boto_client: BaseClient,
@@ -117,6 +119,7 @@ class UserPasswordAuth(ABCInitiateAuth):
 
 class RefreshTokenAuth(ABCInitiateAuth):
     @classmethod
+    @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
         boto_client: BaseClient,
@@ -156,6 +159,7 @@ class NewPasswordChallengeResponse(ABCChallengeResponse):
 
 class RespondToAuthChallenge(ABCInitiateAuth):
     @classmethod
+    @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
         boto_client: BaseClient,
