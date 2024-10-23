@@ -15,7 +15,7 @@ class CoreException(Exception):
             vals += self.args
         if self.kwargs:
             vals += self.kwargs.values()
-        return ', '.join(vals)
+        return ', '.join([str(v) for v in vals])
 
 # Boto3 Exceptions Located below:
 # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html#botocore-exceptions
