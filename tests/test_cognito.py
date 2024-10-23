@@ -114,8 +114,8 @@ class RespondToAuthChallengeTests(BaseTestFixture):
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             challenge_name=cognito_api.AuthChallenge.NEW_PASSWORD_REQUIRED,
             challenge_responses=cognito_api.NewPasswordChallengeResponse(
-                username='test123',
-                new_password='newpass123',
+                USERNAME='test123',
+                NEW_PASSWORD='newpass123',
                 _user_attributes='{\"custom:roles\":\"MEMBER\",\"custom:group\":\"testgroup1\",\"email\":\"johnny@example.com\"}'
             ),
             session=self.TEST_SESSION,
@@ -127,18 +127,18 @@ class RespondToAuthChallengeTests(BaseTestFixture):
 
     def test_NewPasswordChallengeResponse(self):
         val = cognito_api.NewPasswordChallengeResponse(
-            username='test123',
-            new_password='newpass123',
+            USERNAME='test123',
+            NEW_PASSWORD='newpass123',
             _user_attributes='{\"custom:roles\":\"MEMBER\",\"custom:group\":\"testgroup1\",\"email\":\"johnny@example.com\"}'
         )
 
         self.assertEqual(
             {
-                'new_password': 'newpass123',
+                'NEW_PASSWORD': 'newpass123',
                 'userAttributes.custom:group': 'testgroup1',
                 'userAttributes.custom:roles': 'MEMBER',
                 'userAttributes.email': 'johnny@example.com',
-                'username': 'test123'
+                'USERNAME': 'test123'
             },
             val.as_dict()
         )
