@@ -34,7 +34,10 @@ def build_lambda_response(
     if not body:
         body = dict()
     if exc:
-        body['error'] = f'{type(exc).__name__}: {str(exc)}'
+        body['error'] = {
+            'type': type(exc).__name__,
+            'message': str(exc),
+        }
     if isinstance(body, dict):
         body = json.dumps(body)
     response_headers = {

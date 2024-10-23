@@ -159,7 +159,7 @@ class LambdaResponseHandlerTests(TestCase):
         val = func()
         self.assertEqual(
             {
-                'body': '{"error": "RouteNotFound: Route Path Not Found"}',
+                'body': '{"error": {"type": "RouteNotFound", "message": "Route Path Not Found"}}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
@@ -180,7 +180,7 @@ class LambdaResponseHandlerTests(TestCase):
         val = func()
         self.assertEqual(
             {
-                'body': '{"error": "CoreException: A generic error has occurred"}',
+                'body': '{"error": {"type": "CoreException", "message": "A generic error has occurred"}}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
