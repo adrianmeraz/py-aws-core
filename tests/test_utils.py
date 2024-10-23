@@ -86,7 +86,7 @@ class BuildLambdaResponseTests(TestCase):
             val,
             {
                 'isBase64Encoded': False,
-                'body': '{"error": {"type": "SecretsManagerException", "message": "An error occurred while fetching secrets"}}',
+                'body': '{"error": {"type": "SecretsManagerException", "message": "An error occurred while fetching secrets, Lorem Ipsum"}}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],

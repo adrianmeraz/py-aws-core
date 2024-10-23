@@ -7,7 +7,15 @@ class CoreException(Exception):
         self.kwargs = kwargs
 
     def __str__(self):
-        return self.ERROR_MESSAGE
+        return self.build_str()
+
+    def build_str(self):
+        vals = [self.ERROR_MESSAGE]
+        if self.args:
+            vals += self.args
+        if self.kwargs:
+            vals += self.kwargs.values()
+        return ', '.join(vals)
 
 # Boto3 Exceptions Located below:
 # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html#botocore-exceptions
