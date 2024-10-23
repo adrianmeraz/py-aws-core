@@ -111,7 +111,11 @@ class RespondToAuthChallengeTests(BaseTestFixture):
             challenge_responses=cognito_api.NewPasswordChallengeResponse(
                 USERNAME='test123',
                 NEW_PASSWORD='newpass123',
-                _user_attributes='{\"custom:roles\":\"MEMBER\",\"custom:group\":\"testgroup1\",\"email\":\"johnny@example.com\"}'
+                user_attributes={
+                    "custom:roles": "MEMBER",
+                    "custom:group": "testgroup1",
+                    "email": "johnny@example.com"
+                }
             ),
             session=self.TEST_SESSION,
         )
@@ -124,7 +128,11 @@ class RespondToAuthChallengeTests(BaseTestFixture):
         val = cognito_api.NewPasswordChallengeResponse(
             USERNAME='test123',
             NEW_PASSWORD='newpass123',
-            _user_attributes='{\"custom:roles\":\"MEMBER\",\"custom:group\":\"testgroup1\",\"email\":\"johnny@example.com\"}'
+            user_attributes={
+                "custom:roles": "MEMBER",
+                "custom:group": "testgroup1",
+                "email": "johnny@example.com"
+            }
         )
 
         self.assertEqual(

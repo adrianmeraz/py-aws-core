@@ -146,15 +146,15 @@ class ABCChallengeResponse(ABC, mixins.AsDictMixin):
 class NewPasswordChallengeResponse(ABCChallengeResponse):
     NEW_PASSWORD: str
     USERNAME: str
-    _user_attributes: str
+    user_attributes: dict
 
     def __post_init__(self):
         self.set_attrs_from_user_attributes()
 
     def set_attrs_from_user_attributes(self):
-        attr_map = json.loads(self._user_attributes)
-        for k, v in attr_map.items():
+        for k, v in self.user_attributes.items():
             self.__dict__[f'userAttributes.{k}'] = v
+        self.__dict__.pop('user_attributes')
 
 
 class RespondToAuthChallenge(ABCInitiateAuth):
