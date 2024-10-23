@@ -4,7 +4,7 @@ from importlib.resources import as_file
 from botocore.stub import Stubber
 from botocore.exceptions import ClientError
 
-from py_aws_core import cognito_api, const
+from py_aws_core import cognito_api, exceptions
 from py_aws_core.boto_clients import CognitoClientFactory
 from py_aws_core.testing import BaseTestFixture
 
@@ -87,17 +87,12 @@ class RefreshTokenAuthTests(BaseTestFixture):
         stubber = Stubber(boto_client)
         stubber.add_client_error(method='initiate_auth', service_error_code='NotAuthorizedException')
         stubber.activate()
-        with self.assertRaises(ClientError) as e:
+        with self.assertRaises(exceptions.CognitoException) as e:
             cognito_api.RefreshTokenAuth.call(
                 boto_client=boto_client,
                 cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
                 refresh_token='eifuhwseduivfavhwveci',
             )
-
-        self.assertEqual(
-            'NotAuthorizedException',
-            str(e.exception.response['Error']['Code'])
-        )
         stubber.assert_no_pending_responses()
 
 

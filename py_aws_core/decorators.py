@@ -21,8 +21,9 @@ def boto3_handler(raise_as: Type[exceptions.CoreException]):
                 return response
             except ClientError as e:
                 error = e.response['Error']
-                logger.error(f'Boto client error', error_code=error['Code'], response=e.response)
-                raise raise_as(message=error['Message'])
+                message = error['Message']
+                logger.error(f'Boto client error', code=error['Code'], message=message, response=e.response)
+                raise raise_as(message=message)
             except Exception:  # Raise all other exceptions as is
                 raise
         return wrapper_func  # true decorator
@@ -66,7 +67,7 @@ def lambda_response_handler(raise_as: Type[exceptions.CoreException]):
                 exc = e
                 logger.exception('Pass-Through exception detected')
             except Exception as e:
-                exc = raise_as(e)
+                exc = raise_as(exc=e)
                 logger.exception('Fall-Through exception detected')  # Note:  # the logging.exception method just inside the except part
             return utils.build_lambda_response(
                 status_code=exc.HTTP_STATUS_CODE,
@@ -136,8 +137,8 @@ def http_status_check(reraise_status_codes: typing.Tuple[int, ...] = tuple()):
                 if status_code in reraise_status_codes:     # Retryable status codes
                     raise
                 if status_code == codes.UNAUTHORIZED:
-                    raise exceptions.NotAuthorizedException(*args, **kwargs, **e.__dict__)
-                raise exceptions.APIException(*args, **kwargs, **e.__dict__)
+                    raise exceptions.NotAuthorizedException(**kwargs, **e.__dict__)
+                raise exceptions.APIException(**kwargs, **e.__dict__)
 
         return wrapper_func
 
@@ -155,7 +156,7 @@ def wrap_exceptions(raise_as: Type[exceptions.CoreException]):
             except raise_as:
                 raise
             except Exception as e:
-                raise raise_as(*args, **kwargs, **e.__dict__)
+                raise raise_as(**kwargs, **e.__dict__)
 
         return wrapper_func  # true decorator
 

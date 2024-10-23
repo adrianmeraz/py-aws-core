@@ -47,7 +47,7 @@ class Boto3HandlerTests(BaseTestFixture):
         with self.assertRaises(exceptions.CognitoException) as e:
             func()
 
-        self.assertEqual('An error occurred while attempting to access Cognito', str(e.exception))
+        self.assertEqual('An error occurred while attempting to access Cognito, Invalid Refresh Token', str(e.exception))
         self.assertEqual('Invalid Refresh Token', str(e.exception.kwargs['message']))
         stubber.assert_no_pending_responses()
 
@@ -155,11 +155,11 @@ class LambdaResponseHandlerTests(TestCase):
     def test_pass_thru_exception(self):
         @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
         def func():
-            raise exceptions.RouteNotFound('Route Path Not Found')
+            raise exceptions.RouteNotFound()
         val = func()
         self.assertEqual(
             {
-                'body': '{"error": "RouteNotFound: Route Path Not Found"}',
+                'body': '{"error": {"type": "RouteNotFound", "message": "Route Path Not Found"}}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
@@ -176,11 +176,11 @@ class LambdaResponseHandlerTests(TestCase):
     def test_catch_all_exception(self):
         @decorators.lambda_response_handler(raise_as=exceptions.CoreException)
         def func():
-            raise RuntimeError('This is an error')
+            raise RuntimeError('This is a test exception')
         val = func()
         self.assertEqual(
             {
-                'body': '{"error": "CoreException: A generic error has occurred"}',
+                'body': '{"error": {"type": "CoreException", "message": "A generic error has occurred, This is a test exception"}}',
                 'multiValueHeaders': {
                     'Access-Control-Allow-Credentials': [True],
                     'Access-Control-Allow-Headers': ['Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'],
