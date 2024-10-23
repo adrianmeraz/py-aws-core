@@ -100,7 +100,6 @@ def retry(
         def wrapper_func(*args, **kwargs):
             m_tries = 1
             m_delay = delay
-            f_qname = getattr(func, "__qualname__", None)
             while m_tries < tries:
                 try:
                     return func(*args, **kwargs)
