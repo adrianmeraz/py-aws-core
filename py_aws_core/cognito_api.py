@@ -141,8 +141,8 @@ class ABCChallengeResponse(ABC, mixins.AsDictMixin):
 
 @dataclass
 class NewPasswordChallengeResponse(ABCChallengeResponse):
-    new_password: str
-    username: str
+    NEW_PASSWORD: str
+    USERNAME: str
     _user_attributes: str
 
     def __post_init__(self):
