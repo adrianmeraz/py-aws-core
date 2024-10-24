@@ -1,13 +1,14 @@
 from http.cookiejar import CookieJar
 from unittest import mock
 
+from botocore.stub import Stubber
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
 from py_aws_core import dynamodb_entities, exceptions
-from py_aws_core.boto_clients import DynamoDBClientFactory
+from py_aws_core.boto_clients import DynamoTableFactory
 from py_aws_core.clients import RetryClient, SessionPersistClient
-from py_aws_core.exceptions import APIException
 from py_aws_core.db_service import DBService
+from py_aws_core.exceptions import APIException
 from py_aws_core.testing import BaseTestFixture
 
 
@@ -117,10 +118,15 @@ class SessionPersistClientTests(BaseTestFixture):
         session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
         mocked_read_session.return_value = dynamodb_entities.Session(session_json['Item'])
 
-        boto_client = DynamoDBClientFactory.new_client()
-        session_service = DBService(boto_client=boto_client, dynamodb_table_name='TEST_TABLE')
+        table = DynamoTableFactory.new_client(table_name='TEST_TABLE')
+        stubber = Stubber(table.meta.client)
+        stubber.activate()
+
+        session_service = DBService(table=table)
         with SessionPersistClient(session_service=session_service) as client:
             self.assertEqual(len(client.cookies.jar), 0)
 
         self.assertEqual(mocked_write_session.call_count, 1)
         self.assertEqual(mocked_read_session.call_count, 1)
+
+        stubber.assert_no_pending_responses()

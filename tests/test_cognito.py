@@ -2,7 +2,6 @@ import json
 from importlib.resources import as_file
 
 from botocore.stub import Stubber
-from botocore.exceptions import ClientError
 
 from py_aws_core import cognito_api, exceptions
 from py_aws_core.boto_clients import CognitoClientFactory
