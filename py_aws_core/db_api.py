@@ -1,5 +1,3 @@
-from botocore.client import BaseClient
-
 from py_aws_core import decorators, dynamodb_entities, exceptions, logs
 from py_aws_core.boto_responses import ItemResponse, UpdateItemResponse
 from py_aws_core.dynamodb_api import DynamoDBAPI
@@ -17,8 +15,7 @@ class GetOrCreateSession(DynamoDBAPI):
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
     def call(
         cls,
-        boto_client: BaseClient,
-        table_name: str,
+        table,
         session_id: str,
         created_at_datetime: str,
         expires_at: int = None
@@ -32,12 +29,11 @@ class GetOrCreateSession(DynamoDBAPI):
             cls.UpdateField(expression_attr='ea', set_once=True),
             cls.UpdateField(expression_attr='ca', set_once=True),
         ]
-        response = boto_client.update_item(
-            TableName=table_name,
-            Key=cls.serialize_types({
+        response = table.update_item(
+            Key={
                 'PK': pk,
                 'SK': sk,
-            }),
+            },
             UpdateExpression=cls.build_update_expression(update_fields),
             ExpressionAttributeNames={
                 '#ty': 'Type',
@@ -46,13 +42,13 @@ class GetOrCreateSession(DynamoDBAPI):
                 '#ma': 'ModifiedAt',
                 '#ea': 'ExpiresAt',
             },
-            ExpressionAttributeValues=cls.serialize_types({
+            ExpressionAttributeValues={
                 ':ty': _type,
                 ':si': session_id,
                 ':ca': created_at_datetime,
                 ':ma': created_at_datetime,
                 ':ea': expires_at,
-            }),
+            },
             ReturnValues='ALL_NEW'
         )
 
@@ -70,17 +66,15 @@ class GetSessionItem(DynamoDBAPI):
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
     def call(
         cls,
-        boto_client: BaseClient,
-        table_name: str,
+        table,
         session_id: str
     ) -> Response:
         pk = sk = dynamodb_entities.Session.create_key(_id=session_id)
-        response = boto_client.get_item(
-            TableName=table_name,
-            Key=cls.serialize_types({
+        response = table.get_item(
+            Key={
                 'PK': pk,
                 'SK': sk
-            }),
+            },
             ExpressionAttributeNames={
                 "#pk": "PK",
                 "#bc": "Base64Cookies",
@@ -97,8 +91,7 @@ class PutSession(DynamoDBAPI):
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
     def call(
         cls,
-        boto_client: BaseClient,
-        table_name: str,
+        table,
         session_id: str,
         b64_cookies: bytes
     ):
@@ -112,8 +105,7 @@ class PutSession(DynamoDBAPI):
             Base64Cookies=b64_cookies,
             SessionId=session_id
         )
-        response = boto_client.put_item(
-            TableName=table_name,
+        response = table.put_item(
             Item=item,
         )
         logger.debug(f'PutSession called', response=response)
@@ -130,28 +122,26 @@ class UpdateSessionCookies(DynamoDBAPI):
     @decorators.dynamodb_handler(client_err_map=exceptions.ERR_CODE_MAP, cancellation_err_maps=[])
     def call(
         cls,
-        boto_client: BaseClient,
-        table_name: str,
+        table,
         session_id: str,
         b64_cookies: bytes,
         now_datetime: str
     ):
         pk = sk = dynamodb_entities.Session.create_key(_id=session_id)
-        response = boto_client.update_item(
-            TableName=table_name,
-            Key=cls.serialize_types({
+        response = table.update_item(
+            Key={
                 'PK': pk,
                 'SK': sk,
-            }),
+            },
             UpdateExpression='SET #b64 = :b64, #mda = :mda',
             ExpressionAttributeNames={
                 '#b64': 'Base64Cookies',
                 '#mda': 'ModifiedAt',
             },
-            ExpressionAttributeValues=cls.serialize_types({
+            ExpressionAttributeValues={
                 ':b64': b64_cookies,
                 ':mda': now_datetime
-            }),
+            },
             ReturnValues='ALL_NEW'
         )
         logger.debug(f'UpdateSessionCookies called', response=response)
