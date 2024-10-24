@@ -88,9 +88,9 @@ class DynamoDBAPI:
         return len(item_maps)
 
     @classmethod
-    def get_new_table_resource(cls, table_name: str) -> TableResource:
-        resource = boto3.resource('dynamodb')
-        return resource.Table(table_name)
+    def get_new_table_resource(cls, table_name: str):
+        dynamodb_resource = boto3.resource('dynamodb')
+        return dynamodb_resource.Table(table_name)
 
     @classmethod
     def serialize_types(cls, data: dict):

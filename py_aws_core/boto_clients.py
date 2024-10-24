@@ -13,17 +13,8 @@ class ABCBotoClientFactory(ABC):
 
     @classmethod
     @abstractmethod
-    def new_client(cls) -> BaseClient:
+    def new_client(cls, **kwargs) -> BaseClient:
         pass
-
-    @classmethod
-    @abstractmethod
-    def _service_name(cls) -> str:
-        pass
-
-    @classmethod
-    def new_resource_client(cls):
-        return cls._boto3_session.resource(service_name=cls._service_name())
 
     @classmethod
     def _get_config(cls):
@@ -41,12 +32,17 @@ class CognitoClientFactory(ABCBotoClientFactory):
     def new_client(cls):
         return cls._boto3_session.client(
             config=cls._get_config(),
-            service_name=cls._service_name(),
+            service_name='cognito-idp',
         )
 
+
+class DynamoTableFactory(ABCBotoClientFactory):
     @classmethod
-    def _service_name(cls) -> str:
-        return 'cognito-idp'
+    def new_client(cls, table_name: str):
+        return cls._boto3_session.resource(
+            config=cls._get_config(),
+            service_name='dynamodb',
+        )('dynamodb').Table(table_name)
 
 
 class DynamoDBClientFactory(ABCBotoClientFactory):
@@ -54,34 +50,25 @@ class DynamoDBClientFactory(ABCBotoClientFactory):
     def new_client(cls):
         return cls._boto3_session.client(
             config=cls._get_config(),
-            service_name=cls._service_name(),
+            service_name='dynamodb',
             verify=False  # Don't validate SSL certs for faster responses
         )
-
-    @classmethod
-    def _service_name(cls) -> str:
-        return 'dynamodb'
 
 
 class SecretManagerClientFactory(ABCBotoClientFactory):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
-            service_name=cls._service_name(),
+            config=cls._get_config(),
+            service_name='secretsmanager',
         )
-
-    @classmethod
-    def _service_name(cls) -> str:
-        return 'secretsmanager'
 
 
 class SSMClientFactory(ABCBotoClientFactory):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
-            service_name=cls._service_name(),
+            config=cls._get_config(),
+            service_name='ssm',
         )
 
-    @classmethod
-    def _service_name(cls) -> str:
-        return 'ssm'

@@ -1,6 +1,6 @@
 from botocore.stub import Stubber
 
-from py_aws_core.boto_clients import DynamoDBClientFactory
+from py_aws_core.boto_clients import DynamoTableFactory
 from py_aws_core.db_service import DBService
 from py_aws_core.testing import BaseTestFixture
 
@@ -11,8 +11,8 @@ class GetOrCreateSessionTests(BaseTestFixture):
         session_json['Attributes']['Base64Cookies']['B'] = self.to_utf8_bytes(
             session_json['Attributes']['Base64Cookies']['B'])
 
-        boto_client = DynamoDBClientFactory.new_client()
-        stubber = Stubber(boto_client)
+        table = DynamoTableFactory.new_client(table_name='TEST_TABLE')
+        stubber = Stubber(table.meta.client)
         stubber.add_response(method='update_item', service_response=session_json)
         stubber.activate()
 

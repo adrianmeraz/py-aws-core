@@ -54,13 +54,13 @@ class AdminCreateUser:
     @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
-        boto_client: BaseClient,
+        cognito_client: BaseClient,
         cognito_pool_id: str,
         username: str,
         user_attributes: typing.List[typing.Dict],
         desired_delivery_mediums: typing.List[str],
     ):
-        response = boto_client.admin_create_user(
+        response = cognito_client.admin_create_user(
             DesiredDeliveryMediums=desired_delivery_mediums,
             Username=username,
             UserAttributes=user_attributes,
@@ -99,13 +99,13 @@ class UserPasswordAuth(ABCInitiateAuth):
     @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
-        boto_client: BaseClient,
+        cognito_client: BaseClient,
         cognito_pool_client_id: str,
         username: str,
         password: str,
 
     ):
-        response = boto_client.initiate_auth(
+        response = cognito_client.initiate_auth(
             AuthFlow='USER_PASSWORD_AUTH',
             AuthParameters={
                 'USERNAME': username,
@@ -122,11 +122,11 @@ class RefreshTokenAuth(ABCInitiateAuth):
     @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
-        boto_client: BaseClient,
+        cognito_client: BaseClient,
         cognito_pool_client_id: str,
         refresh_token: str,
     ):
-        response = boto_client.initiate_auth(
+        response = cognito_client.initiate_auth(
             AuthFlow='REFRESH_TOKEN',
             AuthParameters={
                 'REFRESH_TOKEN': refresh_token,
@@ -162,13 +162,13 @@ class RespondToAuthChallenge(ABCInitiateAuth):
     @decorators.boto3_handler(raise_as=exceptions.CognitoException)
     def call(
         cls,
-        boto_client: BaseClient,
+        cognito_client: BaseClient,
         cognito_pool_client_id: str,
         challenge_name: AuthChallenge,
         challenge_responses: ABCChallengeResponse,
         session: str = '',
     ):
-        response = boto_client.respond_to_auth_challenge(
+        response = cognito_client.respond_to_auth_challenge(
             ChallengeName=challenge_name.value,
             ChallengeResponses=challenge_responses.as_dict(),
             ClientId=cognito_pool_client_id,

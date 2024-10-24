@@ -19,7 +19,7 @@ class AdminCreateUserTests(BaseTestFixture):
             stubber.activate()
 
         r_call = cognito_api.AdminCreateUser.call(
-            boto_client=boto_client,
+            cognito_client=boto_client,
             cognito_pool_id=self.TEST_COGNITO_POOL_ID,
             username='thecreator44',
             user_attributes=[
@@ -52,7 +52,7 @@ class UserPasswordAuthTests(BaseTestFixture):
             stubber.activate()
 
         r_call = cognito_api.UserPasswordAuth.call(
-            boto_client=boto_client,
+            cognito_client=boto_client,
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             username='thecreator44',
             password='pw123'
@@ -73,7 +73,7 @@ class RefreshTokenAuthTests(BaseTestFixture):
             stubber.activate()
 
         r_call = cognito_api.RefreshTokenAuth.call(
-            boto_client=boto_client,
+            cognito_client=boto_client,
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             refresh_token='eifuhwseduivfavhwveci',
         )
@@ -89,7 +89,7 @@ class RefreshTokenAuthTests(BaseTestFixture):
         stubber.activate()
         with self.assertRaises(exceptions.CognitoException) as e:
             cognito_api.RefreshTokenAuth.call(
-                boto_client=boto_client,
+                cognito_client=boto_client,
                 cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
                 refresh_token='eifuhwseduivfavhwveci',
             )
@@ -105,7 +105,7 @@ class RespondToAuthChallengeTests(BaseTestFixture):
         stubber.activate()
 
         r_call = cognito_api.RespondToAuthChallenge.call(
-            boto_client=boto_client,
+            cognito_client=boto_client,
             cognito_pool_client_id=self.TEST_COGNITO_POOL_CLIENT_ID,
             challenge_name=cognito_api.AuthChallenge.NEW_PASSWORD_REQUIRED,
             challenge_responses=cognito_api.NewPasswordChallengeResponse(
