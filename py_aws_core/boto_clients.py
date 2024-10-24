@@ -40,9 +40,9 @@ class DynamoTableFactory(ABCBotoClientFactory):
     @classmethod
     def new_client(cls, table_name: str):
         return cls._boto3_session.resource(
-            config=cls._get_config(),
             service_name='dynamodb',
-        )('dynamodb').Table(table_name)
+            config=cls._get_config()
+        ).Table(table_name)
 
 
 class DynamoDBClientFactory(ABCBotoClientFactory):
