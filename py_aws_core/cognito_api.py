@@ -1,4 +1,3 @@
-import json
 import typing
 from abc import ABC
 from dataclasses import dataclass
