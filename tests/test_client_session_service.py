@@ -1,6 +1,6 @@
 from botocore.stub import Stubber
 
-from py_aws_core.boto_clients import DynamoTable
+from py_aws_core.boto_clients import DynamoTableFactory
 from py_aws_core.db_service import DBService
 from py_aws_core.testing import BaseTestFixture
 
@@ -12,7 +12,7 @@ class GetOrCreateSessionTests(BaseTestFixture):
             session_json['Attributes']['Base64Cookies']['B'])
 
         ddb_secrets = self.MockDynamoDBSecretsService()
-        table = DynamoTable(ddb_secrets=ddb_secrets).new_client()
+        table = DynamoTableFactory(ddb_secrets=ddb_secrets).new_client()
 
         stubber = Stubber(table.meta.client)
         stubber.add_response(method='update_item', service_response=session_json)
@@ -31,7 +31,7 @@ class GetOrCreateSessionTests(BaseTestFixture):
         session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
 
         ddb_secrets = self.MockDynamoDBSecretsService()
-        table = DynamoTable(ddb_secrets=ddb_secrets).new_client()
+        table = DynamoTableFactory(ddb_secrets=ddb_secrets).new_client()
         stubber = Stubber(table.meta.client)
         stubber.add_response(method='get_item', service_response=session_json)
         stubber.activate()
@@ -45,7 +45,7 @@ class GetOrCreateSessionTests(BaseTestFixture):
 
     def test_put_session(self):
         ddb_secrets = self.MockDynamoDBSecretsService()
-        table = DynamoTable(ddb_secrets=ddb_secrets).new_client()
+        table = DynamoTableFactory(ddb_secrets=ddb_secrets).new_client()
         stubber = Stubber(table.meta.client)
         stubber.add_response(method='put_item', service_response=dict())
         stubber.activate()
@@ -64,7 +64,7 @@ class GetOrCreateSessionTests(BaseTestFixture):
             session_json['Attributes']['Base64Cookies']['B'])
 
         ddb_secrets = self.MockDynamoDBSecretsService()
-        table = DynamoTable(ddb_secrets=ddb_secrets).new_client()
+        table = DynamoTableFactory(ddb_secrets=ddb_secrets).new_client()
         stubber = Stubber(table.meta.client)
         stubber.add_response('update_item', session_json)
         stubber.activate()
