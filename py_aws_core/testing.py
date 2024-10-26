@@ -5,11 +5,14 @@ from importlib.abc import Traversable
 from importlib.resources import as_file
 from importlib.resources import files
 from unittest import TestCase
+from py_aws_core.boto_clients import DynamoTable
+from py_aws_core.db_service import DBService
 
 import respx
 from httpx import Response, codes
 
-from py_aws_core import utils
+from . import utils
+from .secrets_interface import IDynamoDBSecrets
 
 
 class BaseTestFixture(TestCase):
@@ -121,3 +124,10 @@ class BaseTestFixture(TestCase):
         source = path.joinpath(*descendants)
         with as_file(source) as file_text:
             return file_text.read_text(encoding='utf-8')
+
+    class MockDynamoDBSecretsService(IDynamoDBSecrets):
+        def get_secret(self, secret_name: str) -> str:
+            pass
+
+        def get_table_name(self) -> str:
+            return 'TEST_TABLE'

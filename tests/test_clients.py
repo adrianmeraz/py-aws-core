@@ -118,7 +118,8 @@ class SessionPersistClientTests(BaseTestFixture):
         session_json['Item']['Base64Cookies']['B'] = self.to_utf8_bytes(session_json['Item']['Base64Cookies']['B'])
         mocked_read_session.return_value = dynamodb_entities.Session(session_json['Item'])
 
-        table = DynamoTable.new_client(table_name='TEST_TABLE')
+        ddb_secrets = self.MockDynamoDBSecretsService()
+        table = DynamoTable(ddb_secrets=ddb_secrets).new_client()
         stubber = Stubber(table.meta.client)
         stubber.activate()
 
