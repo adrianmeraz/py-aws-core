@@ -34,7 +34,7 @@ class CognitoClientFactory(ABCBotoClientFactory):
         )
 
 
-class DynamoTable(ABCBotoClientFactory):
+class DynamoTableFactory(ABCBotoClientFactory):
     def __init__(self, ddb_secrets: IDynamoDBSecrets):
         self._ddb_secrets = ddb_secrets
 

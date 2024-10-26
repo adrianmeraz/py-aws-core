@@ -5,7 +5,7 @@ from importlib.abc import Traversable
 from importlib.resources import as_file
 from importlib.resources import files
 from unittest import TestCase
-from py_aws_core.boto_clients import DynamoTable
+from py_aws_core.boto_clients import DynamoTableFactory
 from py_aws_core.db_service import DBService
 
 import respx
