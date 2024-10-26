@@ -4,11 +4,12 @@ from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
 from . import exceptions, logs, utils
+from .secrets_interface import ISecrets
 
 logger = logs.get_logger()
 
 
-class SSMParameterStore:
+class SSMParameterStore(ISecrets):
     """
         First checks environment variables for secrets.
         Second, checks cached secrets
@@ -40,7 +41,7 @@ class SSMParameterStore:
         self._boto_client = boto_client
         self._cached_secrets = cached_secrets or dict()
 
-    def get_secret(self, secret_name: str):
+    def get_secret(self, secret_name: str) -> str:
         if secret_value := utils.get_environment_variable(secret_name):
             logger.debug(f'Secret "{secret_name}" found in environment variables')
             return secret_value

@@ -4,11 +4,12 @@ from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
 from . import exceptions, logs, utils
+from .secrets_interface import ISecrets
 
 logger = logs.get_logger()
 
 
-class SecretsManager:
+class SecretsManager(ISecrets):
     class Response:
         def __init__(self, data):
             self.ARN = data['ARN']
@@ -40,7 +41,7 @@ class SecretsManager:
             logger.debug(f'Secret "{secret_name}" found in cached secrets')
             return val
         try:
-            r_secrets = self.Response(self._boto_client.get_secret_value(SecretId=self.get_aws_secret_name))
+            r_secrets = self.Response(self._boto_client.get_secret_value(SecretId=self.aws_secret_name))
             self._secrets_map = r_secrets.secret_json
             return self._secrets_map[secret_name]
         except ClientError as e:
@@ -49,7 +50,8 @@ class SecretsManager:
             # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
             raise exceptions.SecretsManagerException(e)
 
-    def get_aws_secret_name(self) -> str:
+    @property
+    def aws_secret_name(self) -> str:
         if aws_secret_id := utils.get_environment_variable(self.AWS_SECRET_NAME):
             return aws_secret_id
         raise exceptions.SecretsManagerException(f'Missing environment variable "{self.AWS_SECRET_NAME}"')
