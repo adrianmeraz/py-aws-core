@@ -4,7 +4,7 @@ from importlib.resources import as_file
 from botocore.stub import Stubber
 
 from py_aws_core import cognito_api, exceptions
-from py_aws_core.boto_clients import CognitoClientFactory
+from py_aws_core.boto_clients import CognitoClient
 from py_aws_core.testing import BaseTestFixture
 
 
@@ -12,7 +12,7 @@ class AdminCreateUserTests(BaseTestFixture):
     def test_ok(self):
         source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('cognito#admin_create_user.json')
         with as_file(source) as admin_create_user_json:
-            boto_client = CognitoClientFactory.new_client()
+            boto_client = CognitoClient.new_client()
             stubber = Stubber(boto_client)
             stubber.add_response('admin_create_user', json.loads(admin_create_user_json.read_text(encoding='utf-8')))
             stubber.activate()
@@ -45,7 +45,7 @@ class UserPasswordAuthTests(BaseTestFixture):
     def test_ok(self):
         source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('cognito#initiate_auth.json')
         with as_file(source) as initiate_auth_json:
-            boto_client = CognitoClientFactory.new_client()
+            boto_client = CognitoClient.new_client()
             stubber = Stubber(boto_client)
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
             stubber.activate()
@@ -66,7 +66,7 @@ class RefreshTokenAuthTests(BaseTestFixture):
     def test_ok(self):
         source = self.TEST_COGNITO_RESOURCES_PATH.joinpath('cognito#initiate_auth.json')
         with as_file(source) as initiate_auth_json:
-            boto_client = CognitoClientFactory.new_client()
+            boto_client = CognitoClient.new_client()
             stubber = Stubber(boto_client)
             stubber.add_response('initiate_auth', json.loads(initiate_auth_json.read_text(encoding='utf-8')))
             stubber.activate()
@@ -82,7 +82,7 @@ class RefreshTokenAuthTests(BaseTestFixture):
         stubber.assert_no_pending_responses()
 
     def test_invalid_refresh_token(self):
-        boto_client = CognitoClientFactory.new_client()
+        boto_client = CognitoClient.new_client()
         stubber = Stubber(boto_client)
         stubber.add_client_error(method='initiate_auth', service_error_code='NotAuthorizedException')
         stubber.activate()
@@ -98,7 +98,7 @@ class RefreshTokenAuthTests(BaseTestFixture):
 class RespondToAuthChallengeTests(BaseTestFixture):
     def test_ok(self):
         api_json = self.get_resource_json('cognito#respond_to_auth_challenge.json', path=self.TEST_COGNITO_RESOURCES_PATH)
-        boto_client = CognitoClientFactory.new_client()
+        boto_client = CognitoClient.new_client()
         stubber = Stubber(boto_client)
         stubber.add_response('respond_to_auth_challenge', api_json)
         stubber.activate()

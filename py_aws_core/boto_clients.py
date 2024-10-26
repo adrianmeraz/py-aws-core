@@ -1,20 +1,14 @@
 from abc import ABC, abstractmethod
 
 import boto3
-from botocore.client import BaseClient
 from botocore.config import Config
 
 
-class ABCBotoClientFactory(ABC):
+class ABCBotoClient(ABC):
     CLIENT_CONNECT_TIMEOUT = 4.9
     CLIENT_READ_TIMEOUT = 4.9
 
     _boto3_session = boto3.Session()
-
-    @classmethod
-    @abstractmethod
-    def new_client(cls, **kwargs) -> BaseClient:
-        pass
 
     @classmethod
     def _get_config(cls):
@@ -26,8 +20,13 @@ class ABCBotoClientFactory(ABC):
             )
         )
 
+    @classmethod
+    @abstractmethod
+    def new_client(cls, **kwargs):
+        pass
 
-class CognitoClientFactory(ABCBotoClientFactory):
+
+class CognitoClient(ABCBotoClient):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
@@ -36,7 +35,7 @@ class CognitoClientFactory(ABCBotoClientFactory):
         )
 
 
-class DynamoTableFactory(ABCBotoClientFactory):
+class DynamoTable(ABCBotoClient):
     @classmethod
     def new_client(cls, table_name: str):
         return cls._boto3_session.resource(
@@ -45,7 +44,7 @@ class DynamoTableFactory(ABCBotoClientFactory):
         ).Table(table_name)
 
 
-class DynamoDBClientFactory(ABCBotoClientFactory):
+class DynamoDBClient(ABCBotoClient):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
@@ -55,7 +54,7 @@ class DynamoDBClientFactory(ABCBotoClientFactory):
         )
 
 
-class SecretManagerClientFactory(ABCBotoClientFactory):
+class SecretManagerClient(ABCBotoClient):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
@@ -64,11 +63,10 @@ class SecretManagerClientFactory(ABCBotoClientFactory):
         )
 
 
-class SSMClientFactory(ABCBotoClientFactory):
+class SSMClient(ABCBotoClient):
     @classmethod
     def new_client(cls):
         return cls._boto3_session.client(
             config=cls._get_config(),
             service_name='ssm',
         )
-
