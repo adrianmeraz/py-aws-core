@@ -6,7 +6,7 @@ from unittest.mock import PropertyMock
 from botocore.stub import Stubber
 
 from py_aws_core import utils
-from py_aws_core.boto_clients import SecretManagerClient
+from py_aws_core.boto_clients import SecretManagerClientFactory
 from py_aws_core.secrets_manager import SecretsManager
 from py_aws_core.testing import BaseTestFixture
 
@@ -15,7 +15,7 @@ class SecretsManagerTests(BaseTestFixture):
     @mock.patch.object(utils, 'get_environment_variable')
     def test_get_secret_env_var(self, mocked_get_env_var):
         mocked_get_env_var.return_value = 'TEST_VAL_1'
-        boto_client = SecretManagerClient.new_client()
+        boto_client = SecretManagerClientFactory().new_client()
 
         stubber = Stubber(boto_client)
         stubber.activate()
@@ -28,7 +28,7 @@ class SecretsManagerTests(BaseTestFixture):
     @mock.patch.object(SecretsManager, new_callable=PropertyMock, attribute='aws_secret_name')
     def test_get_secret_caching(self, mocked_aws_secret_name):
         mocked_aws_secret_name.return_value = 'TEST_VAL_2'
-        boto_client = SecretManagerClient.new_client()
+        boto_client = SecretManagerClientFactory().new_client()
 
         stubber = Stubber(boto_client)
         stubber.activate()

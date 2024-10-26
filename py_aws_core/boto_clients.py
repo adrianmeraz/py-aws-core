@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 
 import boto3
 from botocore.config import Config
+from . secrets_interface import IDynamoDBSecrets
 
 
-class ABCBotoClient(ABC):
+class ABCBotoClientFactory(ABC):
     CLIENT_CONNECT_TIMEOUT = 4.9
     CLIENT_READ_TIMEOUT = 4.9
 
@@ -20,53 +21,50 @@ class ABCBotoClient(ABC):
             )
         )
 
-    @classmethod
     @abstractmethod
-    def new_client(cls, **kwargs):
+    def new_client(self, **kwargs):
         pass
 
 
-class CognitoClient(ABCBotoClient):
-    @classmethod
-    def new_client(cls):
-        return cls._boto3_session.client(
-            config=cls._get_config(),
+class CognitoClientFactory(ABCBotoClientFactory):
+    def new_client(self):
+        return self._boto3_session.client(
+            config=self._get_config(),
             service_name='cognito-idp',
         )
 
 
-class DynamoTable(ABCBotoClient):
-    @classmethod
-    def new_client(cls, table_name: str):
-        return cls._boto3_session.resource(
+class DynamoTable(ABCBotoClientFactory):
+    def __init__(self, ddb_secrets: IDynamoDBSecrets):
+        self._ddb_secrets = ddb_secrets
+
+    def new_client(self):
+        return self._boto3_session.resource(
             service_name='dynamodb',
-            config=cls._get_config()
-        ).Table(table_name)
+            config=self._get_config()
+        ).Table(self._ddb_secrets.get_table_name())
 
 
-class DynamoDBClient(ABCBotoClient):
-    @classmethod
-    def new_client(cls):
-        return cls._boto3_session.client(
-            config=cls._get_config(),
+class DynamoDBClientFactory(ABCBotoClientFactory):
+    def new_client(self):
+        return self._boto3_session.client(
+            config=self._get_config(),
             service_name='dynamodb',
             verify=False  # Don't validate SSL certs for faster responses
         )
 
 
-class SecretManagerClient(ABCBotoClient):
-    @classmethod
-    def new_client(cls):
-        return cls._boto3_session.client(
-            config=cls._get_config(),
+class SecretManagerClientFactory(ABCBotoClientFactory):
+    def new_client(self):
+        return self._boto3_session.client(
+            config=self._get_config(),
             service_name='secretsmanager',
         )
 
 
-class SSMClient(ABCBotoClient):
-    @classmethod
-    def new_client(cls):
-        return cls._boto3_session.client(
-            config=cls._get_config(),
+class SSMClientFactory(ABCBotoClientFactory):
+    def new_client(self):
+        return self._boto3_session.client(
+            config=self._get_config(),
             service_name='ssm',
         )
