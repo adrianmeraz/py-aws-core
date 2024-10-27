@@ -5,7 +5,7 @@ from botocore.stub import Stubber
 from httpx import HTTPStatusError, NetworkError, Request, Response, codes
 
 from py_aws_core import dynamodb_entities, exceptions
-from py_aws_core.boto_clients import DynamoTableFactory
+from py_aws_core.boto_clients import DynamoTable
 from py_aws_core.clients import RetryClient, SessionPersistClient
 from py_aws_core.db_service import DBService
 from py_aws_core.exceptions import APIException
@@ -119,7 +119,7 @@ class SessionPersistClientTests(BaseTestFixture):
         mocked_read_session.return_value = dynamodb_entities.Session(session_json['Item'])
 
         ddb_secrets = self.MockDynamoDBSecretsService()
-        table = DynamoTableFactory(ddb_secrets=ddb_secrets).new_client()
+        table = DynamoTable(ddb_secrets=ddb_secrets).table
         stubber = Stubber(table.meta.client)
         stubber.activate()
 

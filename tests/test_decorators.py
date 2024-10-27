@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 from httpx import HTTPStatusError, Request, Response
 
 from py_aws_core import decorators, exceptions
-from py_aws_core.boto_clients import CognitoClientFactory
+from py_aws_core.boto_clients import CognitoClient
 from py_aws_core.testing import BaseTestFixture
 
 
@@ -25,7 +25,7 @@ class Boto3HandlerTests(BaseTestFixture):
         )
 
     def test_handle_client_error(self):
-        boto_client = CognitoClientFactory().new_client()
+        boto_client = CognitoClient().boto_client
         stubber = Stubber(boto_client)
         stubber.add_client_error(
             method='initiate_auth',
