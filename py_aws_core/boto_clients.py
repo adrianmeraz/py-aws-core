@@ -1,70 +1,89 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import boto3
+from botocore.client import BaseClient
 from botocore.config import Config
-from . secrets_interface import IDynamoDBSecrets
+
+from .secrets_interface import IDynamoDBSecrets
 
 
-class ABCBotoClientFactory(ABC):
+class ABCBotoSession(ABC):
     CLIENT_CONNECT_TIMEOUT = 4.9
     CLIENT_READ_TIMEOUT = 4.9
 
     _boto3_session = boto3.Session()
 
     @classmethod
-    def _get_config(cls):
+    def _get_config(cls, **kwargs):
         return Config(
             connect_timeout=cls.CLIENT_CONNECT_TIMEOUT,
             read_timeout=cls.CLIENT_READ_TIMEOUT,
             retries=dict(
                 total_max_attempts=2,
-            )
+            ),
+            **kwargs
         )
 
-    @abstractmethod
-    def new_client(self, **kwargs):
-        pass
 
+class ABCBotoClient(ABCBotoSession):
+    def __init__(self, service_name: str, verify: bool = True, **kwargs):
+        self._boto_client = self._get_new_client(
+            service_name=service_name,
+            verify=verify,
+            **kwargs
+        )
 
-class CognitoClientFactory(ABCBotoClientFactory):
-    def new_client(self):
+    def _get_new_client(self, service_name: str, verify: bool, **kwargs) -> BaseClient:
         return self._boto3_session.client(
             config=self._get_config(),
-            service_name='cognito-idp',
+            service_name=service_name,
+            **kwargs
         )
 
+    @property
+    def boto_client(self) -> BaseClient:
+        return self._boto_client
 
-class DynamoTableFactory(ABCBotoClientFactory):
+
+class ABCBotoResource(ABCBotoSession):
+    def __init__(self, service_name: str, **kwargs):
+        self._boto_resource = self._get_new_resource(
+            service_name=service_name,
+            **kwargs
+        )
+
+    def _get_new_resource(self, service_name: str, **kwargs) -> BaseClient:
+        return self._boto3_session.resource(
+            config=self._get_config(),
+            service_name=service_name,
+            **kwargs
+        )
+
+    @property
+    def boto_resource(self) -> BaseClient:
+        return self._boto_resource
+
+
+class CognitoClient(ABCBotoClient):
+    def __init__(self):
+        super().__init__(service_name='cognito-idp')
+
+
+class SecretManagerClient(ABCBotoClient):
+    def __init__(self):
+        super().__init__(service_name='secretsmanager')
+
+
+class SSMClient(ABCBotoClient):
+    def __init__(self):
+        super().__init__(service_name='ssm')
+
+
+class DynamoTable(ABCBotoResource):
     def __init__(self, ddb_secrets: IDynamoDBSecrets):
+        super().__init__(service_name='dynamodb')
         self._ddb_secrets = ddb_secrets
 
-    def new_client(self):
-        return self._boto3_session.resource(
-            service_name='dynamodb',
-            config=self._get_config()
-        ).Table(self._ddb_secrets.get_table_name())
-
-
-class DynamoDBClientFactory(ABCBotoClientFactory):
-    def new_client(self):
-        return self._boto3_session.client(
-            config=self._get_config(),
-            service_name='dynamodb',
-            verify=False  # Don't validate SSL certs for faster responses
-        )
-
-
-class SecretManagerClientFactory(ABCBotoClientFactory):
-    def new_client(self):
-        return self._boto3_session.client(
-            config=self._get_config(),
-            service_name='secretsmanager',
-        )
-
-
-class SSMClientFactory(ABCBotoClientFactory):
-    def new_client(self):
-        return self._boto3_session.client(
-            config=self._get_config(),
-            service_name='ssm',
-        )
+    @property
+    def table(self):
+        return self.boto_resource.Table(self._ddb_secrets.get_table_name())
