@@ -1,9 +1,9 @@
 import json
-from botocore.stub import Stubber
 from importlib.resources import as_file
 from unittest import TestCase, mock
 
 from botocore.exceptions import ClientError
+from botocore.stub import Stubber
 from httpx import HTTPStatusError, Request, Response
 
 from py_aws_core import decorators, exceptions
