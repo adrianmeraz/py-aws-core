@@ -49,16 +49,19 @@ class DynamoDBAPITests(BaseTestFixture):
         self.assertDictEqual(
             val,
             {
-                'CreatedAt': {'S': '2003-09-05T15:33:28+00:00'},
-                'CreatedBy': {'S': ''},
-                'ExpiresAt': {'N': '1065368008'},
-                'ModifiedAt': {'S': ''},
-                'ModifiedBy': {'S': ''},
-                'NewData': {'M': {'key_234': {'S': 'val_090'}, 'key_678': {'S': 'val_234'}}},
-                'PK': {'S': 'TEST_ABC#999777555'},
-                'SK': {'S': 'TEST_ABC#999777555'},
-                'SessionId': {'S': 'a728b36c01f'},
-                'Type': {'S': 'TEST_ABC'}
+                'PK': 'TEST_ABC#999777555',
+                'SK': 'TEST_ABC#999777555',
+                'Type': 'TEST_ABC',
+                'CreatedAt': '2003-09-05T15:33:28+00:00',
+                'CreatedBy': '',
+                'ModifiedAt': '',
+                'ModifiedBy': '',
+                'ExpiresAt': 1065368008,
+                'SessionId': 'a728b36c01f',
+                'NewData': {
+                    'key_678': 'val_234',
+                    'key_234': 'val_090'
+                }
             }
         )
 
