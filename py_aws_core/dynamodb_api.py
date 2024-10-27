@@ -68,7 +68,7 @@ class DynamoDBAPI:
         expire_in_seconds: int | None = const.DB_DEFAULT_EXPIRES_IN_SECONDS,
         **kwargs,
     ) -> dict:
-        vals = {
+        return {
            'PK': pk,
            'SK': sk,
            'Type': _type,
@@ -78,7 +78,6 @@ class DynamoDBAPI:
            'ModifiedBy': '',
            'ExpiresAt': cls.calc_expire_at_timestamp(expire_in_seconds=expire_in_seconds),
         } | kwargs
-        return cls.serialize_types(vals)
 
     @classmethod
     def batch_write_item_maps(cls, table_resource: TableResource, item_maps: list[dict]) -> int:
