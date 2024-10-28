@@ -85,6 +85,10 @@ class DynamoTable(ABCBotoResource):
         self._ddb_secrets = ddb_secrets
 
     @property
+    def client(self):
+        return self.table.meta.client
+
+    @property
     def table(self):
         return self.boto_resource.Table(self.table_name)
 
