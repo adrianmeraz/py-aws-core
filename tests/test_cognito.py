@@ -37,7 +37,7 @@ class AdminCreateUserTests(BaseTestFixture):
         )
         stubber.deactivate()
 
-        self.assertEqual(r_call.User.Username, 'string')
+        self.assertEqual(r_call.User.Username, 'ducky89')
         stubber.assert_no_pending_responses()
 
 

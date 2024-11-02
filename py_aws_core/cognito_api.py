@@ -44,7 +44,7 @@ class AdminCreateUser:
                 self.UserLastModifiedDate = data.get('UserLastModifiedDate')
                 self.Enabled = data.get('Enabled')
                 self.UserStatus = data.get('UserStatus')
-                self.MFAOptions = [self.MFAOptions(mfa) for mfa in data.get('MFAOptions')]
+                self.MFAOptions = [self.MFAOptions(mfa) for mfa in data.get('MFAOptions', list())]
 
         def __init__(self, data: dict):
             self.User = self.User(data.get('User', dict()))

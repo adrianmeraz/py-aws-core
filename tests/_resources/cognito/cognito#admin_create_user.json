@@ -1,20 +1,39 @@
 {
-    "User": {
-        "Username": "string",
-        "Attributes": [
-            {
-                "Name": "string",
-                "Value": "string"
-            }
-        ],
-        "UserCreateDate": "2018-04-13",
-        "UserLastModifiedDate": "2018-04-13",
-        "UserStatus": "UNCONFIRMED",
-        "MFAOptions": [
-            {
-                "DeliveryMedium": "SMS",
-                "AttributeName": "string"
-            }
-        ]
-    }
+  "User": {
+    "Username": "ducky89",
+    "Attributes": [
+      {
+        "Name": "email",
+        "Value": "adrian@rydeas.com"
+      },
+      {
+        "Name": "custom:roles",
+        "Value": "MEMBER"
+      },
+      {
+        "Name": "custom:group",
+        "Value": "testgroup1"
+      },
+      {
+        "Name": "sub",
+        "Value": "a8c1f3f0-8021-7096-54b6-13f0715d5c1f"
+      }
+    ],
+    "UserCreateDate": "Sat, 02 Nov 2024 15:23:05 GMT",
+    "UserLastModifiedDate": "Sat, 02 Nov 2024 15:23:05 GMT",
+    "Enabled": true,
+    "UserStatus": "FORCE_CHANGE_PASSWORD"
+  },
+  "ResponseMetadata": {
+    "RequestId": "daaa9ddf-5021-4533-9c28-33bc60d6b854",
+    "HTTPStatusCode": 200,
+    "HTTPHeaders": {
+      "date": "Sat, 02 Nov 2024 15:23:05 GMT",
+      "content-type": "application/x-amz-json-1.1",
+      "content-length": "365",
+      "connection": "keep-alive",
+      "x-amzn-requestid": "daaa9ddf-5021-4533-9c28-33bc60d6b854"
+    },
+    "RetryAttempts": 0
+  }
 }
